@@ -1,13 +1,9 @@
-export function generateCSVHeader(datasetName: string): string {
-  const headers: Record<string, string[]> = {
-    Users: ['UserOID', 'Username', 'FirstName', 'LastName', 'Email', 'Active', 'Role'],
-    Sites: ['StudyOID', 'SiteNumber', 'SiteName', 'SiteStatus', 'Country', 'Investigator'],
-    Signatures: ['StudyOID', 'SiteNumber', 'SubjectName', 'FormOID', 'SignatureDate', 'Username'],
-    VersionFolders: ['StudyOID', 'FolderOID', 'FolderName', 'VersionNumber', 'Primary'],
-    ClinicalView: ['StudyOID', 'SiteNumber', 'SubjectName', 'FieldOID', 'FieldValue', 'RecordDate']
-  };
+import { loadConfig } from '../config';
 
-  const header = headers[datasetName] || headers.ClinicalView;
+export function generateCSVHeader(datasetName: string): string {
+  const config = loadConfig(process.env.NODE_ENV === 'test' ? 'test' : 'production');
+  
+  const header = config.csv_datasets[datasetName] || config.csv_datasets.ClinicalView;
   return header.join(',') + '\n';
 }
 

@@ -1,17 +1,19 @@
 import { ODMMetadata } from '../types';
+import { loadConfig } from '../config';
 
 export function generateODMRoot(metadata: Partial<ODMMetadata> = {}): string {
+  const config = loadConfig(process.env.NODE_ENV === 'test' ? 'test' : 'production');
   const now = new Date().toISOString();
   const fileOID = metadata.FileOID || `mock-${Date.now()}`;
-  const fileType = metadata.FileType || 'Snapshot';
+  const fileType = metadata.FileType || config.odm.default_file_type;
   
   return `<?xml version="1.0" encoding="utf-8"?>
-<ODM xmlns="http://www.cdisc.org/ns/odm/v1.3"
-     xmlns:mdsol="http://www.mdsol.com/ns/odm/metadata"
+<ODM xmlns="${config.odm.namespace.odm}"
+     xmlns:mdsol="${config.odm.namespace.mdsol}"
      FileType="${fileType}"
      FileOID="${fileOID}"
      CreationDateTime="${now}"
-     ODMVersion="1.3">
+     ODMVersion="${config.odm.version}">
 </ODM>`;
 }
 
@@ -19,17 +21,18 @@ export function generateODMWithClinicalData(
   studyOID: string,
   metadata: Partial<ODMMetadata> = {}
 ): string {
+  const config = loadConfig(process.env.NODE_ENV === 'test' ? 'test' : 'production');
   const now = new Date().toISOString();
   const fileOID = metadata.FileOID || `mock-${Date.now()}`;
-  const fileType = metadata.FileType || 'Snapshot';
+  const fileType = metadata.FileType || config.odm.default_file_type;
   
   return `<?xml version="1.0" encoding="utf-8"?>
-<ODM xmlns="http://www.cdisc.org/ns/odm/v1.3"
-     xmlns:mdsol="http://www.mdsol.com/ns/odm/metadata"
+<ODM xmlns="${config.odm.namespace.odm}"
+     xmlns:mdsol="${config.odm.namespace.mdsol}"
      FileType="${fileType}"
      FileOID="${fileOID}"
      CreationDateTime="${now}"
-     ODMVersion="1.3">
+     ODMVersion="${config.odm.version}">
   <ClinicalData StudyOID="${studyOID}" MetaDataVersionOID="1">
     <!-- Mock: empty clinical data -->
   </ClinicalData>
@@ -37,74 +40,89 @@ export function generateODMWithClinicalData(
 }
 
 export function generateODMMetadata(studyOID: string): string {
+  const config = loadConfig(process.env.NODE_ENV === 'test' ? 'test' : 'production');
   const now = new Date().toISOString();
+  const study = config.odm.test_studies?.find(s => s.study_oid === studyOID) || config.odm.default_study;
+  
+  // Use first study event and form from config
+  const firstEvent = config.odm.study_events[0];
+  const firstForm = config.odm.forms[0];
+  const firstItemGroup = config.odm.item_groups[0];
   
   return `<?xml version="1.0" encoding="utf-8"?>
-<ODM xmlns="http://www.cdisc.org/ns/odm/v1.3"
-     xmlns:mdsol="http://www.mdsol.com/ns/odm/metadata"
-     FileType="Snapshot"
+<ODM xmlns="${config.odm.namespace.odm}"
+     xmlns:mdsol="${config.odm.namespace.mdsol}"
+     FileType="${config.odm.default_file_type}"
      FileOID="metadata-${Date.now()}"
      CreationDateTime="${now}"
-     ODMVersion="1.3">
+     ODMVersion="${config.odm.version}">
   <Study OID="${studyOID}">
     <GlobalVariables>
-      <StudyName>Mock Study</StudyName>
-      <StudyDescription>Mock study metadata</StudyDescription>
-      <ProtocolName>MOCK-001</ProtocolName>
+      <StudyName>${study.study_name}</StudyName>
+      <StudyDescription>${study.study_description}</StudyDescription>
+      <ProtocolName>${study.protocol_name}</ProtocolName>
     </GlobalVariables>
     <MetaDataVersion OID="1" Name="Version 1">
       <Protocol>
-        <StudyEventRef StudyEventOID="SCREENING" OrderNumber="1" Mandatory="Yes"/>
+        <StudyEventRef StudyEventOID="${firstEvent.oid}" OrderNumber="1" Mandatory="Yes"/>
       </Protocol>
-      <StudyEventDef OID="SCREENING" Name="Screening" Type="Scheduled" Repeating="No">
-        <FormRef FormOID="DM" OrderNumber="1" Mandatory="Yes"/>
+      <StudyEventDef OID="${firstEvent.oid}" Name="${firstEvent.name}" Type="${firstEvent.type}" Repeating="${firstEvent.repeating ? 'Yes' : 'No'}">
+        <FormRef FormOID="${firstForm.oid}" OrderNumber="1" Mandatory="Yes"/>
       </StudyEventDef>
-      <FormDef OID="DM" Name="Demographics" Repeating="No">
-        <ItemGroupRef ItemGroupOID="DM_IG" Mandatory="Yes"/>
+      <FormDef OID="${firstForm.oid}" Name="${firstForm.name}" Repeating="${firstForm.repeating ? 'Yes' : 'No'}">
+        <ItemGroupRef ItemGroupOID="${firstItemGroup.oid}" Mandatory="Yes"/>
       </FormDef>
-      <ItemGroupDef OID="DM_IG" Name="Demographics" Repeating="No">
-        <ItemRef ItemOID="SUBJID" OrderNumber="1" Mandatory="Yes"/>
-        <ItemRef ItemOID="AGE" OrderNumber="2" Mandatory="No"/>
+      <ItemGroupDef OID="${firstItemGroup.oid}" Name="${firstItemGroup.name}" Repeating="${firstItemGroup.repeating ? 'Yes' : 'No'}">
+        <ItemRef ItemOID="${config.odm.items[0].oid}" OrderNumber="1" Mandatory="${config.odm.items[0].mandatory ? 'Yes' : 'No'}"/>
+        <ItemRef ItemOID="${config.odm.items[1].oid}" OrderNumber="2" Mandatory="${config.odm.items[1].mandatory ? 'Yes' : 'No'}"/>
       </ItemGroupDef>
-      <ItemDef OID="SUBJID" Name="Subject ID" DataType="text">
-        <Question><TranslatedText>Subject ID</TranslatedText></Question>
+      <ItemDef OID="${config.odm.items[0].oid}" Name="${config.odm.items[0].name}" DataType="${config.odm.items[0].data_type}">
+        <Question><TranslatedText>${config.odm.items[0].question}</TranslatedText></Question>
       </ItemDef>
-      <ItemDef OID="AGE" Name="Age" DataType="integer">
-        <Question><TranslatedText>Age</TranslatedText></Question>
+      <ItemDef OID="${config.odm.items[1].oid}" Name="${config.odm.items[1].name}" DataType="${config.odm.items[1].data_type}">
+        <Question><TranslatedText>${config.odm.items[1].question}</TranslatedText></Question>
       </ItemDef>
     </MetaDataVersion>
   </Study>
 </ODM>`;
 }
 
-export function generateSuccessResponse(referenceNumber: string = '0000'): string {
+export function generateSuccessResponse(referenceNumber?: string): string {
+  const config = loadConfig(process.env.NODE_ENV === 'test' ? 'test' : 'production');
+  const refNum = referenceNumber || config.responses.success.reference_number_default;
+  
   return `<?xml version="1.0" encoding="utf-8"?>
-<Response xmlns="http://www.cdisc.org/ns/odm/v1.3"
-          ReferenceNumber="${referenceNumber}"
-          InboundODMFileOID="mockFile"
-          IsTransactionSuccessful="1">
+<Response xmlns="${config.odm.namespace.odm}"
+          ReferenceNumber="${refNum}"
+          InboundODMFileOID="${config.responses.success.inbound_file_oid}"
+          IsTransactionSuccessful="${config.responses.success.is_transaction_successful}">
 </Response>`;
 }
 
 export function generateErrorResponse(
   reasonCode: string,
   errorDescription: string,
-  isTransactionSuccessful: string = '0'
+  isTransactionSuccessful?: string
 ): string {
+  const config = loadConfig(process.env.NODE_ENV === 'test' ? 'test' : 'production');
+  const txnSuccess = isTransactionSuccessful || config.responses.error.is_transaction_successful;
+  
   return `<?xml version="1.0" encoding="utf-8"?>
-<Response xmlns="http://www.cdisc.org/ns/odm/v1.3"
-          xmlns:mdsol="http://www.mdsol.com/ns/odm/metadata"
-          ReferenceNumber="error"
-          IsTransactionSuccessful="${isTransactionSuccessful}"
+<Response xmlns="${config.odm.namespace.odm}"
+          xmlns:mdsol="${config.odm.namespace.mdsol}"
+          ReferenceNumber="${config.responses.error.reference_number}"
+          IsTransactionSuccessful="${txnSuccess}"
           ReasonCode="${reasonCode}"
           ErrorDescription="${errorDescription}">
 </Response>`;
 }
 
 export function generateODMError(errorDescription: string): string {
+  const config = loadConfig(process.env.NODE_ENV === 'test' ? 'test' : 'production');
+  
   return `<?xml version="1.0" encoding="utf-8"?>
-<ODM xmlns="http://www.cdisc.org/ns/odm/v1.3"
-     xmlns:mdsol="http://www.mdsol.com/ns/odm/metadata"
+<ODM xmlns="${config.odm.namespace.odm}"
+     xmlns:mdsol="${config.odm.namespace.mdsol}"
      mdsol:ErrorDescription="${errorDescription}">
 </ODM>`;
 }
