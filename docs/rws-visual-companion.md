@@ -1,14 +1,14 @@
-# 🎯 RWS Visual Companion — Metadata → Clinical Data → Audit Logs &#40;GitHub-Compatible&#41;
+# 🎯 RWS Visual Companion — Metadata → Clinical Data → Audit Logs (GitHub-Compatible)
 
 **Purpose:** HTML-safe Markdown and GitHub-compatible Mermaid diagrams illustrating how the three RWS endpoints connect through the data lifecycle.  
 **Endpoints covered:**
-- `GET /studies/&#40;study-oid&#41;/datasets/metadata/regular` &#40;ODM metadata&#41;
-- `GET /studies/&#40;study-oid&#41;/datasets/&#40;regular-or-raw&#41;/&#40;form-oid&#41;` &#40;ODM clinical data&#41;
-- `GET /datasets/ClinicalAuditRecords.odm` &#40;ODM audit trail, paginated&#41;
+- `GET /studies/(study-oid)/datasets/metadata/regular` (ODM metadata)
+- `GET /studies/(study-oid)/datasets/(regular-or-raw)/(form-oid)` (ODM clinical data)
+- `GET /datasets/ClinicalAuditRecords.odm` (ODM audit trail, paginated)
 
 ---
 
-## 1&#41; Big Picture: Data Lifecycle Map
+## 1) Big Picture: Data Lifecycle Map
 
 ```mermaid
 flowchart LR
@@ -43,7 +43,7 @@ flowchart LR
 
 ---
 
-## 2&#41; Component View &#40;GitHub-Compatible&#41;
+## 2) Component View (GitHub-Compatible)
 
 ```mermaid
 graph TD
@@ -64,7 +64,7 @@ graph TD
 
 ---
 
-## 3&#41; End-to-End Sequence
+## 3) End-to-End Sequence
 
 ```mermaid
 sequenceDiagram
@@ -95,18 +95,18 @@ sequenceDiagram
 
 ---
 
-## 4&#41; Request/Response Mapping
+## 4) Request/Response Mapping
 
-### Metadata &#40;ODM&#41;
+### Metadata (ODM)
 ```
-GET /RaveWebServices/studies/&#40;study-oid&#41;/datasets/metadata/regular
+GET /RaveWebServices/studies/(study-oid)/datasets/metadata/regular
 Authorization: Basic or MAuth
 Accept: application/xml
 ```
 **Response**
 ```xml
 <ODM>
-  <Study OID="Study&#40;Prod&#41;">
+  <Study OID="Study(Prod)">
     <MetaDataVersion OID="2025-10-20T00:00:00Z">
       <FormDef OID="DM" Name="Demographics"/>
       <ItemDef OID="DM.AGE" Name="AGE" DataType="integer"/>
@@ -115,14 +115,14 @@ Accept: application/xml
 </ODM>
 ```
 
-### Clinical Data &#40;ODM&#41;
+### Clinical Data (ODM)
 ```
-GET /RaveWebServices/studies/&#40;study-oid&#41;/datasets/regular/&#40;form-oid&#41;
+GET /RaveWebServices/studies/(study-oid)/datasets/regular/(form-oid)
 ```
 **Response**
 ```xml
 <ODM>
-  <ClinicalData StudyOID="Study&#40;Prod&#41;">
+  <ClinicalData StudyOID="Study(Prod)">
     <SubjectData SubjectKey="SUBJ001">
       <FormData FormOID="DM">
         <ItemGroupData ItemGroupOID="DM">
@@ -134,14 +134,14 @@ GET /RaveWebServices/studies/&#40;study-oid&#41;/datasets/regular/&#40;form-oid&
 </ODM>
 ```
 
-### Audit Data &#40;ODM&#41;
+### Audit Data (ODM)
 ```
-GET /RaveWebServices/datasets/ClinicalAuditRecords.odm?studyoid=Study&#40;Prod&#41;&startid=0&per_page=1000
+GET /RaveWebServices/datasets/ClinicalAuditRecords.odm?studyoid=Study(Prod)&startid=0&per_page=1000
 ```
 **Response**
 ```xml
 <ODM>
-  <ClinicalData StudyOID="Study&#40;Prod&#41;">
+  <ClinicalData StudyOID="Study(Prod)">
     <AuditRecord ID="1234" User="jsmith" Action="Update" Timestamp="2025-10-20T09:00:00Z">
       <Field OID="AE.AEDESC" OldValue="HEADACHE" NewValue="MIGRAINE"/>
     </AuditRecord>
@@ -151,7 +151,7 @@ GET /RaveWebServices/datasets/ClinicalAuditRecords.odm?studyoid=Study&#40;Prod&#
 
 ---
 
-## 5&#41; Lifecycle State Map
+## 5) Lifecycle State Map
 
 ```mermaid
 stateDiagram-v2
@@ -164,7 +164,7 @@ stateDiagram-v2
 
 ---
 
-## 6&#41; Pagination Flow for Audits
+## 6) Pagination Flow for Audits
 
 ```mermaid
 flowchart LR
@@ -177,7 +177,7 @@ flowchart LR
 
 ---
 
-## 7&#41; Error Handling Flow
+## 7) Error Handling Flow
 
 ```mermaid
 flowchart TD
@@ -193,30 +193,30 @@ flowchart TD
 
 ---
 
-## 8&#41; Minimal cURL Examples
+## 8) Minimal cURL Examples
 
 ```bash
 # Metadata
 curl -u user:pass "https://{host}/RaveWebServices/studies/{study-oid}/datasets/metadata/regular"
 
-# Clinical Data &#40;form-level&#41;
+# Clinical Data (form-level)
 curl -u user:pass "https://{host}/RaveWebServices/studies/{study-oid}/datasets/regular/{form-oid}"
 
-# Audit &#40;paged&#41;
+# Audit (paged)
 curl -u user:pass "https://{host}/RaveWebServices/datasets/ClinicalAuditRecords.odm?studyoid={study-oid}&startid=0&per_page=1000"
 ```
 
 ---
 
-## 9&#41; Implementation Checklist
+## 9) Implementation Checklist
 
-- [ ] Use HTTPS &#40;`Accept: application/xml`&#41;
+- [ ] Use HTTPS (`Accept: application/xml`)
 - [ ] Prefer **MAuth** over Basic for services
 - [ ] URL-encode `study-oid`
 - [ ] Retrieve metadata first
-- [ ] Pull clinical data &#40;decoded/raw/unit variants&#41;
+- [ ] Pull clinical data (decoded/raw/unit variants)
 - [ ] Stream/paginate audit datasets
-- [ ] Implement retry logic &#40;HTTP 500/429&#41;
+- [ ] Implement retry logic (HTTP 500/429)
 - [ ] Cache response headers for sync diagnostics
 
 ---
