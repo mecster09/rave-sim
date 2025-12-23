@@ -39,6 +39,7 @@ export interface BuildTransactionalOptions {
   studyOid: string;
   metadataVersionOid: string;
   entries: AuditRecord[];
+  generatedAt?: string;
   truncate?: boolean;
 }
 
@@ -98,13 +99,13 @@ export function buildSnapshotODM(options: BuildSnapshotOptions): string {
 }
 
 export function buildTransactionalODM(options: BuildTransactionalOptions): string {
-  const { studyOid, metadataVersionOid, entries, truncate } = options;
+  const { studyOid, metadataVersionOid, entries, generatedAt, truncate } = options;
   const lines: string[] = [];
 
   lines.push('<?xml version="1.0" encoding="UTF-8"?>');
   lines.push(
     `<ODM FileOID="${escapeAttribute(hashAuditRecords(entries))}" FileType="Transactional" ODMVersion="1.3.2" CreationDateTime="${escapeAttribute(
-      new Date().toISOString()
+      generatedAt ?? new Date().toISOString()
     )}" xmlns="${ODM_NAMESPACE}" xmlns:mdsol="${MDSOL_NAMESPACE}">`
   );
   lines.push(`  <ClinicalData StudyOID="${escapeAttribute(studyOid)}" MetaDataVersionOID="${escapeAttribute(metadataVersionOid)}">`);

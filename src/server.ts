@@ -471,7 +471,7 @@ export function buildServer() {
       return reply.code(400).send({ error: 'truncate must be a boolean value' });
     }
     const shouldTruncate = currentConfig.truncateOdm || truncateFlag.requested;
-    const { simClock } = computeGeneratedAt();
+    const { simClock, generatedAt } = computeGeneratedAt();
     const metadataVersionOid = 'MDV.DEFAULT';
 
     const backfillComplete = modeRaw === 'all';
@@ -494,6 +494,7 @@ export function buildServer() {
       studyOid,
       metadataVersionOid,
       entries: auditRecords,
+      generatedAt,
       truncate: shouldTruncate
     });
 

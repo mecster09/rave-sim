@@ -1,0 +1,33 @@
+{
+  "harnessConfig": {
+    "studyName": "RWS_HIGH_SUBJECT_VOLUME",
+    "siteCount": 5,
+    "subjectCount": 80,
+    "visitCountPerSubject": 4,
+    "formDataPointsPerVisit": 5,
+    "simSpeedMinutesPerDay": 60,
+    "resetOnStartup": false,
+    "randomSeed": 314159,
+    "truncateOdm": false
+  },
+  "simStudyDay": 1.25,
+  "freeze": true,
+  "scenarios": [
+    {
+      "family": "subjects",
+      "name": "all-status",
+      "request": {
+        "method": "GET",
+        "url": "/RaveWebServices/studies/RWS_HIGH_SUBJECT_VOLUME/Subjects?include=inactive&status=all"
+      }
+    },
+    {
+      "family": "datasets",
+      "name": "regular-snapshot",
+      "request": {
+        "method": "GET",
+        "url": "/RaveWebServices/studies/RWS_HIGH_SUBJECT_VOLUME/datasets/regular"
+      }
+    }
+  ]
+}

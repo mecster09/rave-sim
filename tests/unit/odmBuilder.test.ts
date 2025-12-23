@@ -68,6 +68,7 @@ describe('odmBuilder', () => {
   const transactionalOptions: BuildTransactionalOptions = {
     studyOid: 'STUDY1',
     metadataVersionOid: 'MDV1',
+    generatedAt: '2025-12-23T14:02:17.981Z',
     truncate: false,
     entries: [
       {
