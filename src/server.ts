@@ -8,6 +8,7 @@ import { registerSubjectRoutes } from './routes/subjects';
 import { registerClinicalDatasetRoutes } from './routes/clinicalDatasets';
 import { registerVersionFoldersRoutes } from './routes/versionFolders';
 import { registerAuditRecordsRoutes } from './routes/auditRecords';
+import { registerMetadataRoutes } from './routes/metadata';
 
 const DEFAULT_CONFIG_INPUT = {
   studyName: 'Default Study',
@@ -79,6 +80,10 @@ export function buildServer() {
     getSimulatorState
   });
   registerAuditRecordsRoutes(app, {
+    getConfig,
+    getSimulatorState
+  });
+  registerMetadataRoutes(app, {
     getConfig,
     getSimulatorState
   });

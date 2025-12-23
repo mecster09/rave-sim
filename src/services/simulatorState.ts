@@ -30,10 +30,71 @@ interface Subject {
   visits: Visit[];
 }
 
+export interface MetadataStudyEventFormRef {
+  formOid: string;
+  mandatory: 'Yes' | 'No';
+  orderNumber: number;
+}
+
+export interface MetadataStudyEventDefinition {
+  studyEventOid: string;
+  name: string;
+  orderNumber: number;
+  type: string;
+  formRefs: MetadataStudyEventFormRef[];
+}
+
+export interface MetadataItemDefinition {
+  itemOid: string;
+  name: string;
+  dataType: string;
+  sasFieldName: string;
+  mandatory: 'Yes' | 'No';
+  length?: number;
+  codeListOid?: string;
+}
+
+export interface MetadataItemGroupDefinition {
+  itemGroupOid: string;
+  name: string;
+  repeating: 'Yes' | 'No';
+  items: MetadataItemDefinition[];
+}
+
+export interface MetadataFormDefinition {
+  formOid: string;
+  name: string;
+  repeating: 'Yes' | 'No';
+  description: string;
+  itemGroups: MetadataItemGroupDefinition[];
+}
+
+export interface MetadataCodeListItem {
+  codedValue: string;
+  decode: string;
+}
+
+export interface MetadataCodeListDefinition {
+  codeListOid: string;
+  name: string;
+  dataType: string;
+  items: MetadataCodeListItem[];
+}
+
+export interface StudyMetadataVersion {
+  metadataVersionOid: string;
+  name: string;
+  primaryFormOid: string;
+  studyEvents: MetadataStudyEventDefinition[];
+  forms: MetadataFormDefinition[];
+  codeLists: MetadataCodeListDefinition[];
+}
+
 export interface SimulatorSnapshot {
   sites: Site[];
   subjects: Subject[];
   versionFolders: VersionFolderMetadata[];
+  metadataVersions: StudyMetadataVersion[];
 }
 
 export type SubjectStatus = 'Active' | 'Inactive' | 'Deleted';
@@ -246,10 +307,12 @@ export class SimulatorState {
     const sites = createSites(this.config);
     const subjects = createSubjects(this.config, rng);
     const versionFolders = buildVersionMetadata(this.config);
+    const metadataVersions = buildStudyMetadata(this.config);
     return {
       sites,
       subjects,
-      versionFolders
+      versionFolders,
+      metadataVersions
     };
   }
 
@@ -392,6 +455,14 @@ export class SimulatorState {
   getVersionFolders(): VersionFolderMetadata[] {
     return this.getSnapshot().versionFolders;
   }
+
+  getMetadataVersions(): StudyMetadataVersion[] {
+    return this.getSnapshot().metadataVersions;
+  }
+
+  findMetadataVersion(metadataVersionOid: string): StudyMetadataVersion | undefined {
+    return this.getMetadataVersions().find(version => version.metadataVersionOid === metadataVersionOid);
+  }
 }
 
 export function hashSnapshot(snapshot: SimulatorSnapshot): string {
@@ -415,6 +486,148 @@ function buildVersionMetadata(config: HarnessConfig): VersionFolderMetadata[] {
       name: '1',
       primaryFormOid,
       studyEvents
+    }
+  ];
+}
+
+function buildStudyMetadata(config: HarnessConfig): StudyMetadataVersion[] {
+  const visitTemplates = buildVisitTemplates(config);
+
+  const studyEvents: MetadataStudyEventDefinition[] = visitTemplates.map(template => ({
+    studyEventOid: template.visitOid,
+    name: template.name,
+    orderNumber: template.sequenceNumber,
+    type: 'Scheduled',
+    formRefs: [
+      { formOid: 'DM', mandatory: 'Yes', orderNumber: 1 },
+      { formOid: 'VS', mandatory: 'Yes', orderNumber: 2 },
+      { formOid: 'AE', mandatory: 'No', orderNumber: 3 }
+    ]
+  }));
+
+  const forms: MetadataFormDefinition[] = [
+    {
+      formOid: 'DM',
+      name: 'Demographics',
+      repeating: 'No',
+      description: 'Demographics form',
+      itemGroups: [
+        {
+          itemGroupOid: 'IG.DM',
+          name: 'Demographics',
+          repeating: 'No',
+          items: [
+            {
+              itemOid: 'DM.SEX',
+              name: 'Subject Sex',
+              dataType: 'text',
+              length: 1,
+              sasFieldName: 'DMSEX',
+              mandatory: 'Yes',
+              codeListOid: 'CL.SEX'
+            },
+            {
+              itemOid: 'DM.AGE',
+              name: 'Subject Age',
+              dataType: 'integer',
+              sasFieldName: 'DMAGE',
+              mandatory: 'Yes'
+            }
+          ]
+        }
+      ]
+    },
+    {
+      formOid: 'VS',
+      name: 'Vital Signs',
+      repeating: 'No',
+      description: 'Vital signs assessment',
+      itemGroups: [
+        {
+          itemGroupOid: 'IG.VS',
+          name: 'Vital Signs',
+          repeating: 'No',
+          items: [
+            {
+              itemOid: 'VS.SYS',
+              name: 'Systolic Blood Pressure',
+              dataType: 'integer',
+              sasFieldName: 'VSSYS',
+              mandatory: 'Yes'
+            },
+            {
+              itemOid: 'VS.DIA',
+              name: 'Diastolic Blood Pressure',
+              dataType: 'integer',
+              sasFieldName: 'VSDIA',
+              mandatory: 'Yes'
+            }
+          ]
+        }
+      ]
+    },
+    {
+      formOid: 'AE',
+      name: 'Adverse Event Log',
+      repeating: 'Yes',
+      description: 'Adverse event tracking',
+      itemGroups: [
+        {
+          itemGroupOid: 'IG.AE',
+          name: 'Adverse Events',
+          repeating: 'Yes',
+          items: [
+            {
+              itemOid: 'AE.TERM',
+              name: 'Preferred Term',
+              dataType: 'text',
+              sasFieldName: 'AETERM',
+              mandatory: 'Yes'
+            },
+            {
+              itemOid: 'AE.SEVERITY',
+              name: 'Severity',
+              dataType: 'text',
+              sasFieldName: 'AESEV',
+              mandatory: 'Yes',
+              codeListOid: 'CL.SEVERITY'
+            }
+          ]
+        }
+      ]
+    }
+  ];
+
+  const codeLists: MetadataCodeListDefinition[] = [
+    {
+      codeListOid: 'CL.SEX',
+      name: 'Sex',
+      dataType: 'text',
+      items: [
+        { codedValue: 'M', decode: 'Male' },
+        { codedValue: 'F', decode: 'Female' }
+      ]
+    },
+    {
+      codeListOid: 'CL.SEVERITY',
+      name: 'Severity',
+      dataType: 'text',
+      items: [
+        { codedValue: 'MILD', decode: 'Mild' },
+        { codedValue: 'MODERATE', decode: 'Moderate' },
+        { codedValue: 'SEVERE', decode: 'Severe' }
+      ]
+    }
+  ];
+
+  return [
+    {
+      metadataVersionOid: 'MDV.VERSION-1',
+      name: '1',
+      primaryFormOid: 'DM',
+      studyEvents,
+      forms,
+      codeLists
     }
   ];
 }

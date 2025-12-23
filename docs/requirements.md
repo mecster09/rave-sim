@@ -23,7 +23,7 @@ This harness has two cooperating parts:
 - **1.4.2** – ODM Operational Data Model Adapter
 - **1.5.1.6** – Retrieve Clinical View Datasets as ODM
 - **1.5.3.5** – Retrieve Admin Data with the Version Folders Dataset
-- **1.5.7** – Clinical View metadata and extension dependencies
+- **1.5.7** – Retrieve Study and Library Metadata
 - **1.5.9** – Retrieve the List of Subjects in a Study
 
 ### Out of Scope
@@ -490,7 +490,7 @@ GET /RaveWebServices/studies/{study-oid}/versions/{version-id}/subjects/{subject
 
 ---
 
-## 2.3 Retrieve the List of Subjects in a Study (Section 1.5.9)
+## 2.4 Retrieve the List of Subjects in a Study (Section 1.5.9)
 
 ### Purpose
 Retrieve a list of **all subjects accessible to the authenticated user** within a specified study. This endpoint is used as a discovery dependency for subject-level operations.
@@ -615,7 +615,32 @@ GET /RaveWebServices/studies/{study-oid}/Subjects
 
 ---
 
-## 2.3 Retrieve the List of Subjects in a Study Scenarios (1.5.9)
+
+## 2.4 Retrieve Study and Library Metadata Scenarios (1.5.7)
+
+**Endpoint under test (MUST):**  
+`GET /RaveWebServices/metadata/studies/{study-name}/versions/{version-id}` fileciteturn9file7L1-L23
+
+### Scenario table
+
+| Scenario ID | Inputs | Simulator pre-state | Match rules | Expected status | Expected body |
+|---|---|---|---|---:|---|
+| META-200-BASE | `study-name={StudyName}`, `version-id={DefaultVersionId}` | Simulator initialized; metadata objects generated for configured study | Path match + version-id exact | 200 | ODM 1.3 Snapshot generated from simulator state; `Content-Type: application/xml` fileciteturn9file7L17-L23 |
+| META-200-GOLDEN | Same as above + `X-Harness-Scenario: META-200-GOLDEN` | Golden mode enabled | Header overrides simulator selection | 200 | Exact byte-for-byte match to stored golden `metadata/default-study-mdv.version-1.xml` |
+| META-401 | Any request with bad Basic auth | N/A | Auth failure | 401 | RWS error payload format (consistent global error model) fileciteturn10file2L748-L770 |
+| META-403 | Valid auth, but user not permitted for `{study-name}` | User configured with limited access | Authorization failure | 403 | RWS error payload format |
+| META-404-STUDY | `study-name` not configured/known | N/A | Study name mismatch | 404 | RWS error payload format |
+| META-404-VERSION | Known study, unknown `version-id` | N/A | Version mismatch | 404 | RWS error payload format |
+| META-200-LABELS (optional) | Add `?labels=independent` | Labels enabled in simulator | Query param match | 200 | ODM 1.3 Snapshot containing label defs (if implemented) fileciteturn11file1L15-L23 |
+| META-200-ATTRS (optional) | `/attributes?namespace=MyIntegration` | Vendor attributes enabled | Path suffix + namespace match | 200 | ODM 1.3 Snapshot including `mdsol:Attribute` nodes fileciteturn12file8L11-L20 |
+
+### Golden snapshot rules (MUST)
+- For `META-200-GOLDEN`, the response MUST be **exact bytes** of the golden file (including whitespace/newlines).
+- For `META-200-BASE`, the response MUST still be deterministic for a given simulator seed/time; the harness MUST provide a command or mode to materialize the generated payload into a new golden snapshot (see “Golden Snapshot Generation” section).
+
+
+
+## 2.5 Retrieve the List of Subjects in a Study Scenarios (1.5.9)
 
 | Scenario ID | Match Inputs | Simulator Preconditions | Expected Result | Golden Payload |
 |-----------|--------------|------------------------|----------------|---------------|
@@ -628,9 +653,9 @@ GET /RaveWebServices/studies/{study-oid}/Subjects
 
 ---
 
-## 2.4 Control Plane Scenarios (NEW)
+## 2.6 Control Plane Scenarios (NEW)
 
-### 2.4.1 `/harness/config`
+### 2.6.1 `/harness/config`
 
 | Scenario ID | Method | Inputs | Expected Result |
 |-----------|--------|--------|----------------|
@@ -639,7 +664,7 @@ GET /RaveWebServices/studies/{study-oid}/Subjects
 | CFG-003 | PUT | invalid values (e.g., `simSpeedMinutesPerDay=17`) | 400 + validation error |
 | CFG-004 | PUT | apply without reset (`applyMode=apply`) | 200 + config updated; note: only safe fields updated without reset |
 
-### 2.4.2 `/harness/speed`
+### 2.6.2 `/harness/speed`
 
 | Scenario ID | Method | Inputs | Expected Result |
 |-----------|--------|--------|----------------|
@@ -648,14 +673,14 @@ GET /RaveWebServices/studies/{study-oid}/Subjects
 | SPD-003 | PUT | `simSpeedMinutesPerDay=15` | 200 + speed updated (max acceleration) |
 | SPD-004 | PUT | invalid step (e.g., 20) | 400 + validation error |
 
-### 2.4.3 `/harness/reset`
+### 2.6.3 `/harness/reset`
 
 | Scenario ID | Method | Inputs | Expected Result |
 |-----------|--------|--------|----------------|
 | RST-001 | POST | none | 200 + reset performed; new clock baseline; entities regenerated |
 | RST-002 | POST | with optional seed/config override (optional enhancement) | 200 + reset with specified seed |
 
-### 2.4.4 `/harness/status`
+### 2.6.4 `/harness/status`
 
 | Scenario ID | Method | Inputs | Expected Result |
 |-----------|--------|--------|----------------|
@@ -665,7 +690,7 @@ GET /RaveWebServices/studies/{study-oid}/Subjects
 
 ---
 
-## 2.5 Cross-Endpoint, Time-Driven Parity Scenarios (End-to-End)
+## 2.7 Cross-Endpoint, Time-Driven Parity Scenarios (End-to-End)
 
 These scenarios validate that simulator time impacts parity endpoints consistently.
 

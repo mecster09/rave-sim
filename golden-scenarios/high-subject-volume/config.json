@@ -1,8 +1,8 @@
 {
   "harnessConfig": {
     "studyName": "RWS_HIGH_SUBJECT_VOLUME",
-    "siteCount": 5,
-    "subjectCount": 80,
+    "siteCount": 2,
+    "subjectCount": 10000,
     "visitCountPerSubject": 4,
     "formDataPointsPerVisit": 5,
     "simSpeedMinutesPerDay": 60,
