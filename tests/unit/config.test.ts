@@ -8,7 +8,8 @@ const baseConfig: HarnessConfig = {
   visitCountPerSubject: 3,
   formDataPointsPerVisit: 5,
   simSpeedMinutesPerDay: 60,
-  resetOnStartup: false
+  resetOnStartup: false,
+  truncateOdm: false
 };
 
 describe('validateConfig', () => {
@@ -18,11 +19,11 @@ describe('validateConfig', () => {
     expect(result).toEqual({ value: baseConfig });
   });
 
-  it('applies default for resetOnStartup when omitted', () => {
-    const { resetOnStartup, ...rest } = baseConfig;
+  it('applies defaults when optional flags omitted', () => {
+    const { resetOnStartup, truncateOdm, ...rest } = baseConfig;
     const result = validateConfig(rest);
 
-    expect(result).toEqual({ value: { ...rest, resetOnStartup: false } });
+    expect(result).toEqual({ value: { ...rest, resetOnStartup: false, truncateOdm: false } });
   });
 
   it('returns error when input is not an object', () => {
@@ -70,5 +71,11 @@ describe('validateConfig', () => {
     const result = validateConfig({ ...baseConfig, resetOnStartup: 'yes' as unknown as boolean });
 
     expect(result.error).toContain('resetOnStartup must be a boolean if provided');
+  });
+
+  it('returns error when truncateOdm is not boolean', () => {
+    const result = validateConfig({ ...baseConfig, truncateOdm: 'true' as unknown as boolean });
+
+    expect(result.error).toContain('truncateOdm must be a boolean if provided');
   });
 });

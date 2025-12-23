@@ -14,7 +14,8 @@ const DEFAULT_CONFIG_INPUT = {
   visitCountPerSubject: 3,
   formDataPointsPerVisit: 5,
   simSpeedMinutesPerDay: 60,
-  resetOnStartup: false
+  resetOnStartup: false,
+  truncateOdm: false
 };
 
 const DEFAULT_CONFIG_RESULT = validateConfig(DEFAULT_CONFIG_INPUT);
@@ -98,6 +99,28 @@ export function buildServer() {
     const counts = computeCounts(snapshot, simClock.simCurrentStudyDay);
     const availability = simulatorState.getSubjectAvailability(simClock.simCurrentStudyDay);
     return { simClock, counts, availability, freeze: simulatorState.isFrozen() };
+  };
+
+  const parseTruncateFlag = (raw: unknown) => {
+    if (typeof raw === 'undefined') {
+      return { valid: true, requested: false } as const;
+    }
+
+    if (typeof raw !== 'string') {
+      return { valid: false, requested: false } as const;
+    }
+
+    const value = raw.trim().toLowerCase();
+
+    if (value === 'true' || value === '1') {
+      return { valid: true, requested: true } as const;
+    }
+
+    if (value === 'false' || value === '0') {
+      return { valid: true, requested: false } as const;
+    }
+
+    return { valid: false, requested: false } as const;
   };
 
   app.get('/health', async () => {
@@ -219,7 +242,7 @@ export function buildServer() {
 
   app.get('/RaveWebServices/studies/:studyOid/Subjects', async (request, reply) => {
     const params = request.params as { studyOid?: unknown };
-    const query = request.query as { include?: unknown; status?: unknown };
+    const query = request.query as { include?: unknown; status?: unknown; truncate?: unknown };
 
     const studyOid = typeof params.studyOid === 'string' ? params.studyOid : '';
     if (!studyOid) {
@@ -228,6 +251,11 @@ export function buildServer() {
 
     const include = typeof query.include === 'string' ? query.include : undefined;
     const status = typeof query.status === 'string' ? query.status : undefined;
+    const truncateFlag = parseTruncateFlag(query.truncate);
+
+    if (!truncateFlag.valid) {
+      return reply.code(400).send({ error: 'truncate must be a boolean value' });
+    }
 
     const allowedIncludes = new Set(['inactive', 'inactiveAndDeleted']);
     if (include && !allowedIncludes.has(include)) {
@@ -263,11 +291,14 @@ export function buildServer() {
 
     const { simClock, generatedAt } = computeGeneratedAt();
 
+    const shouldTruncate = currentConfig.truncateOdm || truncateFlag.requested;
+
     const xml = buildSnapshotODM({
       studyOid,
       metadataVersionOid: 'MDV.DEFAULT',
       generatedAt,
-      subjects: filteredSubjects
+      subjects: filteredSubjects,
+      truncate: shouldTruncate
     });
 
     reply.header('content-type', 'application/xml');
@@ -276,10 +307,16 @@ export function buildServer() {
 
   app.get('/RaveWebServices/studies/:studyOid/datasets/regular', async (request, reply) => {
     const params = request.params as { studyOid?: unknown };
+    const query = request.query as { truncate?: unknown };
     const studyOid = typeof params.studyOid === 'string' ? params.studyOid : '';
 
     if (!studyOid) {
       return reply.code(400).send({ error: 'Invalid studyOid' });
+    }
+
+    const truncateFlag = parseTruncateFlag(query.truncate);
+    if (!truncateFlag.valid) {
+      return reply.code(400).send({ error: 'truncate must be a boolean value' });
     }
 
     const snapshot = simulatorState.getSnapshot();
@@ -288,11 +325,14 @@ export function buildServer() {
       currentStudyDay: simClock.simCurrentStudyDay
     });
 
+    const shouldTruncate = currentConfig.truncateOdm || truncateFlag.requested;
+
     const xml = buildSnapshotODM({
       studyOid,
       metadataVersionOid: 'MDV.DEFAULT',
       generatedAt,
-      subjects
+      subjects,
+      truncate: shouldTruncate
     });
 
     reply.header('content-type', 'application/xml');
@@ -301,6 +341,7 @@ export function buildServer() {
 
   app.get('/RaveWebServices/studies/:studyOid/datasets/regular/:formOid', async (request, reply) => {
     const params = request.params as { studyOid?: unknown; formOid?: unknown };
+    const query = request.query as { truncate?: unknown };
     const studyOid = typeof params.studyOid === 'string' ? params.studyOid : '';
     const formOidRaw = typeof params.formOid === 'string' ? params.formOid : '';
     const formOid = formOidRaw.trim();
@@ -313,6 +354,12 @@ export function buildServer() {
       return reply.code(400).send({ error: 'Invalid formOid' });
     }
 
+    const truncateFlag = parseTruncateFlag(query.truncate);
+
+    if (!truncateFlag.valid) {
+      return reply.code(400).send({ error: 'truncate must be a boolean value' });
+    }
+
     const snapshot = simulatorState.getSnapshot();
     const { simClock, generatedAt } = computeGeneratedAt();
     const subjects = buildClinicalViewSubjects(snapshot, {
@@ -320,11 +367,14 @@ export function buildServer() {
       formOid
     });
 
+    const shouldTruncate = currentConfig.truncateOdm || truncateFlag.requested;
+
     const xml = buildSnapshotODM({
       studyOid,
       metadataVersionOid: 'MDV.DEFAULT',
       generatedAt,
-      subjects
+      subjects,
+      truncate: shouldTruncate
     });
 
     reply.header('content-type', 'application/xml');
@@ -333,6 +383,7 @@ export function buildServer() {
 
   app.get('/RaveWebServices/studies/:studyOid/subjects/:subjectKey/datasets/regular', async (request, reply) => {
     const params = request.params as { studyOid?: unknown; subjectKey?: unknown };
+    const query = request.query as { truncate?: unknown };
     const studyOid = typeof params.studyOid === 'string' ? params.studyOid : '';
     const subjectKeyValue = typeof params.subjectKey === 'string' ? params.subjectKey : '';
 
@@ -342,6 +393,12 @@ export function buildServer() {
 
     if (!subjectKeyValue || subjectKeyValue.trim().length === 0) {
       return reply.code(400).send({ error: 'Invalid subjectKey' });
+    }
+
+    const truncateFlag = parseTruncateFlag(query.truncate);
+
+    if (!truncateFlag.valid) {
+      return reply.code(400).send({ error: 'truncate must be a boolean value' });
     }
 
     const numericSubjectKey = Number(subjectKeyValue);
@@ -362,11 +419,14 @@ export function buildServer() {
       subjectKey: numericSubjectKey
     });
 
+    const shouldTruncate = currentConfig.truncateOdm || truncateFlag.requested;
+
     const xml = buildSnapshotODM({
       studyOid,
       metadataVersionOid: 'MDV.DEFAULT',
       generatedAt,
-      subjects
+      subjects,
+      truncate: shouldTruncate
     });
 
     reply.header('content-type', 'application/xml');
@@ -380,6 +440,7 @@ export function buildServer() {
       per_page?: unknown;
       mode?: unknown;
       unicode?: unknown;
+      truncate?: unknown;
     };
 
     const studyOid = typeof query.studyoid === 'string' ? query.studyoid.trim() : '';
@@ -403,6 +464,11 @@ export function buildServer() {
     }
 
     const unicode = unicodeRaw === 'true';
+    const truncateFlag = parseTruncateFlag(query.truncate);
+    if (!truncateFlag.valid) {
+      return reply.code(400).send({ error: 'truncate must be a boolean value' });
+    }
+    const shouldTruncate = currentConfig.truncateOdm || truncateFlag.requested;
     const { simClock } = computeGeneratedAt();
     const metadataVersionOid = 'MDV.DEFAULT';
 
@@ -425,7 +491,8 @@ export function buildServer() {
     const xml = buildTransactionalODM({
       studyOid,
       metadataVersionOid,
-      entries: auditRecords
+      entries: auditRecords,
+      truncate: shouldTruncate
     });
 
     if (nextId) {

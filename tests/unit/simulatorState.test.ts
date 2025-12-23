@@ -9,7 +9,8 @@ const baseConfig: HarnessConfig = {
   visitCountPerSubject: 2,
   formDataPointsPerVisit: 4,
   simSpeedMinutesPerDay: 60,
-  resetOnStartup: false
+  resetOnStartup: false,
+  truncateOdm: false
 };
 
 describe('SimulatorState', () => {

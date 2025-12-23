@@ -67,7 +67,8 @@ describe('Harness control plane endpoints', () => {
       visitCountPerSubject: 2,
       formDataPointsPerVisit: 6,
       simSpeedMinutesPerDay: 90,
-      resetOnStartup: true
+      resetOnStartup: true,
+      truncateOdm: true
     };
 
     const updateRes = await app.inject({
@@ -117,6 +118,17 @@ describe('Harness control plane endpoints', () => {
       expect(firstSubjectAvailability.visits[1].isAvailable).toBe(false);
     }
     expect(statusBody.freeze).toBe(false);
+
+    const datasetRes = await app.inject({
+      method: 'GET',
+      url: '/RaveWebServices/studies/Updated%20Study/datasets/regular',
+      headers: {
+        authorization: authHeader()
+      }
+    });
+
+    expect(datasetRes.statusCode).toBe(200);
+    expect(datasetRes.body.trim().endsWith('</ODM>')).toBe(false);
   });
 
   it('updates simulation speed independently', async () => {
@@ -182,7 +194,8 @@ describe('Harness control plane endpoints', () => {
           visitCountPerSubject: 1,
           formDataPointsPerVisit: 1,
           simSpeedMinutesPerDay: 15,
-          resetOnStartup: false
+          resetOnStartup: false,
+          truncateOdm: false
         }
       }
     });

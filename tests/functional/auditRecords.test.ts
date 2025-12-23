@@ -110,4 +110,19 @@ describe('ClinicalAuditRecords dataset', () => {
     expect(res.statusCode).toBe(200);
     expect(res.body).toContain('ユニコード');
   });
+
+  it('truncates transactional ODM when requested', async () => {
+    const app = buildServer();
+
+    const res = await app.inject({
+      method: 'GET',
+      url: '/RaveWebServices/datasets/ClinicalAuditRecords.odm?studyoid=Default%20Study&truncate=1',
+      headers: {
+        authorization: authHeader()
+      }
+    });
+
+    expect(res.statusCode).toBe(200);
+    expect(res.body.trim().endsWith('</ODM>')).toBe(false);
+  });
 });

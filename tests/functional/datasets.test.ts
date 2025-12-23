@@ -148,4 +148,34 @@ describe('Clinical view datasets', () => {
     expect(res.statusCode).toBe(400);
     expect(res.json().error).toBe('Invalid formOid');
   });
+
+  it('truncates snapshot ODM when requested via query flag', async () => {
+    const app = buildServer();
+
+    const res = await app.inject({
+      method: 'GET',
+      url: '/RaveWebServices/studies/Default%20Study/datasets/regular?truncate=true',
+      headers: {
+        authorization: authHeader()
+      }
+    });
+
+    expect(res.statusCode).toBe(200);
+    expect(res.body.trim().endsWith('</ODM>')).toBe(false);
+  });
+
+  it('rejects invalid truncate query value', async () => {
+    const app = buildServer();
+
+    const res = await app.inject({
+      method: 'GET',
+      url: '/RaveWebServices/studies/Default%20Study/datasets/regular?truncate=maybe',
+      headers: {
+        authorization: authHeader()
+      }
+    });
+
+    expect(res.statusCode).toBe(400);
+    expect(res.json().error).toBe('truncate must be a boolean value');
+  });
 });

@@ -6,6 +6,7 @@ export interface HarnessConfig {
   formDataPointsPerVisit: number;
   simSpeedMinutesPerDay: number;
   resetOnStartup: boolean;
+  truncateOdm: boolean;
 }
 
 interface SuccessResult {
@@ -38,7 +39,8 @@ export function validateConfig(input: unknown): ValidateConfigResult {
     visitCountPerSubject,
     formDataPointsPerVisit,
     simSpeedMinutesPerDay,
-    resetOnStartup
+    resetOnStartup,
+    truncateOdm
   } = input as Partial<HarnessConfig> & Record<string, unknown>;
 
   let normalizedStudyName: string | undefined;
@@ -73,6 +75,10 @@ export function validateConfig(input: unknown): ValidateConfigResult {
     errors.push('resetOnStartup must be a boolean if provided');
   }
 
+  if (typeof truncateOdm !== 'boolean' && typeof truncateOdm !== 'undefined') {
+    errors.push('truncateOdm must be a boolean if provided');
+  }
+
   if (errors.length > 0) {
     return { error: errors };
   }
@@ -85,7 +91,8 @@ export function validateConfig(input: unknown): ValidateConfigResult {
       visitCountPerSubject: visitCountPerSubject as number,
       formDataPointsPerVisit: formDataPointsPerVisit as number,
       simSpeedMinutesPerDay: simSpeedMinutesPerDay as number,
-      resetOnStartup: typeof resetOnStartup === 'boolean' ? resetOnStartup : false
+      resetOnStartup: typeof resetOnStartup === 'boolean' ? resetOnStartup : false,
+      truncateOdm: typeof truncateOdm === 'boolean' ? truncateOdm : false
     }
   };
 }

@@ -7,7 +7,7 @@
     "doc": "docs"
   },
   "scripts": {
-    "dev": "ts-node src/server.ts",
+    "dev": "ts-node -r dotenv/config src/server.ts",
     "test": "vitest run --coverage",
     "test:watch": "vitest",
     "build": "tsc",
@@ -32,6 +32,7 @@
     "@types/node": "^25.0.3",
     "@vitest/coverage-v8": "^4.0.16",
     "fastify-plugin": "^5.1.0",
+    "dotenv": "^16.4.5",
     "ts-node": "^10.9.2",
     "typescript": "^5.9.3",
     "vitest": "^4.0.16",

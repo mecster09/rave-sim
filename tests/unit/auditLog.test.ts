@@ -10,7 +10,8 @@ const baseConfig: HarnessConfig = {
   visitCountPerSubject: 2,
   formDataPointsPerVisit: 2,
   simSpeedMinutesPerDay: 60,
-  resetOnStartup: false
+  resetOnStartup: false,
+  truncateOdm: false
 };
 
 describe('auditLog', () => {
