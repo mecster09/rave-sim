@@ -1,0 +1,12 @@
+{
+  "generatedAt": "2025-12-23T14:11:09.226Z",
+  "scenarios": [
+    {
+      "family": "datasets",
+      "name": "high-visit-snapshot",
+      "file": "datasets/high-visit-snapshot.xml",
+      "sha256": "f56ac4c1a841122f62934e90d320ead81c7c7351c9a939b9869920bda73116ff",
+      "statusCode": 200
+    }
+  ]
+}

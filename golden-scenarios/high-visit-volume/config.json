@@ -1,0 +1,25 @@
+{
+  "harnessConfig": {
+    "studyName": "RWS_HIGH_VISIT_VOLUME",
+    "siteCount": 4,
+    "subjectCount": 24,
+    "visitCountPerSubject": 12,
+    "formDataPointsPerVisit": 5,
+    "simSpeedMinutesPerDay": 60,
+    "resetOnStartup": false,
+    "randomSeed": 987654,
+    "truncateOdm": false
+  },
+  "simStudyDay": 9.5,
+  "freeze": true,
+  "scenarios": [
+    {
+      "family": "datasets",
+      "name": "high-visit-snapshot",
+      "request": {
+        "method": "GET",
+        "url": "/RaveWebServices/studies/RWS_HIGH_VISIT_VOLUME/datasets/regular"
+      }
+    }
+  ]
+}
