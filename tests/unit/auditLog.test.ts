@@ -22,7 +22,7 @@ describe('auditLog', () => {
       studyOid: 'STUDY',
       metadataVersionOid: 'MDV',
       unicode: false,
-      mode: 'normal',
+      mode: 'default',
       startId: '',
       pageSize: 5,
       backfillComplete: true
@@ -39,7 +39,7 @@ describe('auditLog', () => {
       studyOid: 'STUDY',
       metadataVersionOid: 'MDV',
       unicode: false,
-      mode: 'normal',
+      mode: 'default',
       startId: '',
       pageSize: 3,
       backfillComplete: true
@@ -49,7 +49,7 @@ describe('auditLog', () => {
       studyOid: 'STUDY',
       metadataVersionOid: 'MDV',
       unicode: false,
-      mode: 'normal',
+      mode: 'default',
       startId: firstPage.auditRecords[2].id,
       pageSize: 3,
       backfillComplete: true
@@ -65,7 +65,7 @@ describe('auditLog', () => {
       studyOid: 'STUDY',
       metadataVersionOid: 'MDV',
       unicode: true,
-      mode: 'normal',
+      mode: 'default',
       startId: '',
       pageSize: 1,
       backfillComplete: true

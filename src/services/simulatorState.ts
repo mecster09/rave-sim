@@ -198,10 +198,13 @@ export class SimulatorState {
 
   private readonly now: () => number;
 
+  private readonly auditBackfillReadyDay: number;
+
   constructor(config: HarnessConfig, private readonly seed = 123456, nowProvider: () => number = () => Date.now()) {
     this.config = { ...config };
     this.now = nowProvider;
     this.simStartWallClock = this.now();
+    this.auditBackfillReadyDay = Math.max(1, config.visitCountPerSubject + 0.5);
   }
 
   private generateSnapshot(): SimulatorSnapshot {
@@ -342,6 +345,10 @@ export class SimulatorState {
     this.simStartWallClock = now - safeDay * speed * 60000;
     this.frozenDay = freeze ? safeDay : null;
     this.updateSubjectStatuses(safeDay);
+  }
+
+  isAuditBackfillComplete(currentDay = this.getSimClock().simCurrentStudyDay): boolean {
+    return currentDay >= this.auditBackfillReadyDay;
   }
 }
 

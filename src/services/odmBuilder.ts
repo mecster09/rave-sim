@@ -43,6 +43,14 @@ export interface BuildTransactionalOptions {
   truncate?: boolean;
 }
 
+export interface BuildOdmErrorOptions {
+  studyOid: string;
+  metadataVersionOid: string;
+  code: string;
+  message: string;
+  generatedAt?: string;
+}
+
 const ODM_NAMESPACE = 'http://www.cdisc.org/ns/odm/v1.3';
 const MDSOL_NAMESPACE = 'http://www.mdsol.com/ns/odm/metadata';
 
@@ -142,6 +150,26 @@ export function buildTransactionalODM(options: BuildTransactionalOptions): strin
   return lines.join('\n');
 }
 
+export function buildOdmError(options: BuildOdmErrorOptions): string {
+  const { studyOid, metadataVersionOid, code, message, generatedAt } = options;
+  const lines: string[] = [];
+
+  lines.push('<?xml version="1.0" encoding="UTF-8"?>');
+  lines.push(
+    `<ODM FileOID="${escapeAttribute(hashErrorPayload(code, message))}" FileType="Transactional" ODMVersion="1.3.2" CreationDateTime="${escapeAttribute(
+      generatedAt ?? new Date().toISOString()
+    )}" xmlns="${ODM_NAMESPACE}" xmlns:mdsol="${MDSOL_NAMESPACE}">`
+  );
+  lines.push(`  <ClinicalData StudyOID="${escapeAttribute(studyOid)}" MetaDataVersionOID="${escapeAttribute(metadataVersionOid)}">`);
+  lines.push('    <mdsol:Errors>');
+  lines.push(`      <mdsol:Error Code="${escapeAttribute(code)}">${escapeText(message)}</mdsol:Error>`);
+  lines.push('    </mdsol:Errors>');
+  lines.push('  </ClinicalData>');
+  lines.push('</ODM>');
+
+  return lines.join('\n');
+}
+
 function hashSubjects(subjects: SnapshotSubject[]): string {
   const hash = crypto.createHash('sha256');
   const normalized = subjects
@@ -184,6 +212,12 @@ function hashAuditRecords(entries: AuditRecord[]): string {
     .sort((a, b) => a.id.localeCompare(b.id));
 
   hash.update(JSON.stringify(normalized));
+  return hash.digest('hex');
+}
+
+function hashErrorPayload(code: string, message: string): string {
+  const hash = crypto.createHash('sha256');
+  hash.update(`${code}|${message}`);
   return hash.digest('hex');
 }
 

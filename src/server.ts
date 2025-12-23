@@ -3,7 +3,7 @@ import { URL } from 'node:url';
 import basicAuthPlugin from './plugins/basicAuth';
 import { DEFAULT_RANDOM_SEED, HarnessConfig, validateConfig } from './services/config';
 import { SimulatorSnapshot, SimulatorState, SubjectStatus } from './services/simulatorState';
-import { buildSnapshotODM, buildTransactionalODM } from './services/odmBuilder';
+import { buildSnapshotODM, buildTransactionalODM, buildOdmError } from './services/odmBuilder';
 import { buildClinicalViewSubjects } from './services/clinicalViewBuilder';
 import { buildAuditPage } from './services/auditLog';
 
@@ -776,7 +776,7 @@ export function buildServer() {
 
     const startId = typeof query.startid === 'string' ? query.startid.trim() : '';
     const perPageRaw = query.per_page;
-    const modeRaw = typeof query.mode === 'string' ? query.mode.trim().toLowerCase() : 'normal';
+    const rawModeInput = typeof query.mode === 'string' ? query.mode.trim().toLowerCase() : 'default';
     const unicodeRaw = typeof query.unicode === 'string' ? query.unicode.trim().toLowerCase() : undefined;
 
     const perPage = typeof perPageRaw === 'number' ? perPageRaw : Number(perPageRaw ?? 50);
@@ -784,8 +784,15 @@ export function buildServer() {
       return reply.code(400).send({ error: 'per_page must be an integer between 1 and 100' });
     }
 
-    const allowedModes = new Set(['normal', 'enhanced', 'all']);
-    if (!allowedModes.has(modeRaw)) {
+    const MODE_ALIASES: Record<string, 'default' | 'enhanced' | 'all'> = {
+      default: 'default',
+      normal: 'default',
+      enhanced: 'enhanced',
+      all: 'all'
+    };
+
+    const mode = MODE_ALIASES[rawModeInput];
+    if (!mode) {
       return reply.code(400).send({ error: 'Invalid mode parameter' });
     }
 
@@ -797,22 +804,29 @@ export function buildServer() {
     const shouldTruncate = currentConfig.truncateOdm || truncateFlag.requested;
     const { simClock, generatedAt } = computeGeneratedAt();
     const metadataVersionOid = 'MDV.DEFAULT';
+    const backfillComplete = simulatorState.isAuditBackfillComplete(simClock.simCurrentStudyDay);
 
-    const backfillComplete = modeRaw === 'all';
+    if ((mode === 'enhanced' || mode === 'all') && !backfillComplete) {
+      const errorXml = buildOdmError({
+        studyOid,
+        metadataVersionOid,
+        code: 'BACKFILL_NOT_READY',
+        message: 'Audit backfill is still in progress',
+        generatedAt
+      });
+      reply.header('content-type', 'application/xml');
+      return reply.code(503).send(errorXml);
+    }
 
     const { auditRecords, nextId } = buildAuditPage(simulatorState, {
       studyOid,
       metadataVersionOid,
       unicode,
-      mode: modeRaw as 'normal' | 'enhanced' | 'all',
+      mode,
       startId,
       pageSize: perPage,
       backfillComplete
     });
-
-    if (modeRaw === 'enhanced' && !backfillComplete && auditRecords.length === 0) {
-      return reply.code(204).send();
-    }
 
     const xml = buildTransactionalODM({
       studyOid,

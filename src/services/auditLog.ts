@@ -5,7 +5,7 @@ export interface AuditLogOptions {
   studyOid: string;
   metadataVersionOid: string;
   unicode: boolean;
-  mode: 'normal' | 'enhanced' | 'all';
+  mode: 'default' | 'enhanced' | 'all';
   startId: string;
   pageSize: number;
   backfillComplete: boolean;
@@ -106,7 +106,7 @@ export function buildAuditPage(state: SimulatorState, options: AuditLogOptions):
 
   let filtered = rawRecords;
 
-  if (options.mode === 'enhanced' && !options.backfillComplete) {
+  if ((options.mode === 'enhanced' || options.mode === 'all') && !options.backfillComplete) {
     return {
       auditRecords: [],
       nextId: null,

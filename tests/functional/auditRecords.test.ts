@@ -82,7 +82,7 @@ describe('ClinicalAuditRecords dataset', () => {
     expect(res.json().error).toBe('per_page must be an integer between 1 and 100');
   });
 
-  it('returns 204 when enhanced mode gated', async () => {
+  it('returns ODM error when enhanced mode gated', async () => {
     const app = buildServer();
 
     const res = await app.inject({
@@ -93,7 +93,24 @@ describe('ClinicalAuditRecords dataset', () => {
       }
     });
 
-    expect(res.statusCode).toBe(204);
+    expect(res.statusCode).toBe(503);
+    expect(res.headers['content-type']).toContain('application/xml');
+    expect(res.body).toContain('<mdsol:Error Code="BACKFILL_NOT_READY">Audit backfill is still in progress</mdsol:Error>');
+  });
+
+  it('treats normal mode as default', async () => {
+    const app = buildServer();
+
+    const res = await app.inject({
+      method: 'GET',
+      url: '/RaveWebServices/datasets/ClinicalAuditRecords.odm?studyoid=Default%20Study&mode=normal&per_page=1',
+      headers: {
+        authorization: authHeader()
+      }
+    });
+
+    expect(res.statusCode).toBe(200);
+    expect(res.body).toContain('<AuditRecord');
   });
 
   it('preserves unicode when requested', async () => {
