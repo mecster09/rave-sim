@@ -124,6 +124,7 @@ export function buildServer() {
   };
 
   type ClinicalDatasetType = 'regular' | 'raw';
+  const VERSION_ID_REGEX = /^[A-Za-z0-9._-]+$/;
 
   interface ParsedClinicalDatasetQuery {
     truncateRequested: boolean;
@@ -412,19 +413,12 @@ export function buildServer() {
     datasetType: ClinicalDatasetType,
     studyOid: string,
     params: { formOid?: string; subjectKey?: number },
-    query: Record<string, unknown>
+    query: Record<string, unknown>,
+    options: { versionId?: string } = {}
   ) {
     const parseResult = parseClinicalDatasetQuery(query, datasetType);
     if (!parseResult.ok) {
       return reply.code(parseResult.statusCode).send({ error: parseResult.message });
-    }
-
-    const snapshot = simulatorState.getSnapshot();
-    if (typeof params.subjectKey === 'number') {
-      const found = snapshot.subjects.some(subject => subject.subjectKey === params.subjectKey);
-      if (!found) {
-        return reply.code(404).send({ error: 'Subject not found' });
-      }
     }
 
     const { simClock, generatedAt } = computeGeneratedAt();
@@ -433,6 +427,14 @@ export function buildServer() {
       simClock.simStartWallClock,
       simClock.simSpeedMinutesPerDay
     );
+
+    const snapshot = resolveClinicalDatasetSnapshot(options.versionId, simClock);
+    if (typeof params.subjectKey === 'number') {
+      const found = snapshot.subjects.some(subject => subject.subjectKey === params.subjectKey);
+      if (!found) {
+        return reply.code(404).send({ error: 'Subject not found' });
+      }
+    }
 
     const rawSuffix = parseResult.value.rawSuffix ?? (datasetType === 'raw' ? '_RAW' : undefined);
 
@@ -458,6 +460,27 @@ export function buildServer() {
 
     reply.header('content-type', 'application/xml');
     return reply.send(xml);
+  }
+
+  function resolveClinicalDatasetSnapshot(versionId: string | undefined, simClock: {
+    simCurrentStudyDay: number;
+  }): SimulatorSnapshot {
+    if (!versionId) {
+      return simulatorState.getSnapshot();
+    }
+
+    const seed = computeVersionSeed(versionId);
+    const versionState = createSimulatorState(currentConfig, seed);
+    versionState.setSimDay(simClock.simCurrentStudyDay, simulatorState.isFrozen());
+    return versionState.getSnapshot();
+  }
+
+  function computeVersionSeed(versionId: string): number {
+    let hash = 0;
+    for (let i = 0; i < versionId.length; i += 1) {
+      hash = (hash * 33 + versionId.charCodeAt(i)) >>> 0;
+    }
+    return hash === 0 ? 1 : hash;
   }
 
   app.get('/RaveWebServices/studies/:studyOid/datasets/regular', async (request, reply) => {
@@ -556,6 +579,184 @@ export function buildServer() {
     }
 
     return sendClinicalDataset(reply, 'raw', studyOid, { subjectKey: numericSubjectKey }, request.query as Record<string, unknown>);
+  });
+
+  app.get('/RaveWebServices/studies/:studyOid/versions/:versionId/datasets/regular', async (request, reply) => {
+    const params = request.params as { studyOid?: unknown; versionId?: unknown };
+    const studyOid = typeof params.studyOid === 'string' ? params.studyOid : '';
+    const versionIdRaw = typeof params.versionId === 'string' ? params.versionId : '';
+    const versionId = versionIdRaw.trim();
+
+    if (!studyOid) {
+      return reply.code(400).send({ error: 'Invalid studyOid' });
+    }
+
+    if (!versionId || !VERSION_ID_REGEX.test(versionId)) {
+      return reply.code(400).send({ error: 'Invalid versionId' });
+    }
+
+    return sendClinicalDataset(
+      reply,
+      'regular',
+      studyOid,
+      {},
+      request.query as Record<string, unknown>,
+      { versionId }
+    );
+  });
+
+  app.get('/RaveWebServices/studies/:studyOid/versions/:versionId/datasets/regular/:formOid', async (request, reply) => {
+    const params = request.params as { studyOid?: unknown; versionId?: unknown; formOid?: unknown };
+    const studyOid = typeof params.studyOid === 'string' ? params.studyOid : '';
+    const versionIdRaw = typeof params.versionId === 'string' ? params.versionId : '';
+    const formOidRaw = typeof params.formOid === 'string' ? params.formOid : '';
+    const versionId = versionIdRaw.trim();
+    const formOid = formOidRaw.trim();
+
+    if (!studyOid) {
+      return reply.code(400).send({ error: 'Invalid studyOid' });
+    }
+
+    if (!versionId || !VERSION_ID_REGEX.test(versionId)) {
+      return reply.code(400).send({ error: 'Invalid versionId' });
+    }
+
+    if (!formOid) {
+      return reply.code(400).send({ error: 'Invalid formOid' });
+    }
+
+    return sendClinicalDataset(
+      reply,
+      'regular',
+      studyOid,
+      { formOid },
+      request.query as Record<string, unknown>,
+      { versionId }
+    );
+  });
+
+  app.get('/RaveWebServices/studies/:studyOid/versions/:versionId/subjects/:subjectKey/datasets/regular', async (request, reply) => {
+    const params = request.params as { studyOid?: unknown; versionId?: unknown; subjectKey?: unknown };
+    const studyOid = typeof params.studyOid === 'string' ? params.studyOid : '';
+    const versionIdRaw = typeof params.versionId === 'string' ? params.versionId : '';
+    const subjectKeyValue = typeof params.subjectKey === 'string' ? params.subjectKey : '';
+    const versionId = versionIdRaw.trim();
+
+    if (!studyOid) {
+      return reply.code(400).send({ error: 'Invalid studyOid' });
+    }
+
+    if (!versionId || !VERSION_ID_REGEX.test(versionId)) {
+      return reply.code(400).send({ error: 'Invalid versionId' });
+    }
+
+    const normalizedSubject = subjectKeyValue.trim();
+    if (!normalizedSubject) {
+      return reply.code(400).send({ error: 'Invalid subjectKey' });
+    }
+
+    const numericSubjectKey = Number(normalizedSubject);
+    if (!Number.isInteger(numericSubjectKey) || Number.isNaN(numericSubjectKey) || numericSubjectKey <= 0) {
+      return reply.code(400).send({ error: 'Invalid subjectKey' });
+    }
+
+    return sendClinicalDataset(
+      reply,
+      'regular',
+      studyOid,
+      { subjectKey: numericSubjectKey },
+      request.query as Record<string, unknown>,
+      { versionId }
+    );
+  });
+
+  app.get('/RaveWebServices/studies/:studyOid/versions/:versionId/datasets/raw', async (request, reply) => {
+    const params = request.params as { studyOid?: unknown; versionId?: unknown };
+    const studyOid = typeof params.studyOid === 'string' ? params.studyOid : '';
+    const versionIdRaw = typeof params.versionId === 'string' ? params.versionId : '';
+    const versionId = versionIdRaw.trim();
+
+    if (!studyOid) {
+      return reply.code(400).send({ error: 'Invalid studyOid' });
+    }
+
+    if (!versionId || !VERSION_ID_REGEX.test(versionId)) {
+      return reply.code(400).send({ error: 'Invalid versionId' });
+    }
+
+    return sendClinicalDataset(
+      reply,
+      'raw',
+      studyOid,
+      {},
+      request.query as Record<string, unknown>,
+      { versionId }
+    );
+  });
+
+  app.get('/RaveWebServices/studies/:studyOid/versions/:versionId/datasets/raw/:formOid', async (request, reply) => {
+    const params = request.params as { studyOid?: unknown; versionId?: unknown; formOid?: unknown };
+    const studyOid = typeof params.studyOid === 'string' ? params.studyOid : '';
+    const versionIdRaw = typeof params.versionId === 'string' ? params.versionId : '';
+    const formOidRaw = typeof params.formOid === 'string' ? params.formOid : '';
+    const versionId = versionIdRaw.trim();
+    const formOid = formOidRaw.trim();
+
+    if (!studyOid) {
+      return reply.code(400).send({ error: 'Invalid studyOid' });
+    }
+
+    if (!versionId || !VERSION_ID_REGEX.test(versionId)) {
+      return reply.code(400).send({ error: 'Invalid versionId' });
+    }
+
+    if (!formOid) {
+      return reply.code(400).send({ error: 'Invalid formOid' });
+    }
+
+    return sendClinicalDataset(
+      reply,
+      'raw',
+      studyOid,
+      { formOid },
+      request.query as Record<string, unknown>,
+      { versionId }
+    );
+  });
+
+  app.get('/RaveWebServices/studies/:studyOid/versions/:versionId/subjects/:subjectKey/datasets/raw', async (request, reply) => {
+    const params = request.params as { studyOid?: unknown; versionId?: unknown; subjectKey?: unknown };
+    const studyOid = typeof params.studyOid === 'string' ? params.studyOid : '';
+    const versionIdRaw = typeof params.versionId === 'string' ? params.versionId : '';
+    const subjectKeyValue = typeof params.subjectKey === 'string' ? params.subjectKey : '';
+    const versionId = versionIdRaw.trim();
+
+    if (!studyOid) {
+      return reply.code(400).send({ error: 'Invalid studyOid' });
+    }
+
+    if (!versionId || !VERSION_ID_REGEX.test(versionId)) {
+      return reply.code(400).send({ error: 'Invalid versionId' });
+    }
+
+    const normalizedSubject = subjectKeyValue.trim();
+    if (!normalizedSubject) {
+      return reply.code(400).send({ error: 'Invalid subjectKey' });
+    }
+
+    const numericSubjectKey = Number(normalizedSubject);
+    if (!Number.isInteger(numericSubjectKey) || Number.isNaN(numericSubjectKey) || numericSubjectKey <= 0) {
+      return reply.code(400).send({ error: 'Invalid subjectKey' });
+    }
+
+    return sendClinicalDataset(
+      reply,
+      'raw',
+      studyOid,
+      { subjectKey: numericSubjectKey },
+      request.query as Record<string, unknown>,
+      { versionId }
+    );
   });
 
   app.get('/RaveWebServices/datasets/ClinicalAuditRecords.odm', async (request, reply) => {

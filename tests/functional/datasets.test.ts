@@ -261,4 +261,119 @@ describe('Clinical view datasets', () => {
 
     expect(res.statusCode).toBe(401);
   });
+
+  it('serves versioned regular datasets with filtering', async () => {
+    const app = buildServer();
+    await freezeStudyDay(app, 2.5);
+    const startIso = await resolveStartIso(app, 1);
+
+    const res = await app.inject({
+      method: 'GET',
+      url: `/RaveWebServices/studies/Default%20Study/versions/V1/datasets/regular?start=${encodeURIComponent(startIso)}`,
+      headers: {
+        authorization: authHeader()
+      }
+    });
+
+    expect(res.statusCode).toBe(200);
+    const visits = extractVisitOids(res.body);
+    expect(new Set(visits)).toEqual(new Set(['VISIT-002', 'VISIT-003']));
+  });
+
+  it('serves versioned raw datasets with query options', async () => {
+    const app = buildServer();
+    await freezeStudyDay(app, 2.5);
+    const startIso = await resolveStartIso(app, 1);
+
+    const res = await app.inject({
+      method: 'GET',
+      url:
+        `/RaveWebServices/studies/Default%20Study/versions/V2/datasets/raw?start=${encodeURIComponent(
+          startIso
+        )}&decodesuffix=_DEC&rawsuffix=_RAW&versionitem=VERSION`,
+      headers: {
+        authorization: authHeader()
+      }
+    });
+
+    expect(res.statusCode).toBe(200);
+    const body = res.body;
+    const visits = extractVisitOids(body);
+    expect(new Set(visits)).toEqual(new Set(['VISIT-002', 'VISIT-003']));
+    expect(body).toContain('ItemOID="SYS_DEC"');
+    expect(body).toContain('ItemOID="SYS_RAW"');
+    expect(body).toContain('ItemOID="VS.VERSION"');
+  });
+
+  it('filters versioned dataset by subject', async () => {
+    const app = buildServer();
+    await freezeStudyDay(app, 2.5);
+
+    const res = await app.inject({
+      method: 'GET',
+      url: '/RaveWebServices/studies/Default%20Study/versions/V3/subjects/100002/datasets/regular',
+      headers: {
+        authorization: authHeader()
+      }
+    });
+
+    expect(res.statusCode).toBe(200);
+    const subjectKeys = Array.from(res.body.matchAll(/SubjectKey="([^"]+)"/g)).map(match => match[1]);
+    expect(new Set(subjectKeys)).toEqual(new Set(['100002']));
+  });
+
+  it('requires authentication for versioned datasets', async () => {
+    const app = buildServer();
+
+    const res = await app.inject({
+      method: 'GET',
+      url: '/RaveWebServices/studies/Default%20Study/versions/V4/datasets/regular'
+    });
+
+    expect(res.statusCode).toBe(401);
+  });
+
+  it('rejects invalid version ids', async () => {
+    const app = buildServer();
+
+    const res = await app.inject({
+      method: 'GET',
+      url: '/RaveWebServices/studies/Default%20Study/versions/%20/datasets/regular',
+      headers: {
+        authorization: authHeader()
+      }
+    });
+
+    expect(res.statusCode).toBe(400);
+    expect(res.json().error).toBe('Invalid versionId');
+  });
+
+  it('rejects rawsuffix on versioned regular dataset endpoints', async () => {
+    const app = buildServer();
+
+    const res = await app.inject({
+      method: 'GET',
+      url: '/RaveWebServices/studies/Default%20Study/versions/V5/datasets/regular?rawsuffix=_RAW',
+      headers: {
+        authorization: authHeader()
+      }
+    });
+
+    expect(res.statusCode).toBe(400);
+    expect(res.json().error).toBe('rawsuffix is only supported on raw dataset endpoints');
+  });
+
+  it('returns 404 when versioned subject is missing', async () => {
+    const app = buildServer();
+
+    const res = await app.inject({
+      method: 'GET',
+      url: '/RaveWebServices/studies/Default%20Study/versions/V6/subjects/999999/datasets/regular',
+      headers: {
+        authorization: authHeader()
+      }
+    });
+
+    expect(res.statusCode).toBe(404);
+  });
 });

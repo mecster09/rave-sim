@@ -1,5 +1,5 @@
 {
-  "generatedAt": "2025-12-23T17:04:45.066Z",
+  "generatedAt": "2025-12-23T17:16:09.472Z",
   "scenarios": [
     {
       "family": "audit",
@@ -20,6 +20,20 @@
       "name": "raw-options",
       "file": "datasets/raw-options.json",
       "sha256": "0ce48ac86609577918c6c816ac17f07ad76f97e8c8b61d347013faf299f90e76",
+      "statusCode": 200
+    },
+    {
+      "family": "datasets",
+      "name": "versioned-raw",
+      "file": "datasets/versioned-raw.json",
+      "sha256": "9fb7c31039c83704019dcd00d4250a91697c33865ac169b08ddf8a201a9a5eae",
+      "statusCode": 200
+    },
+    {
+      "family": "datasets",
+      "name": "versioned-regular",
+      "file": "datasets/versioned-regular.xml",
+      "sha256": "1a5491dc6af24af9c1eb63be8db55f917734c4482ff120cd24d921e5ef09b2a7",
       "statusCode": 200
     }
   ]

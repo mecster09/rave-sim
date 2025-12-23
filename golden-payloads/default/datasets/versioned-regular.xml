@@ -1,0 +1,455 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<ODM FileOID="c6490829ef0efd689d462ada7ef19f5388e437fe87836c08f3b3a1213b372f16" FileType="Snapshot" ODMVersion="1.3.2" CreationDateTime="2024-01-01T00:00:00.000Z" xmlns="http://www.cdisc.org/ns/odm/v1.3" xmlns:mdsol="http://www.mdsol.com/ns/odm/metadata">
+  <ClinicalData StudyOID="Default Study" MetaDataVersionOID="MDV.DEFAULT">
+    <SubjectData SubjectKey="100001" mdsol:SubjectStatus="Active">
+      <SiteRef LocationOID="SITE-001"/>
+      <StudyEventData StudyEventOID="VISIT-002">
+        <FormData FormOID="AE">
+          <ItemData ItemOID="AE.VERSION" Value="9"/>
+          <ItemData ItemOID="SEVERITY" Value="MODERATE"/>
+          <ItemData ItemOID="SEVERITY_DEC" Value="DECODED-MODERATE"/>
+        </FormData>
+        <FormData FormOID="DM">
+          <ItemData ItemOID="AGE" Value="62"/>
+          <ItemData ItemOID="AGE_DEC" Value="DECODED-62"/>
+          <ItemData ItemOID="DM.VERSION" Value="2"/>
+          <ItemData ItemOID="SEX" Value="F"/>
+          <ItemData ItemOID="SEX_DEC" Value="DECODED-F"/>
+        </FormData>
+        <FormData FormOID="VS">
+          <ItemData ItemOID="DIA" Value="66"/>
+          <ItemData ItemOID="DIA_DEC" Value="DECODED-66"/>
+          <ItemData ItemOID="SYS" Value="128"/>
+          <ItemData ItemOID="SYS_DEC" Value="DECODED-128"/>
+          <ItemData ItemOID="VS.VERSION" Value="8"/>
+        </FormData>
+      </StudyEventData>
+      <StudyEventData StudyEventOID="VISIT-003">
+        <FormData FormOID="AE">
+          <ItemData ItemOID="AE.VERSION" Value="9"/>
+          <ItemData ItemOID="SEVERITY" Value="MILD"/>
+          <ItemData ItemOID="SEVERITY_DEC" Value="DECODED-MILD"/>
+        </FormData>
+        <FormData FormOID="DM">
+          <ItemData ItemOID="AGE" Value="65"/>
+          <ItemData ItemOID="AGE_DEC" Value="DECODED-65"/>
+          <ItemData ItemOID="DM.VERSION" Value="2"/>
+          <ItemData ItemOID="SEX" Value="M"/>
+          <ItemData ItemOID="SEX_DEC" Value="DECODED-M"/>
+        </FormData>
+        <FormData FormOID="VS">
+          <ItemData ItemOID="DIA" Value="91"/>
+          <ItemData ItemOID="DIA_DEC" Value="DECODED-91"/>
+          <ItemData ItemOID="SYS" Value="140"/>
+          <ItemData ItemOID="SYS_DEC" Value="DECODED-140"/>
+          <ItemData ItemOID="VS.VERSION" Value="8"/>
+        </FormData>
+      </StudyEventData>
+    </SubjectData>
+    <SubjectData SubjectKey="100002" mdsol:SubjectStatus="Active">
+      <SiteRef LocationOID="SITE-002"/>
+      <StudyEventData StudyEventOID="VISIT-002">
+        <FormData FormOID="AE">
+          <ItemData ItemOID="AE.VERSION" Value="9"/>
+          <ItemData ItemOID="SEVERITY" Value="SEVERE"/>
+          <ItemData ItemOID="SEVERITY_DEC" Value="DECODED-SEVERE"/>
+        </FormData>
+        <FormData FormOID="DM">
+          <ItemData ItemOID="AGE" Value="43"/>
+          <ItemData ItemOID="AGE_DEC" Value="DECODED-43"/>
+          <ItemData ItemOID="DM.VERSION" Value="2"/>
+          <ItemData ItemOID="SEX" Value="M"/>
+          <ItemData ItemOID="SEX_DEC" Value="DECODED-M"/>
+        </FormData>
+        <FormData FormOID="VS">
+          <ItemData ItemOID="DIA" Value="70"/>
+          <ItemData ItemOID="DIA_DEC" Value="DECODED-70"/>
+          <ItemData ItemOID="SYS" Value="118"/>
+          <ItemData ItemOID="SYS_DEC" Value="DECODED-118"/>
+          <ItemData ItemOID="VS.VERSION" Value="8"/>
+        </FormData>
+      </StudyEventData>
+      <StudyEventData StudyEventOID="VISIT-003">
+        <FormData FormOID="AE">
+          <ItemData ItemOID="AE.VERSION" Value="9"/>
+          <ItemData ItemOID="SEVERITY" Value="MILD"/>
+          <ItemData ItemOID="SEVERITY_DEC" Value="DECODED-MILD"/>
+        </FormData>
+        <FormData FormOID="DM">
+          <ItemData ItemOID="AGE" Value="32"/>
+          <ItemData ItemOID="AGE_DEC" Value="DECODED-32"/>
+          <ItemData ItemOID="DM.VERSION" Value="2"/>
+          <ItemData ItemOID="SEX" Value="M"/>
+          <ItemData ItemOID="SEX_DEC" Value="DECODED-M"/>
+        </FormData>
+        <FormData FormOID="VS">
+          <ItemData ItemOID="DIA" Value="79"/>
+          <ItemData ItemOID="DIA_DEC" Value="DECODED-79"/>
+          <ItemData ItemOID="SYS" Value="107"/>
+          <ItemData ItemOID="SYS_DEC" Value="DECODED-107"/>
+          <ItemData ItemOID="VS.VERSION" Value="8"/>
+        </FormData>
+      </StudyEventData>
+    </SubjectData>
+    <SubjectData SubjectKey="100003" mdsol:SubjectStatus="Inactive">
+      <SiteRef LocationOID="SITE-001"/>
+      <StudyEventData StudyEventOID="VISIT-002">
+        <FormData FormOID="AE">
+          <ItemData ItemOID="AE.VERSION" Value="9"/>
+          <ItemData ItemOID="SEVERITY" Value="MODERATE"/>
+          <ItemData ItemOID="SEVERITY_DEC" Value="DECODED-MODERATE"/>
+        </FormData>
+        <FormData FormOID="DM">
+          <ItemData ItemOID="AGE" Value="50"/>
+          <ItemData ItemOID="AGE_DEC" Value="DECODED-50"/>
+          <ItemData ItemOID="DM.VERSION" Value="2"/>
+          <ItemData ItemOID="SEX" Value="M"/>
+          <ItemData ItemOID="SEX_DEC" Value="DECODED-M"/>
+        </FormData>
+        <FormData FormOID="VS">
+          <ItemData ItemOID="DIA" Value="91"/>
+          <ItemData ItemOID="DIA_DEC" Value="DECODED-91"/>
+          <ItemData ItemOID="SYS" Value="114"/>
+          <ItemData ItemOID="SYS_DEC" Value="DECODED-114"/>
+          <ItemData ItemOID="VS.VERSION" Value="8"/>
+        </FormData>
+      </StudyEventData>
+      <StudyEventData StudyEventOID="VISIT-003">
+        <FormData FormOID="AE">
+          <ItemData ItemOID="AE.VERSION" Value="9"/>
+          <ItemData ItemOID="SEVERITY" Value="MODERATE"/>
+          <ItemData ItemOID="SEVERITY_DEC" Value="DECODED-MODERATE"/>
+        </FormData>
+        <FormData FormOID="DM">
+          <ItemData ItemOID="AGE" Value="44"/>
+          <ItemData ItemOID="AGE_DEC" Value="DECODED-44"/>
+          <ItemData ItemOID="DM.VERSION" Value="2"/>
+          <ItemData ItemOID="SEX" Value="M"/>
+          <ItemData ItemOID="SEX_DEC" Value="DECODED-M"/>
+        </FormData>
+        <FormData FormOID="VS">
+          <ItemData ItemOID="DIA" Value="85"/>
+          <ItemData ItemOID="DIA_DEC" Value="DECODED-85"/>
+          <ItemData ItemOID="SYS" Value="105"/>
+          <ItemData ItemOID="SYS_DEC" Value="DECODED-105"/>
+          <ItemData ItemOID="VS.VERSION" Value="8"/>
+        </FormData>
+      </StudyEventData>
+    </SubjectData>
+    <SubjectData SubjectKey="100004" mdsol:SubjectStatus="Active">
+      <SiteRef LocationOID="SITE-002"/>
+      <StudyEventData StudyEventOID="VISIT-002">
+        <FormData FormOID="AE">
+          <ItemData ItemOID="AE.VERSION" Value="9"/>
+          <ItemData ItemOID="SEVERITY" Value="SEVERE"/>
+          <ItemData ItemOID="SEVERITY_DEC" Value="DECODED-SEVERE"/>
+        </FormData>
+        <FormData FormOID="DM">
+          <ItemData ItemOID="AGE" Value="46"/>
+          <ItemData ItemOID="AGE_DEC" Value="DECODED-46"/>
+          <ItemData ItemOID="DM.VERSION" Value="2"/>
+          <ItemData ItemOID="SEX" Value="F"/>
+          <ItemData ItemOID="SEX_DEC" Value="DECODED-F"/>
+        </FormData>
+        <FormData FormOID="VS">
+          <ItemData ItemOID="DIA" Value="61"/>
+          <ItemData ItemOID="DIA_DEC" Value="DECODED-61"/>
+          <ItemData ItemOID="SYS" Value="125"/>
+          <ItemData ItemOID="SYS_DEC" Value="DECODED-125"/>
+          <ItemData ItemOID="VS.VERSION" Value="8"/>
+        </FormData>
+      </StudyEventData>
+      <StudyEventData StudyEventOID="VISIT-003">
+        <FormData FormOID="AE">
+          <ItemData ItemOID="AE.VERSION" Value="9"/>
+          <ItemData ItemOID="SEVERITY" Value="MILD"/>
+          <ItemData ItemOID="SEVERITY_DEC" Value="DECODED-MILD"/>
+        </FormData>
+        <FormData FormOID="DM">
+          <ItemData ItemOID="AGE" Value="70"/>
+          <ItemData ItemOID="AGE_DEC" Value="DECODED-70"/>
+          <ItemData ItemOID="DM.VERSION" Value="2"/>
+          <ItemData ItemOID="SEX" Value="M"/>
+          <ItemData ItemOID="SEX_DEC" Value="DECODED-M"/>
+        </FormData>
+        <FormData FormOID="VS">
+          <ItemData ItemOID="DIA" Value="61"/>
+          <ItemData ItemOID="DIA_DEC" Value="DECODED-61"/>
+          <ItemData ItemOID="SYS" Value="114"/>
+          <ItemData ItemOID="SYS_DEC" Value="DECODED-114"/>
+          <ItemData ItemOID="VS.VERSION" Value="8"/>
+        </FormData>
+      </StudyEventData>
+    </SubjectData>
+    <SubjectData SubjectKey="100005" mdsol:SubjectStatus="Active">
+      <SiteRef LocationOID="SITE-001"/>
+      <StudyEventData StudyEventOID="VISIT-002">
+        <FormData FormOID="AE">
+          <ItemData ItemOID="AE.VERSION" Value="9"/>
+          <ItemData ItemOID="SEVERITY" Value="SEVERE"/>
+          <ItemData ItemOID="SEVERITY_DEC" Value="DECODED-SEVERE"/>
+        </FormData>
+        <FormData FormOID="DM">
+          <ItemData ItemOID="AGE" Value="33"/>
+          <ItemData ItemOID="AGE_DEC" Value="DECODED-33"/>
+          <ItemData ItemOID="DM.VERSION" Value="2"/>
+          <ItemData ItemOID="SEX" Value="M"/>
+          <ItemData ItemOID="SEX_DEC" Value="DECODED-M"/>
+        </FormData>
+        <FormData FormOID="VS">
+          <ItemData ItemOID="DIA" Value="70"/>
+          <ItemData ItemOID="DIA_DEC" Value="DECODED-70"/>
+          <ItemData ItemOID="SYS" Value="142"/>
+          <ItemData ItemOID="SYS_DEC" Value="DECODED-142"/>
+          <ItemData ItemOID="VS.VERSION" Value="8"/>
+        </FormData>
+      </StudyEventData>
+      <StudyEventData StudyEventOID="VISIT-003">
+        <FormData FormOID="AE">
+          <ItemData ItemOID="AE.VERSION" Value="9"/>
+          <ItemData ItemOID="SEVERITY" Value="SEVERE"/>
+          <ItemData ItemOID="SEVERITY_DEC" Value="DECODED-SEVERE"/>
+        </FormData>
+        <FormData FormOID="DM">
+          <ItemData ItemOID="AGE" Value="70"/>
+          <ItemData ItemOID="AGE_DEC" Value="DECODED-70"/>
+          <ItemData ItemOID="DM.VERSION" Value="2"/>
+          <ItemData ItemOID="SEX" Value="M"/>
+          <ItemData ItemOID="SEX_DEC" Value="DECODED-M"/>
+        </FormData>
+        <FormData FormOID="VS">
+          <ItemData ItemOID="DIA" Value="63"/>
+          <ItemData ItemOID="DIA_DEC" Value="DECODED-63"/>
+          <ItemData ItemOID="SYS" Value="125"/>
+          <ItemData ItemOID="SYS_DEC" Value="DECODED-125"/>
+          <ItemData ItemOID="VS.VERSION" Value="8"/>
+        </FormData>
+      </StudyEventData>
+    </SubjectData>
+    <SubjectData SubjectKey="100006" mdsol:SubjectStatus="Deleted">
+      <SiteRef LocationOID="SITE-002"/>
+      <StudyEventData StudyEventOID="VISIT-002">
+        <FormData FormOID="AE">
+          <ItemData ItemOID="AE.VERSION" Value="9"/>
+          <ItemData ItemOID="SEVERITY" Value="MILD"/>
+          <ItemData ItemOID="SEVERITY_DEC" Value="DECODED-MILD"/>
+        </FormData>
+        <FormData FormOID="DM">
+          <ItemData ItemOID="AGE" Value="51"/>
+          <ItemData ItemOID="AGE_DEC" Value="DECODED-51"/>
+          <ItemData ItemOID="DM.VERSION" Value="2"/>
+          <ItemData ItemOID="SEX" Value="F"/>
+          <ItemData ItemOID="SEX_DEC" Value="DECODED-F"/>
+        </FormData>
+        <FormData FormOID="VS">
+          <ItemData ItemOID="DIA" Value="68"/>
+          <ItemData ItemOID="DIA_DEC" Value="DECODED-68"/>
+          <ItemData ItemOID="SYS" Value="131"/>
+          <ItemData ItemOID="SYS_DEC" Value="DECODED-131"/>
+          <ItemData ItemOID="VS.VERSION" Value="8"/>
+        </FormData>
+      </StudyEventData>
+      <StudyEventData StudyEventOID="VISIT-003">
+        <FormData FormOID="AE">
+          <ItemData ItemOID="AE.VERSION" Value="9"/>
+          <ItemData ItemOID="SEVERITY" Value="MILD"/>
+          <ItemData ItemOID="SEVERITY_DEC" Value="DECODED-MILD"/>
+        </FormData>
+        <FormData FormOID="DM">
+          <ItemData ItemOID="AGE" Value="60"/>
+          <ItemData ItemOID="AGE_DEC" Value="DECODED-60"/>
+          <ItemData ItemOID="DM.VERSION" Value="2"/>
+          <ItemData ItemOID="SEX" Value="M"/>
+          <ItemData ItemOID="SEX_DEC" Value="DECODED-M"/>
+        </FormData>
+        <FormData FormOID="VS">
+          <ItemData ItemOID="DIA" Value="88"/>
+          <ItemData ItemOID="DIA_DEC" Value="DECODED-88"/>
+          <ItemData ItemOID="SYS" Value="118"/>
+          <ItemData ItemOID="SYS_DEC" Value="DECODED-118"/>
+          <ItemData ItemOID="VS.VERSION" Value="8"/>
+        </FormData>
+      </StudyEventData>
+    </SubjectData>
+    <SubjectData SubjectKey="100007" mdsol:SubjectStatus="Inactive">
+      <SiteRef LocationOID="SITE-001"/>
+      <StudyEventData StudyEventOID="VISIT-002">
+        <FormData FormOID="AE">
+          <ItemData ItemOID="AE.VERSION" Value="9"/>
+          <ItemData ItemOID="SEVERITY" Value="MILD"/>
+          <ItemData ItemOID="SEVERITY_DEC" Value="DECODED-MILD"/>
+        </FormData>
+        <FormData FormOID="DM">
+          <ItemData ItemOID="AGE" Value="70"/>
+          <ItemData ItemOID="AGE_DEC" Value="DECODED-70"/>
+          <ItemData ItemOID="DM.VERSION" Value="2"/>
+          <ItemData ItemOID="SEX" Value="F"/>
+          <ItemData ItemOID="SEX_DEC" Value="DECODED-F"/>
+        </FormData>
+        <FormData FormOID="VS">
+          <ItemData ItemOID="DIA" Value="94"/>
+          <ItemData ItemOID="DIA_DEC" Value="DECODED-94"/>
+          <ItemData ItemOID="SYS" Value="134"/>
+          <ItemData ItemOID="SYS_DEC" Value="DECODED-134"/>
+          <ItemData ItemOID="VS.VERSION" Value="8"/>
+        </FormData>
+      </StudyEventData>
+      <StudyEventData StudyEventOID="VISIT-003">
+        <FormData FormOID="AE">
+          <ItemData ItemOID="AE.VERSION" Value="9"/>
+          <ItemData ItemOID="SEVERITY" Value="MILD"/>
+          <ItemData ItemOID="SEVERITY_DEC" Value="DECODED-MILD"/>
+        </FormData>
+        <FormData FormOID="DM">
+          <ItemData ItemOID="AGE" Value="22"/>
+          <ItemData ItemOID="AGE_DEC" Value="DECODED-22"/>
+          <ItemData ItemOID="DM.VERSION" Value="2"/>
+          <ItemData ItemOID="SEX" Value="M"/>
+          <ItemData ItemOID="SEX_DEC" Value="DECODED-M"/>
+        </FormData>
+        <FormData FormOID="VS">
+          <ItemData ItemOID="DIA" Value="78"/>
+          <ItemData ItemOID="DIA_DEC" Value="DECODED-78"/>
+          <ItemData ItemOID="SYS" Value="116"/>
+          <ItemData ItemOID="SYS_DEC" Value="DECODED-116"/>
+          <ItemData ItemOID="VS.VERSION" Value="8"/>
+        </FormData>
+      </StudyEventData>
+    </SubjectData>
+    <SubjectData SubjectKey="100008" mdsol:SubjectStatus="Inactive">
+      <SiteRef LocationOID="SITE-002"/>
+      <StudyEventData StudyEventOID="VISIT-002">
+        <FormData FormOID="AE">
+          <ItemData ItemOID="AE.VERSION" Value="9"/>
+          <ItemData ItemOID="SEVERITY" Value="MODERATE"/>
+          <ItemData ItemOID="SEVERITY_DEC" Value="DECODED-MODERATE"/>
+        </FormData>
+        <FormData FormOID="DM">
+          <ItemData ItemOID="AGE" Value="44"/>
+          <ItemData ItemOID="AGE_DEC" Value="DECODED-44"/>
+          <ItemData ItemOID="DM.VERSION" Value="2"/>
+          <ItemData ItemOID="SEX" Value="F"/>
+          <ItemData ItemOID="SEX_DEC" Value="DECODED-F"/>
+        </FormData>
+        <FormData FormOID="VS">
+          <ItemData ItemOID="DIA" Value="99"/>
+          <ItemData ItemOID="DIA_DEC" Value="DECODED-99"/>
+          <ItemData ItemOID="SYS" Value="114"/>
+          <ItemData ItemOID="SYS_DEC" Value="DECODED-114"/>
+          <ItemData ItemOID="VS.VERSION" Value="8"/>
+        </FormData>
+      </StudyEventData>
+      <StudyEventData StudyEventOID="VISIT-003">
+        <FormData FormOID="AE">
+          <ItemData ItemOID="AE.VERSION" Value="9"/>
+          <ItemData ItemOID="SEVERITY" Value="MILD"/>
+          <ItemData ItemOID="SEVERITY_DEC" Value="DECODED-MILD"/>
+        </FormData>
+        <FormData FormOID="DM">
+          <ItemData ItemOID="AGE" Value="65"/>
+          <ItemData ItemOID="AGE_DEC" Value="DECODED-65"/>
+          <ItemData ItemOID="DM.VERSION" Value="2"/>
+          <ItemData ItemOID="SEX" Value="F"/>
+          <ItemData ItemOID="SEX_DEC" Value="DECODED-F"/>
+        </FormData>
+        <FormData FormOID="VS">
+          <ItemData ItemOID="DIA" Value="60"/>
+          <ItemData ItemOID="DIA_DEC" Value="DECODED-60"/>
+          <ItemData ItemOID="SYS" Value="117"/>
+          <ItemData ItemOID="SYS_DEC" Value="DECODED-117"/>
+          <ItemData ItemOID="VS.VERSION" Value="8"/>
+        </FormData>
+      </StudyEventData>
+    </SubjectData>
+    <SubjectData SubjectKey="100009" mdsol:SubjectStatus="Inactive">
+      <SiteRef LocationOID="SITE-001"/>
+      <StudyEventData StudyEventOID="VISIT-002">
+        <FormData FormOID="AE">
+          <ItemData ItemOID="AE.VERSION" Value="9"/>
+          <ItemData ItemOID="SEVERITY" Value="SEVERE"/>
+          <ItemData ItemOID="SEVERITY_DEC" Value="DECODED-SEVERE"/>
+        </FormData>
+        <FormData FormOID="DM">
+          <ItemData ItemOID="AGE" Value="25"/>
+          <ItemData ItemOID="AGE_DEC" Value="DECODED-25"/>
+          <ItemData ItemOID="DM.VERSION" Value="2"/>
+          <ItemData ItemOID="SEX" Value="F"/>
+          <ItemData ItemOID="SEX_DEC" Value="DECODED-F"/>
+        </FormData>
+        <FormData FormOID="VS">
+          <ItemData ItemOID="DIA" Value="94"/>
+          <ItemData ItemOID="DIA_DEC" Value="DECODED-94"/>
+          <ItemData ItemOID="SYS" Value="107"/>
+          <ItemData ItemOID="SYS_DEC" Value="DECODED-107"/>
+          <ItemData ItemOID="VS.VERSION" Value="8"/>
+        </FormData>
+      </StudyEventData>
+      <StudyEventData StudyEventOID="VISIT-003">
+        <FormData FormOID="AE">
+          <ItemData ItemOID="AE.VERSION" Value="9"/>
+          <ItemData ItemOID="SEVERITY" Value="MODERATE"/>
+          <ItemData ItemOID="SEVERITY_DEC" Value="DECODED-MODERATE"/>
+        </FormData>
+        <FormData FormOID="DM">
+          <ItemData ItemOID="AGE" Value="68"/>
+          <ItemData ItemOID="AGE_DEC" Value="DECODED-68"/>
+          <ItemData ItemOID="DM.VERSION" Value="2"/>
+          <ItemData ItemOID="SEX" Value="M"/>
+          <ItemData ItemOID="SEX_DEC" Value="DECODED-M"/>
+        </FormData>
+        <FormData FormOID="VS">
+          <ItemData ItemOID="DIA" Value="97"/>
+          <ItemData ItemOID="DIA_DEC" Value="DECODED-97"/>
+          <ItemData ItemOID="SYS" Value="112"/>
+          <ItemData ItemOID="SYS_DEC" Value="DECODED-112"/>
+          <ItemData ItemOID="VS.VERSION" Value="8"/>
+        </FormData>
+      </StudyEventData>
+    </SubjectData>
+    <SubjectData SubjectKey="100010" mdsol:SubjectStatus="Inactive">
+      <SiteRef LocationOID="SITE-002"/>
+      <StudyEventData StudyEventOID="VISIT-002">
+        <FormData FormOID="AE">
+          <ItemData ItemOID="AE.VERSION" Value="9"/>
+          <ItemData ItemOID="SEVERITY" Value="MODERATE"/>
+          <ItemData ItemOID="SEVERITY_DEC" Value="DECODED-MODERATE"/>
+        </FormData>
+        <FormData FormOID="DM">
+          <ItemData ItemOID="AGE" Value="34"/>
+          <ItemData ItemOID="AGE_DEC" Value="DECODED-34"/>
+          <ItemData ItemOID="DM.VERSION" Value="2"/>
+          <ItemData ItemOID="SEX" Value="F"/>
+          <ItemData ItemOID="SEX_DEC" Value="DECODED-F"/>
+        </FormData>
+        <FormData FormOID="VS">
+          <ItemData ItemOID="DIA" Value="90"/>
+          <ItemData ItemOID="DIA_DEC" Value="DECODED-90"/>
+          <ItemData ItemOID="SYS" Value="139"/>
+          <ItemData ItemOID="SYS_DEC" Value="DECODED-139"/>
+          <ItemData ItemOID="VS.VERSION" Value="8"/>
+        </FormData>
+      </StudyEventData>
+      <StudyEventData StudyEventOID="VISIT-003">
+        <FormData FormOID="AE">
+          <ItemData ItemOID="AE.VERSION" Value="9"/>
+          <ItemData ItemOID="SEVERITY" Value="SEVERE"/>
+          <ItemData ItemOID="SEVERITY_DEC" Value="DECODED-SEVERE"/>
+        </FormData>
+        <FormData FormOID="DM">
+          <ItemData ItemOID="AGE" Value="37"/>
+          <ItemData ItemOID="AGE_DEC" Value="DECODED-37"/>
+          <ItemData ItemOID="DM.VERSION" Value="2"/>
+          <ItemData ItemOID="SEX" Value="F"/>
+          <ItemData ItemOID="SEX_DEC" Value="DECODED-F"/>
+        </FormData>
+        <FormData FormOID="VS">
+          <ItemData ItemOID="DIA" Value="83"/>
+          <ItemData ItemOID="DIA_DEC" Value="DECODED-83"/>
+          <ItemData ItemOID="SYS" Value="139"/>
+          <ItemData ItemOID="SYS_DEC" Value="DECODED-139"/>
+          <ItemData ItemOID="VS.VERSION" Value="8"/>
+        </FormData>
+      </StudyEventData>
+    </SubjectData>
+  </ClinicalData>
+</ODM>
