@@ -28,6 +28,15 @@
         "method": "GET",
         "url": "/RaveWebServices/datasets/ClinicalAuditRecords.odm?studyoid=Default%20Study&per_page=5"
       }
+    },
+    {
+      "family": "datasets",
+      "name": "raw-options",
+      "outputFormat": "clinical-dataset-json",
+      "request": {
+        "method": "GET",
+        "url": "/RaveWebServices/studies/Default%20Study/datasets/raw?start=2023-12-31T22:30:00Z&decodesuffix=_DEC&rawsuffix=_RAW&versionitem=VERSION"
+      }
     }
   ]
 }

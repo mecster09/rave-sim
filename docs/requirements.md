@@ -20,7 +20,7 @@ This harness has two cooperating parts:
 ### In-Scope Reference Sections (Production Parity Targets)
 - **1.4.2** – ODM Operational Data Model Adapter
 - **1.5.1.6** – Retrieve Clinical View Datasets as ODM
-- **1.5.3.5** – Retrieve Clinical Data with the Clinical Audit Records Dataset (CAR)
+- **1.5.3.5** – Retrieve Admin Data with the Version Folders Dataset
 - **1.5.7** – Clinical View metadata and extension dependencies
 - **1.5.9** – Retrieve the List of Subjects in a Study
 
@@ -336,7 +336,9 @@ Some endpoints may return:
 
 ---
 
-## 2.1 ODM Adapter / Clinical Audit Records (Sections 1.4.2 & 1.5.3.5)
+## 2.1 ODM Adapter / Clinical Audit Records (Section 1.4.2)
+
+> Note: Clinical Audit Records (CAR) is part of the ODM Adapter capabilities used for clinical transaction/audit extraction. Section **1.5.3.5** in the reference set is **not** CAR; it is the **Version Folders** dataset (see Section 2.2).
 
 ### Endpoint
 ```
@@ -396,7 +398,46 @@ GET /RaveWebServices/datasets/ClinicalAuditRecords.odm
 
 ---
 
-## 2.2 Retrieve Clinical View Datasets as ODM (Section 1.5.1.6)
+## 2.2 Retrieve Admin Data with the Version Folders Dataset (Section 1.5.3.5)
+
+### Purpose
+Retrieve a list of **all folders (visits/study events) across all matrices** for each **CRF version "in use"** for a specified study. This is typically used alongside ODM Adapter transaction feeds to interpret audit/transaction data.
+
+### Endpoint
+```
+GET /RaveWebServices/datasets/VersionFolders.odm
+```
+
+### Query Parameters
+
+| Name | Required | Description |
+|----|--------|------------|
+| `studyoid` | Yes | Study name and environment (URL-escaped), e.g., `Mediflex(Prod)` |
+
+### Response Semantics
+
+The request results in one of:
+1. **SUCCESS:** `200 OK` with complete ODM (the `<ODM>` element is closed).
+2. **FAIL:** `200 OK` with incomplete ODM (the `<ODM>` element is **not** closed).
+3. **FAIL:** `4xx` or `5xx`; further details may be logged server-side.
+
+### ODM Requirements
+- Payload MUST be ODM and include `StudyEventDef` structures representing folders.
+- Minimum ODM version required to support `StudyEventDef` elements with no child elements is **ODM 1.3.1**.
+
+### Example Request
+```
+GET https://{host}/RaveWebServices/datasets/VersionFolders.odm?studyoid=Mediflex(Prod)
+```
+
+### Harness Requirements
+- Must return deterministic folder lists for each CRF version "in use".
+- Must preserve element ordering and schema validity (except intentional truncation scenarios).
+- Must support streaming-failure (partial ODM) scenarios.
+
+---
+
+## 2.3 Retrieve Clinical View Datasets as ODM (Section 1.5.1.6)
 
 ### Endpoints
 ```
@@ -529,7 +570,17 @@ GET /RaveWebServices/studies/{study-oid}/Subjects
 
 ---
 
-## 2.2 Clinical View Datasets as ODM Scenarios (1.5.1.6)
+## 2.2 VersionFolders.odm Scenarios (1.5.3.5)
+
+| Scenario ID | Match Inputs | Simulator Preconditions | Expected Result | Golden Payload |
+|-----------|--------------|------------------------|----------------|---------------|
+| VF-001 | `studyoid` only | Study exists; at least one CRF version in use | 200 + complete ODM listing folders per in-use CRF version | `VersionFolders/VF-001.xml` |
+| VF-002 | `studyoid` only | Streaming failure toggle enabled | 200 + **incomplete ODM** (ODM not closed) | `VersionFolders/VF-002.xml` |
+| VF-003 | Unauthorized | Auth fails | 4xx | `VersionFolders/VF-003.xml` (if body required) |
+
+---
+
+## 2.3 Clinical View Datasets as ODM Scenarios
 
 | Scenario ID | Endpoint Variant | Match Inputs | Simulator Preconditions | Expected Result | Golden Payload |
 |-----------|------------------|-------------|------------------------|----------------|---------------|
@@ -846,7 +897,49 @@ Golden payloads should be stored using the following convention:
 
 ---
 
-## 3.5 Golden Payloads — Clinical View Datasets as ODM
+## 3.5 Golden Payloads — VersionFolders.odm
+
+### Scenario VF-001 — Version Folders Export (Complete ODM)
+**File:** `VersionFolders/VF-001.xml`
+
+```xml
+<ODM ODMVersion="1.3.1" CreationDateTime="2024-01-01T00:00:00">
+  <Study OID="ExampleStudy(Prod)">
+    <GlobalVariables>
+      <StudyName>ExampleStudy(Prod)</StudyName>
+      <ProtocolName>ExampleStudy</ProtocolName>
+    </GlobalVariables>
+    <MetaDataVersion OID="18" Name="1" mdsol:PrimaryFormOID="EN" xmlns:mdsol="http://www.mdsol.com/ns/odm/metadata">
+      <Protocol>
+        <StudyEventRef StudyEventOID="SCREEN" OrderNumber="1" Mandatory="No" mdsol:StudyEventDefName="Screening" />
+        <StudyEventRef StudyEventOID="VISIT1" OrderNumber="2" Mandatory="No" mdsol:StudyEventDefName="Visit 1" />
+      </Protocol>
+      <StudyEventDef OID="SCREEN" Name="Screening" Repeating="No" Type="Common" />
+      <StudyEventDef OID="VISIT1" Name="Visit 1" Repeating="No" Type="Common" />
+    </MetaDataVersion>
+    <!-- More MetaDataVersion elements - one for each CRF version "in use" -->
+  </Study>
+</ODM>
+```
+
+---
+
+### Scenario VF-002 — Partial ODM (Streaming Failure)
+**File:** `VersionFolders/VF-002.xml`
+
+```xml
+<ODM ODMVersion="1.3.1">
+  <Study OID="ExampleStudy(Prod)">
+    <MetaDataVersion OID="18" Name="1">
+      <Protocol>
+        <StudyEventRef StudyEventOID="SCREEN" OrderNumber="1" Mandatory="No" />
+```
+
+**NOTE:** The ODM element is intentionally **not closed** to emulate streaming failure behavior.
+
+---
+
+## 3.6 Golden Payloads — Clinical View Datasets as ODM
 
 ### Scenario CV-001 — Regular Dataset (All Subjects)
 **File:** `ClinicalViews/CV-001.xml`

@@ -1,11 +1,11 @@
 {
-  "generatedAt": "2025-12-23T13:02:01.189Z",
+  "generatedAt": "2025-12-23T17:04:45.066Z",
   "scenarios": [
     {
       "family": "audit",
       "name": "clinical-records",
       "file": "audit/clinical-records.xml",
-      "sha256": "5bd1f0f281b04adea640a71657485acc11ded063800080c16bb007a3e426b57a",
+      "sha256": "4e993c067f626925ce7760d1122c4e8024c78c2038fc7e131f49785099f5b89f",
       "statusCode": 200
     },
     {
@@ -13,6 +13,13 @@
       "name": "regular-dataset",
       "file": "clinical-view/regular-dataset.xml",
       "sha256": "c1852112c2dc4ef1e72ddda0c0b1aed047c3b500be21143843aae4a5d6459c40",
+      "statusCode": 200
+    },
+    {
+      "family": "datasets",
+      "name": "raw-options",
+      "file": "datasets/raw-options.json",
+      "sha256": "0ce48ac86609577918c6c816ac17f07ad76f97e8c8b61d347013faf299f90e76",
       "statusCode": 200
     }
   ]

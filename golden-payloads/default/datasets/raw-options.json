@@ -1,0 +1,664 @@
+{
+  "file": {
+    "oid": "efb112442b710745e8e214aa6f7eabf6e867e3c18d8e10462d74c34bbcc3fafd",
+    "type": "Snapshot",
+    "version": "1.3.2",
+    "created": "2024-01-01T00:00:00.000Z"
+  },
+  "clinicalData": {
+    "study": "Default Study",
+    "metadataVersion": "MDV.DEFAULT",
+    "subjects": [
+      {
+        "subjectKey": "100001",
+        "status": "Active",
+        "site": "SITE-001",
+        "visits": [
+          {
+            "eventOid": "VISIT-002",
+            "forms": {
+              "AE": {
+                "AE.VERSION": "9",
+                "SEVERITY": "SEVERE",
+                "SEVERITY_DEC": "DECODED-SEVERE",
+                "SEVERITY_RAW": "RAW-SEVERE"
+              },
+              "DM": {
+                "AGE": "45",
+                "AGE_DEC": "DECODED-45",
+                "AGE_RAW": "RAW-45",
+                "DM.VERSION": "2",
+                "SEX": "F",
+                "SEX_DEC": "DECODED-F",
+                "SEX_RAW": "RAW-F"
+              },
+              "VS": {
+                "DIA": "77",
+                "DIA_DEC": "DECODED-77",
+                "DIA_RAW": "RAW-77",
+                "SYS": "111",
+                "SYS_DEC": "DECODED-111",
+                "SYS_RAW": "RAW-111",
+                "VS.VERSION": "8"
+              }
+            }
+          },
+          {
+            "eventOid": "VISIT-003",
+            "forms": {
+              "AE": {
+                "AE.VERSION": "9",
+                "SEVERITY": "MILD",
+                "SEVERITY_DEC": "DECODED-MILD",
+                "SEVERITY_RAW": "RAW-MILD"
+              },
+              "DM": {
+                "AGE": "72",
+                "AGE_DEC": "DECODED-72",
+                "AGE_RAW": "RAW-72",
+                "DM.VERSION": "2",
+                "SEX": "M",
+                "SEX_DEC": "DECODED-M",
+                "SEX_RAW": "RAW-M"
+              },
+              "VS": {
+                "DIA": "79",
+                "DIA_DEC": "DECODED-79",
+                "DIA_RAW": "RAW-79",
+                "SYS": "149",
+                "SYS_DEC": "DECODED-149",
+                "SYS_RAW": "RAW-149",
+                "VS.VERSION": "8"
+              }
+            }
+          }
+        ]
+      },
+      {
+        "subjectKey": "100002",
+        "status": "Active",
+        "site": "SITE-002",
+        "visits": [
+          {
+            "eventOid": "VISIT-002",
+            "forms": {
+              "AE": {
+                "AE.VERSION": "9",
+                "SEVERITY": "MODERATE",
+                "SEVERITY_DEC": "DECODED-MODERATE",
+                "SEVERITY_RAW": "RAW-MODERATE"
+              },
+              "DM": {
+                "AGE": "26",
+                "AGE_DEC": "DECODED-26",
+                "AGE_RAW": "RAW-26",
+                "DM.VERSION": "2",
+                "SEX": "F",
+                "SEX_DEC": "DECODED-F",
+                "SEX_RAW": "RAW-F"
+              },
+              "VS": {
+                "DIA": "68",
+                "DIA_DEC": "DECODED-68",
+                "DIA_RAW": "RAW-68",
+                "SYS": "132",
+                "SYS_DEC": "DECODED-132",
+                "SYS_RAW": "RAW-132",
+                "VS.VERSION": "8"
+              }
+            }
+          },
+          {
+            "eventOid": "VISIT-003",
+            "forms": {
+              "AE": {
+                "AE.VERSION": "9",
+                "SEVERITY": "MILD",
+                "SEVERITY_DEC": "DECODED-MILD",
+                "SEVERITY_RAW": "RAW-MILD"
+              },
+              "DM": {
+                "AGE": "47",
+                "AGE_DEC": "DECODED-47",
+                "AGE_RAW": "RAW-47",
+                "DM.VERSION": "2",
+                "SEX": "F",
+                "SEX_DEC": "DECODED-F",
+                "SEX_RAW": "RAW-F"
+              },
+              "VS": {
+                "DIA": "86",
+                "DIA_DEC": "DECODED-86",
+                "DIA_RAW": "RAW-86",
+                "SYS": "132",
+                "SYS_DEC": "DECODED-132",
+                "SYS_RAW": "RAW-132",
+                "VS.VERSION": "8"
+              }
+            }
+          }
+        ]
+      },
+      {
+        "subjectKey": "100003",
+        "status": "Inactive",
+        "site": "SITE-001",
+        "visits": [
+          {
+            "eventOid": "VISIT-002",
+            "forms": {
+              "AE": {
+                "AE.VERSION": "9",
+                "SEVERITY": "MILD",
+                "SEVERITY_DEC": "DECODED-MILD",
+                "SEVERITY_RAW": "RAW-MILD"
+              },
+              "DM": {
+                "AGE": "66",
+                "AGE_DEC": "DECODED-66",
+                "AGE_RAW": "RAW-66",
+                "DM.VERSION": "2",
+                "SEX": "M",
+                "SEX_DEC": "DECODED-M",
+                "SEX_RAW": "RAW-M"
+              },
+              "VS": {
+                "DIA": "84",
+                "DIA_DEC": "DECODED-84",
+                "DIA_RAW": "RAW-84",
+                "SYS": "108",
+                "SYS_DEC": "DECODED-108",
+                "SYS_RAW": "RAW-108",
+                "VS.VERSION": "8"
+              }
+            }
+          },
+          {
+            "eventOid": "VISIT-003",
+            "forms": {
+              "AE": {
+                "AE.VERSION": "9",
+                "SEVERITY": "MILD",
+                "SEVERITY_DEC": "DECODED-MILD",
+                "SEVERITY_RAW": "RAW-MILD"
+              },
+              "DM": {
+                "AGE": "20",
+                "AGE_DEC": "DECODED-20",
+                "AGE_RAW": "RAW-20",
+                "DM.VERSION": "2",
+                "SEX": "M",
+                "SEX_DEC": "DECODED-M",
+                "SEX_RAW": "RAW-M"
+              },
+              "VS": {
+                "DIA": "82",
+                "DIA_DEC": "DECODED-82",
+                "DIA_RAW": "RAW-82",
+                "SYS": "133",
+                "SYS_DEC": "DECODED-133",
+                "SYS_RAW": "RAW-133",
+                "VS.VERSION": "8"
+              }
+            }
+          }
+        ]
+      },
+      {
+        "subjectKey": "100004",
+        "status": "Active",
+        "site": "SITE-002",
+        "visits": [
+          {
+            "eventOid": "VISIT-002",
+            "forms": {
+              "AE": {
+                "AE.VERSION": "9",
+                "SEVERITY": "SEVERE",
+                "SEVERITY_DEC": "DECODED-SEVERE",
+                "SEVERITY_RAW": "RAW-SEVERE"
+              },
+              "DM": {
+                "AGE": "69",
+                "AGE_DEC": "DECODED-69",
+                "AGE_RAW": "RAW-69",
+                "DM.VERSION": "2",
+                "SEX": "F",
+                "SEX_DEC": "DECODED-F",
+                "SEX_RAW": "RAW-F"
+              },
+              "VS": {
+                "DIA": "70",
+                "DIA_DEC": "DECODED-70",
+                "DIA_RAW": "RAW-70",
+                "SYS": "147",
+                "SYS_DEC": "DECODED-147",
+                "SYS_RAW": "RAW-147",
+                "VS.VERSION": "8"
+              }
+            }
+          },
+          {
+            "eventOid": "VISIT-003",
+            "forms": {
+              "AE": {
+                "AE.VERSION": "9",
+                "SEVERITY": "MILD",
+                "SEVERITY_DEC": "DECODED-MILD",
+                "SEVERITY_RAW": "RAW-MILD"
+              },
+              "DM": {
+                "AGE": "53",
+                "AGE_DEC": "DECODED-53",
+                "AGE_RAW": "RAW-53",
+                "DM.VERSION": "2",
+                "SEX": "M",
+                "SEX_DEC": "DECODED-M",
+                "SEX_RAW": "RAW-M"
+              },
+              "VS": {
+                "DIA": "87",
+                "DIA_DEC": "DECODED-87",
+                "DIA_RAW": "RAW-87",
+                "SYS": "138",
+                "SYS_DEC": "DECODED-138",
+                "SYS_RAW": "RAW-138",
+                "VS.VERSION": "8"
+              }
+            }
+          }
+        ]
+      },
+      {
+        "subjectKey": "100005",
+        "status": "Active",
+        "site": "SITE-001",
+        "visits": [
+          {
+            "eventOid": "VISIT-002",
+            "forms": {
+              "AE": {
+                "AE.VERSION": "9",
+                "SEVERITY": "MODERATE",
+                "SEVERITY_DEC": "DECODED-MODERATE",
+                "SEVERITY_RAW": "RAW-MODERATE"
+              },
+              "DM": {
+                "AGE": "40",
+                "AGE_DEC": "DECODED-40",
+                "AGE_RAW": "RAW-40",
+                "DM.VERSION": "2",
+                "SEX": "M",
+                "SEX_DEC": "DECODED-M",
+                "SEX_RAW": "RAW-M"
+              },
+              "VS": {
+                "DIA": "83",
+                "DIA_DEC": "DECODED-83",
+                "DIA_RAW": "RAW-83",
+                "SYS": "104",
+                "SYS_DEC": "DECODED-104",
+                "SYS_RAW": "RAW-104",
+                "VS.VERSION": "8"
+              }
+            }
+          },
+          {
+            "eventOid": "VISIT-003",
+            "forms": {
+              "AE": {
+                "AE.VERSION": "9",
+                "SEVERITY": "SEVERE",
+                "SEVERITY_DEC": "DECODED-SEVERE",
+                "SEVERITY_RAW": "RAW-SEVERE"
+              },
+              "DM": {
+                "AGE": "32",
+                "AGE_DEC": "DECODED-32",
+                "AGE_RAW": "RAW-32",
+                "DM.VERSION": "2",
+                "SEX": "F",
+                "SEX_DEC": "DECODED-F",
+                "SEX_RAW": "RAW-F"
+              },
+              "VS": {
+                "DIA": "81",
+                "DIA_DEC": "DECODED-81",
+                "DIA_RAW": "RAW-81",
+                "SYS": "149",
+                "SYS_DEC": "DECODED-149",
+                "SYS_RAW": "RAW-149",
+                "VS.VERSION": "8"
+              }
+            }
+          }
+        ]
+      },
+      {
+        "subjectKey": "100006",
+        "status": "Deleted",
+        "site": "SITE-002",
+        "visits": [
+          {
+            "eventOid": "VISIT-002",
+            "forms": {
+              "AE": {
+                "AE.VERSION": "9",
+                "SEVERITY": "MODERATE",
+                "SEVERITY_DEC": "DECODED-MODERATE",
+                "SEVERITY_RAW": "RAW-MODERATE"
+              },
+              "DM": {
+                "AGE": "72",
+                "AGE_DEC": "DECODED-72",
+                "AGE_RAW": "RAW-72",
+                "DM.VERSION": "2",
+                "SEX": "F",
+                "SEX_DEC": "DECODED-F",
+                "SEX_RAW": "RAW-F"
+              },
+              "VS": {
+                "DIA": "96",
+                "DIA_DEC": "DECODED-96",
+                "DIA_RAW": "RAW-96",
+                "SYS": "115",
+                "SYS_DEC": "DECODED-115",
+                "SYS_RAW": "RAW-115",
+                "VS.VERSION": "8"
+              }
+            }
+          },
+          {
+            "eventOid": "VISIT-003",
+            "forms": {
+              "AE": {
+                "AE.VERSION": "9",
+                "SEVERITY": "MODERATE",
+                "SEVERITY_DEC": "DECODED-MODERATE",
+                "SEVERITY_RAW": "RAW-MODERATE"
+              },
+              "DM": {
+                "AGE": "61",
+                "AGE_DEC": "DECODED-61",
+                "AGE_RAW": "RAW-61",
+                "DM.VERSION": "2",
+                "SEX": "F",
+                "SEX_DEC": "DECODED-F",
+                "SEX_RAW": "RAW-F"
+              },
+              "VS": {
+                "DIA": "74",
+                "DIA_DEC": "DECODED-74",
+                "DIA_RAW": "RAW-74",
+                "SYS": "142",
+                "SYS_DEC": "DECODED-142",
+                "SYS_RAW": "RAW-142",
+                "VS.VERSION": "8"
+              }
+            }
+          }
+        ]
+      },
+      {
+        "subjectKey": "100007",
+        "status": "Inactive",
+        "site": "SITE-001",
+        "visits": [
+          {
+            "eventOid": "VISIT-002",
+            "forms": {
+              "AE": {
+                "AE.VERSION": "9",
+                "SEVERITY": "SEVERE",
+                "SEVERITY_DEC": "DECODED-SEVERE",
+                "SEVERITY_RAW": "RAW-SEVERE"
+              },
+              "DM": {
+                "AGE": "62",
+                "AGE_DEC": "DECODED-62",
+                "AGE_RAW": "RAW-62",
+                "DM.VERSION": "2",
+                "SEX": "M",
+                "SEX_DEC": "DECODED-M",
+                "SEX_RAW": "RAW-M"
+              },
+              "VS": {
+                "DIA": "61",
+                "DIA_DEC": "DECODED-61",
+                "DIA_RAW": "RAW-61",
+                "SYS": "142",
+                "SYS_DEC": "DECODED-142",
+                "SYS_RAW": "RAW-142",
+                "VS.VERSION": "8"
+              }
+            }
+          },
+          {
+            "eventOid": "VISIT-003",
+            "forms": {
+              "AE": {
+                "AE.VERSION": "9",
+                "SEVERITY": "SEVERE",
+                "SEVERITY_DEC": "DECODED-SEVERE",
+                "SEVERITY_RAW": "RAW-SEVERE"
+              },
+              "DM": {
+                "AGE": "20",
+                "AGE_DEC": "DECODED-20",
+                "AGE_RAW": "RAW-20",
+                "DM.VERSION": "2",
+                "SEX": "M",
+                "SEX_DEC": "DECODED-M",
+                "SEX_RAW": "RAW-M"
+              },
+              "VS": {
+                "DIA": "70",
+                "DIA_DEC": "DECODED-70",
+                "DIA_RAW": "RAW-70",
+                "SYS": "147",
+                "SYS_DEC": "DECODED-147",
+                "SYS_RAW": "RAW-147",
+                "VS.VERSION": "8"
+              }
+            }
+          }
+        ]
+      },
+      {
+        "subjectKey": "100008",
+        "status": "Inactive",
+        "site": "SITE-002",
+        "visits": [
+          {
+            "eventOid": "VISIT-002",
+            "forms": {
+              "AE": {
+                "AE.VERSION": "9",
+                "SEVERITY": "MODERATE",
+                "SEVERITY_DEC": "DECODED-MODERATE",
+                "SEVERITY_RAW": "RAW-MODERATE"
+              },
+              "DM": {
+                "AGE": "18",
+                "AGE_DEC": "DECODED-18",
+                "AGE_RAW": "RAW-18",
+                "DM.VERSION": "2",
+                "SEX": "M",
+                "SEX_DEC": "DECODED-M",
+                "SEX_RAW": "RAW-M"
+              },
+              "VS": {
+                "DIA": "75",
+                "DIA_DEC": "DECODED-75",
+                "DIA_RAW": "RAW-75",
+                "SYS": "138",
+                "SYS_DEC": "DECODED-138",
+                "SYS_RAW": "RAW-138",
+                "VS.VERSION": "8"
+              }
+            }
+          },
+          {
+            "eventOid": "VISIT-003",
+            "forms": {
+              "AE": {
+                "AE.VERSION": "9",
+                "SEVERITY": "MODERATE",
+                "SEVERITY_DEC": "DECODED-MODERATE",
+                "SEVERITY_RAW": "RAW-MODERATE"
+              },
+              "DM": {
+                "AGE": "62",
+                "AGE_DEC": "DECODED-62",
+                "AGE_RAW": "RAW-62",
+                "DM.VERSION": "2",
+                "SEX": "M",
+                "SEX_DEC": "DECODED-M",
+                "SEX_RAW": "RAW-M"
+              },
+              "VS": {
+                "DIA": "85",
+                "DIA_DEC": "DECODED-85",
+                "DIA_RAW": "RAW-85",
+                "SYS": "112",
+                "SYS_DEC": "DECODED-112",
+                "SYS_RAW": "RAW-112",
+                "VS.VERSION": "8"
+              }
+            }
+          }
+        ]
+      },
+      {
+        "subjectKey": "100009",
+        "status": "Inactive",
+        "site": "SITE-001",
+        "visits": [
+          {
+            "eventOid": "VISIT-002",
+            "forms": {
+              "AE": {
+                "AE.VERSION": "9",
+                "SEVERITY": "SEVERE",
+                "SEVERITY_DEC": "DECODED-SEVERE",
+                "SEVERITY_RAW": "RAW-SEVERE"
+              },
+              "DM": {
+                "AGE": "56",
+                "AGE_DEC": "DECODED-56",
+                "AGE_RAW": "RAW-56",
+                "DM.VERSION": "2",
+                "SEX": "F",
+                "SEX_DEC": "DECODED-F",
+                "SEX_RAW": "RAW-F"
+              },
+              "VS": {
+                "DIA": "80",
+                "DIA_DEC": "DECODED-80",
+                "DIA_RAW": "RAW-80",
+                "SYS": "109",
+                "SYS_DEC": "DECODED-109",
+                "SYS_RAW": "RAW-109",
+                "VS.VERSION": "8"
+              }
+            }
+          },
+          {
+            "eventOid": "VISIT-003",
+            "forms": {
+              "AE": {
+                "AE.VERSION": "9",
+                "SEVERITY": "MILD",
+                "SEVERITY_DEC": "DECODED-MILD",
+                "SEVERITY_RAW": "RAW-MILD"
+              },
+              "DM": {
+                "AGE": "49",
+                "AGE_DEC": "DECODED-49",
+                "AGE_RAW": "RAW-49",
+                "DM.VERSION": "2",
+                "SEX": "M",
+                "SEX_DEC": "DECODED-M",
+                "SEX_RAW": "RAW-M"
+              },
+              "VS": {
+                "DIA": "80",
+                "DIA_DEC": "DECODED-80",
+                "DIA_RAW": "RAW-80",
+                "SYS": "129",
+                "SYS_DEC": "DECODED-129",
+                "SYS_RAW": "RAW-129",
+                "VS.VERSION": "8"
+              }
+            }
+          }
+        ]
+      },
+      {
+        "subjectKey": "100010",
+        "status": "Inactive",
+        "site": "SITE-002",
+        "visits": [
+          {
+            "eventOid": "VISIT-002",
+            "forms": {
+              "AE": {
+                "AE.VERSION": "9",
+                "SEVERITY": "SEVERE",
+                "SEVERITY_DEC": "DECODED-SEVERE",
+                "SEVERITY_RAW": "RAW-SEVERE"
+              },
+              "DM": {
+                "AGE": "20",
+                "AGE_DEC": "DECODED-20",
+                "AGE_RAW": "RAW-20",
+                "DM.VERSION": "2",
+                "SEX": "F",
+                "SEX_DEC": "DECODED-F",
+                "SEX_RAW": "RAW-F"
+              },
+              "VS": {
+                "DIA": "83",
+                "DIA_DEC": "DECODED-83",
+                "DIA_RAW": "RAW-83",
+                "SYS": "109",
+                "SYS_DEC": "DECODED-109",
+                "SYS_RAW": "RAW-109",
+                "VS.VERSION": "8"
+              }
+            }
+          },
+          {
+            "eventOid": "VISIT-003",
+            "forms": {
+              "AE": {
+                "AE.VERSION": "9",
+                "SEVERITY": "MODERATE",
+                "SEVERITY_DEC": "DECODED-MODERATE",
+                "SEVERITY_RAW": "RAW-MODERATE"
+              },
+              "DM": {
+                "AGE": "58",
+                "AGE_DEC": "DECODED-58",
+                "AGE_RAW": "RAW-58",
+                "DM.VERSION": "2",
+                "SEX": "F",
+                "SEX_DEC": "DECODED-F",
+                "SEX_RAW": "RAW-F"
+              },
+              "VS": {
+                "DIA": "69",
+                "DIA_DEC": "DECODED-69",
+                "DIA_RAW": "RAW-69",
+                "SYS": "126",
+                "SYS_DEC": "DECODED-126",
+                "SYS_RAW": "RAW-126",
+                "VS.VERSION": "8"
+              }
+            }
+          }
+        ]
+      }
+    ]
+  }
+}

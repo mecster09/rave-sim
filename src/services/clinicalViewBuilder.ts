@@ -5,6 +5,10 @@ export interface ClinicalViewOptions {
   currentStudyDay: number;
   formOid?: string;
   subjectKey?: number;
+  startStudyDay?: number;
+  versionItem?: string;
+  decodeSuffix?: string;
+  rawSuffix?: string;
 }
 
 function isVisitAvailableForDay(visit: Visit, currentStudyDay: number): boolean {
@@ -12,7 +16,7 @@ function isVisitAvailableForDay(visit: Visit, currentStudyDay: number): boolean 
 }
 
 export function buildClinicalViewSubjects(snapshot: SimulatorSnapshot, options: ClinicalViewOptions): SnapshotSubject[] {
-  const { currentStudyDay, formOid, subjectKey } = options;
+  const { currentStudyDay, formOid, subjectKey, startStudyDay, versionItem, decodeSuffix, rawSuffix } = options;
   const normalizedFormOid = formOid?.trim() || undefined;
   const results: SnapshotSubject[] = [];
 
@@ -28,11 +32,19 @@ export function buildClinicalViewSubjects(snapshot: SimulatorSnapshot, options: 
         continue;
       }
 
+      if (typeof startStudyDay === 'number' && visit.availableDay < Math.floor(startStudyDay)) {
+        continue;
+      }
+
       const forms = visit.forms
         .filter(form => !normalizedFormOid || form.formOid === normalizedFormOid)
         .map(form => ({
           formOid: form.formOid,
-          data: { ...form.data }
+          data: augmentFormData(form.formOid, form.data, {
+            versionItem,
+            decodeSuffix,
+            rawSuffix
+          })
         }))
         .filter(form => Object.keys(form.data).length > 0);
 
@@ -59,4 +71,45 @@ export function buildClinicalViewSubjects(snapshot: SimulatorSnapshot, options: 
   }
 
   return results;
+}
+
+interface AugmentOptions {
+  versionItem?: string;
+  decodeSuffix?: string;
+  rawSuffix?: string;
+}
+
+function augmentFormData(
+  formOid: string,
+  source: Record<string, string | number>,
+  options: AugmentOptions
+): Record<string, string | number> {
+  const { versionItem, decodeSuffix, rawSuffix } = options;
+  const result: Record<string, string | number> = { ...source };
+
+  const fieldKeys = Object.keys(source);
+
+  for (const key of fieldKeys) {
+    const value = source[key];
+    if (decodeSuffix) {
+      result[`${key}${decodeSuffix}`] = `DECODED-${String(value)}`;
+    }
+    if (rawSuffix) {
+      result[`${key}${rawSuffix}`] = `RAW-${String(value)}`;
+    }
+  }
+
+  if (versionItem) {
+    result[`${formOid}.${versionItem}`] = `${computeVersionValue(formOid)}`;
+  }
+
+  return result;
+}
+
+function computeVersionValue(formOid: string): number {
+  let hash = 0;
+  for (let i = 0; i < formOid.length; i += 1) {
+    hash += formOid.charCodeAt(i);
+  }
+  return (hash % 9) + 1;
 }

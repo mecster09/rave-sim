@@ -123,6 +123,106 @@ export function buildServer() {
     return { valid: false, requested: false } as const;
   };
 
+  type ClinicalDatasetType = 'regular' | 'raw';
+
+  interface ParsedClinicalDatasetQuery {
+    truncateRequested: boolean;
+    startTimeMs?: number;
+    versionItem?: string;
+    decodeSuffix?: string;
+    rawSuffix?: string;
+  }
+
+  interface QueryParseResult {
+    ok: true;
+    value: ParsedClinicalDatasetQuery;
+  }
+
+  interface QueryParseError {
+    ok: false;
+    statusCode: number;
+    message: string;
+  }
+
+  function normalizeOptionalString(raw: unknown, label: string): { ok: true; value?: string } | QueryParseError {
+    if (typeof raw === 'undefined') {
+      return { ok: true };
+    }
+    if (typeof raw !== 'string') {
+      return { ok: false, statusCode: 400, message: `${label} must be a string` };
+    }
+    const trimmed = raw.trim();
+    if (trimmed.length === 0) {
+      return { ok: false, statusCode: 400, message: `${label} must be a non-empty string` };
+    }
+    return { ok: true, value: trimmed };
+  }
+
+  function parseClinicalDatasetQuery(
+    query: Record<string, unknown>,
+    datasetType: ClinicalDatasetType
+  ): QueryParseResult | QueryParseError {
+    const truncateFlag = parseTruncateFlag(query.truncate);
+    if (!truncateFlag.valid) {
+      return { ok: false, statusCode: 400, message: 'truncate must be a boolean value' };
+    }
+
+    const startResult = normalizeOptionalString(query.start, 'start');
+    if (!startResult.ok) {
+      return startResult;
+    }
+    let startTimeMs: number | undefined;
+    if (startResult.value) {
+      const parsed = Date.parse(startResult.value);
+      if (Number.isNaN(parsed)) {
+        return { ok: false, statusCode: 400, message: 'start must be a valid ISO-8601 datetime' };
+      }
+      startTimeMs = parsed;
+    }
+
+    const versionResult = normalizeOptionalString(query.versionitem, 'versionitem');
+    if (!versionResult.ok) {
+      return versionResult;
+    }
+
+    const decodeResult = normalizeOptionalString(query.decodesuffix, 'decodesuffix');
+    if (!decodeResult.ok) {
+      return decodeResult;
+    }
+
+    const rawResult = normalizeOptionalString(query.rawsuffix, 'rawsuffix');
+    if (!rawResult.ok) {
+      return rawResult;
+    }
+
+    if (datasetType === 'regular' && rawResult.value) {
+      return { ok: false, statusCode: 400, message: 'rawsuffix is only supported on raw dataset endpoints' };
+    }
+
+    return {
+      ok: true,
+      value: {
+        truncateRequested: truncateFlag.requested,
+        startTimeMs,
+        versionItem: versionResult.value,
+        decodeSuffix: decodeResult.value,
+        rawSuffix: rawResult.value
+      }
+    };
+  }
+
+  function computeStartStudyDay(
+    startTimeMs: number | undefined,
+    simStartWallClock: number,
+    simSpeedMinutesPerDay: number
+  ): number | undefined {
+    if (typeof startTimeMs === 'undefined') {
+      return undefined;
+    }
+    const minutes = (startTimeMs - simStartWallClock) / 60000;
+    return minutes / simSpeedMinutesPerDay;
+  }
+
   app.get('/health', async () => {
     return { status: 'ok' };
   });
@@ -307,27 +407,46 @@ export function buildServer() {
     return reply.send(xml);
   });
 
-  app.get('/RaveWebServices/studies/:studyOid/datasets/regular', async (request, reply) => {
-    const params = request.params as { studyOid?: unknown };
-    const query = request.query as { truncate?: unknown };
-    const studyOid = typeof params.studyOid === 'string' ? params.studyOid : '';
-
-    if (!studyOid) {
-      return reply.code(400).send({ error: 'Invalid studyOid' });
-    }
-
-    const truncateFlag = parseTruncateFlag(query.truncate);
-    if (!truncateFlag.valid) {
-      return reply.code(400).send({ error: 'truncate must be a boolean value' });
+  async function sendClinicalDataset(
+    reply: import('fastify').FastifyReply,
+    datasetType: ClinicalDatasetType,
+    studyOid: string,
+    params: { formOid?: string; subjectKey?: number },
+    query: Record<string, unknown>
+  ) {
+    const parseResult = parseClinicalDatasetQuery(query, datasetType);
+    if (!parseResult.ok) {
+      return reply.code(parseResult.statusCode).send({ error: parseResult.message });
     }
 
     const snapshot = simulatorState.getSnapshot();
+    if (typeof params.subjectKey === 'number') {
+      const found = snapshot.subjects.some(subject => subject.subjectKey === params.subjectKey);
+      if (!found) {
+        return reply.code(404).send({ error: 'Subject not found' });
+      }
+    }
+
     const { simClock, generatedAt } = computeGeneratedAt();
+    const startStudyDay = computeStartStudyDay(
+      parseResult.value.startTimeMs,
+      simClock.simStartWallClock,
+      simClock.simSpeedMinutesPerDay
+    );
+
+    const rawSuffix = parseResult.value.rawSuffix ?? (datasetType === 'raw' ? '_RAW' : undefined);
+
     const subjects = buildClinicalViewSubjects(snapshot, {
-      currentStudyDay: simClock.simCurrentStudyDay
+      currentStudyDay: simClock.simCurrentStudyDay,
+      formOid: params.formOid,
+      subjectKey: params.subjectKey,
+      startStudyDay,
+      versionItem: parseResult.value.versionItem,
+      decodeSuffix: parseResult.value.decodeSuffix,
+      rawSuffix
     });
 
-    const shouldTruncate = currentConfig.truncateOdm || truncateFlag.requested;
+    const shouldTruncate = currentConfig.truncateOdm || parseResult.value.truncateRequested;
 
     const xml = buildSnapshotODM({
       studyOid,
@@ -339,11 +458,20 @@ export function buildServer() {
 
     reply.header('content-type', 'application/xml');
     return reply.send(xml);
+  }
+
+  app.get('/RaveWebServices/studies/:studyOid/datasets/regular', async (request, reply) => {
+    const params = request.params as { studyOid?: unknown };
+    const studyOid = typeof params.studyOid === 'string' ? params.studyOid : '';
+    if (!studyOid) {
+      return reply.code(400).send({ error: 'Invalid studyOid' });
+    }
+
+    return sendClinicalDataset(reply, 'regular', studyOid, {}, request.query as Record<string, unknown>);
   });
 
   app.get('/RaveWebServices/studies/:studyOid/datasets/regular/:formOid', async (request, reply) => {
     const params = request.params as { studyOid?: unknown; formOid?: unknown };
-    const query = request.query as { truncate?: unknown };
     const studyOid = typeof params.studyOid === 'string' ? params.studyOid : '';
     const formOidRaw = typeof params.formOid === 'string' ? params.formOid : '';
     const formOid = formOidRaw.trim();
@@ -356,36 +484,11 @@ export function buildServer() {
       return reply.code(400).send({ error: 'Invalid formOid' });
     }
 
-    const truncateFlag = parseTruncateFlag(query.truncate);
-
-    if (!truncateFlag.valid) {
-      return reply.code(400).send({ error: 'truncate must be a boolean value' });
-    }
-
-    const snapshot = simulatorState.getSnapshot();
-    const { simClock, generatedAt } = computeGeneratedAt();
-    const subjects = buildClinicalViewSubjects(snapshot, {
-      currentStudyDay: simClock.simCurrentStudyDay,
-      formOid
-    });
-
-    const shouldTruncate = currentConfig.truncateOdm || truncateFlag.requested;
-
-    const xml = buildSnapshotODM({
-      studyOid,
-      metadataVersionOid: 'MDV.DEFAULT',
-      generatedAt,
-      subjects,
-      truncate: shouldTruncate
-    });
-
-    reply.header('content-type', 'application/xml');
-    return reply.send(xml);
+    return sendClinicalDataset(reply, 'regular', studyOid, { formOid }, request.query as Record<string, unknown>);
   });
 
   app.get('/RaveWebServices/studies/:studyOid/subjects/:subjectKey/datasets/regular', async (request, reply) => {
     const params = request.params as { studyOid?: unknown; subjectKey?: unknown };
-    const query = request.query as { truncate?: unknown };
     const studyOid = typeof params.studyOid === 'string' ? params.studyOid : '';
     const subjectKeyValue = typeof params.subjectKey === 'string' ? params.subjectKey : '';
 
@@ -393,46 +496,66 @@ export function buildServer() {
       return reply.code(400).send({ error: 'Invalid studyOid' });
     }
 
-    if (!subjectKeyValue || subjectKeyValue.trim().length === 0) {
+    const normalizedSubject = subjectKeyValue.trim();
+    if (!normalizedSubject) {
       return reply.code(400).send({ error: 'Invalid subjectKey' });
     }
 
-    const truncateFlag = parseTruncateFlag(query.truncate);
-
-    if (!truncateFlag.valid) {
-      return reply.code(400).send({ error: 'truncate must be a boolean value' });
-    }
-
-    const numericSubjectKey = Number(subjectKeyValue);
+    const numericSubjectKey = Number(normalizedSubject);
     if (!Number.isInteger(numericSubjectKey) || Number.isNaN(numericSubjectKey) || numericSubjectKey <= 0) {
       return reply.code(400).send({ error: 'Invalid subjectKey' });
     }
 
-    const snapshot = simulatorState.getSnapshot();
-    const subjectExists = snapshot.subjects.some(subject => subject.subjectKey === numericSubjectKey);
+    return sendClinicalDataset(reply, 'regular', studyOid, { subjectKey: numericSubjectKey }, request.query as Record<string, unknown>);
+  });
 
-    if (!subjectExists) {
-      return reply.code(404).send({ error: 'Subject not found' });
+  app.get('/RaveWebServices/studies/:studyOid/datasets/raw', async (request, reply) => {
+    const params = request.params as { studyOid?: unknown };
+    const studyOid = typeof params.studyOid === 'string' ? params.studyOid : '';
+    if (!studyOid) {
+      return reply.code(400).send({ error: 'Invalid studyOid' });
     }
 
-    const { simClock, generatedAt } = computeGeneratedAt();
-    const subjects = buildClinicalViewSubjects(snapshot, {
-      currentStudyDay: simClock.simCurrentStudyDay,
-      subjectKey: numericSubjectKey
-    });
+    return sendClinicalDataset(reply, 'raw', studyOid, {}, request.query as Record<string, unknown>);
+  });
 
-    const shouldTruncate = currentConfig.truncateOdm || truncateFlag.requested;
+  app.get('/RaveWebServices/studies/:studyOid/datasets/raw/:formOid', async (request, reply) => {
+    const params = request.params as { studyOid?: unknown; formOid?: unknown };
+    const studyOid = typeof params.studyOid === 'string' ? params.studyOid : '';
+    const formOidRaw = typeof params.formOid === 'string' ? params.formOid : '';
+    const formOid = formOidRaw.trim();
 
-    const xml = buildSnapshotODM({
-      studyOid,
-      metadataVersionOid: 'MDV.DEFAULT',
-      generatedAt,
-      subjects,
-      truncate: shouldTruncate
-    });
+    if (!studyOid) {
+      return reply.code(400).send({ error: 'Invalid studyOid' });
+    }
 
-    reply.header('content-type', 'application/xml');
-    return reply.send(xml);
+    if (!formOid) {
+      return reply.code(400).send({ error: 'Invalid formOid' });
+    }
+
+    return sendClinicalDataset(reply, 'raw', studyOid, { formOid }, request.query as Record<string, unknown>);
+  });
+
+  app.get('/RaveWebServices/studies/:studyOid/subjects/:subjectKey/datasets/raw', async (request, reply) => {
+    const params = request.params as { studyOid?: unknown; subjectKey?: unknown };
+    const studyOid = typeof params.studyOid === 'string' ? params.studyOid : '';
+    const subjectKeyValue = typeof params.subjectKey === 'string' ? params.subjectKey : '';
+
+    if (!studyOid) {
+      return reply.code(400).send({ error: 'Invalid studyOid' });
+    }
+
+    const normalizedSubject = subjectKeyValue.trim();
+    if (!normalizedSubject) {
+      return reply.code(400).send({ error: 'Invalid subjectKey' });
+    }
+
+    const numericSubjectKey = Number(normalizedSubject);
+    if (!Number.isInteger(numericSubjectKey) || Number.isNaN(numericSubjectKey) || numericSubjectKey <= 0) {
+      return reply.code(400).send({ error: 'Invalid subjectKey' });
+    }
+
+    return sendClinicalDataset(reply, 'raw', studyOid, { subjectKey: numericSubjectKey }, request.query as Record<string, unknown>);
   });
 
   app.get('/RaveWebServices/datasets/ClinicalAuditRecords.odm', async (request, reply) => {

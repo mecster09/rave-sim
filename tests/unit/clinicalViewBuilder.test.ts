@@ -103,4 +103,32 @@ describe('buildClinicalViewSubjects', () => {
     const subjects = buildClinicalViewSubjects(snapshot, { currentStudyDay: -1 });
     expect(subjects).toHaveLength(0);
   });
+
+  it('applies startStudyDay filter to visits', () => {
+    const subjects = buildClinicalViewSubjects(snapshot, {
+      currentStudyDay: 5,
+      startStudyDay: 1.1
+    });
+    expect(subjects).toHaveLength(1);
+    expect(subjects[0].visits).toHaveLength(1);
+    expect(subjects[0].visits[0].visitOid).toBe('VISIT-002');
+  });
+
+  it('adds decoded, raw, and version items when requested', () => {
+    const subjects = buildClinicalViewSubjects(snapshot, {
+      currentStudyDay: 2,
+      decodeSuffix: '_DEC',
+      rawSuffix: '_RAW',
+      versionItem: 'VERSION'
+    });
+
+    expect(subjects[0].visits[0].forms[0].data).toMatchObject({
+      'DM.VERSION': expect.any(String)
+    });
+
+    const dmForm = subjects[0].visits[0].forms.find(form => form.formOid === 'DM');
+    expect(dmForm).toBeDefined();
+    expect(dmForm?.data).toHaveProperty('SEX_DEC', expect.stringContaining('DECODED-'));
+    expect(dmForm?.data).toHaveProperty('SEX_RAW', expect.stringContaining('RAW-'));
+  });
 });

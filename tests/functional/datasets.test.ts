@@ -40,6 +40,23 @@ function extractFormOids(xml: string) {
   return Array.from(xml.matchAll(/FormOID="([^"]+)"/g)).map(match => match[1]);
 }
 
+async function resolveStartIso(app: ReturnType<typeof buildServer>, day: number) {
+  const res = await app.inject({
+    method: 'GET',
+    url: '/harness/time'
+  });
+  expect(res.statusCode).toBe(200);
+  const body = res.json() as {
+    simClock: {
+      simStartWallClock: number;
+      simSpeedMinutesPerDay: number;
+    };
+  };
+  const { simStartWallClock, simSpeedMinutesPerDay } = body.simClock;
+  const millis = simStartWallClock + day * simSpeedMinutesPerDay * 60000;
+  return new Date(millis).toISOString();
+}
+
 describe('Clinical view datasets', () => {
   it('requires authentication', async () => {
     const app = buildServer();
@@ -177,5 +194,71 @@ describe('Clinical view datasets', () => {
 
     expect(res.statusCode).toBe(400);
     expect(res.json().error).toBe('truncate must be a boolean value');
+  });
+
+  it('supports raw datasets with start and suffix query options', async () => {
+    const app = buildServer();
+    await freezeStudyDay(app, 2.5);
+    const startIso = await resolveStartIso(app, 1);
+
+    const res = await app.inject({
+      method: 'GET',
+      url:
+        `/RaveWebServices/studies/Default%20Study/datasets/raw?start=${encodeURIComponent(
+          startIso
+        )}&decodesuffix=_DEC&rawsuffix=_RAW&versionitem=VERSION`,
+      headers: {
+        authorization: authHeader()
+      }
+    });
+
+    expect(res.statusCode).toBe(200);
+    const body = res.body;
+    const visits = extractVisitOids(body);
+    expect(new Set(visits)).toEqual(new Set(['VISIT-002', 'VISIT-003']));
+    expect(body).toContain('ItemOID="SYS_DEC"');
+    expect(body).toContain('ItemOID="SYS_RAW"');
+    expect(body).toContain('ItemOID="VS.VERSION"');
+  });
+
+  it('rejects rawsuffix on regular dataset endpoints', async () => {
+    const app = buildServer();
+
+    const res = await app.inject({
+      method: 'GET',
+      url: '/RaveWebServices/studies/Default%20Study/datasets/regular?rawsuffix=_RAW',
+      headers: {
+        authorization: authHeader()
+      }
+    });
+
+    expect(res.statusCode).toBe(400);
+    expect(res.json().error).toBe('rawsuffix is only supported on raw dataset endpoints');
+  });
+
+  it('validates start query parameter', async () => {
+    const app = buildServer();
+
+    const res = await app.inject({
+      method: 'GET',
+      url: '/RaveWebServices/studies/Default%20Study/datasets/raw?start=not-a-date',
+      headers: {
+        authorization: authHeader()
+      }
+    });
+
+    expect(res.statusCode).toBe(400);
+    expect(res.json().error).toBe('start must be a valid ISO-8601 datetime');
+  });
+
+  it('requires authentication for raw datasets', async () => {
+    const app = buildServer();
+
+    const res = await app.inject({
+      method: 'GET',
+      url: '/RaveWebServices/studies/Default%20Study/datasets/raw'
+    });
+
+    expect(res.statusCode).toBe(401);
   });
 });

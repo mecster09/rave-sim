@@ -1,0 +1,42 @@
+meta {
+  name: Apply Harness
+  type: http
+  seq: 1
+}
+
+put {
+  url: http://localhost:3000/harness/config
+  body: json
+  auth: basic
+}
+
+headers {
+  Content-Type: application/json
+}
+
+auth:basic {
+  username: test-user
+  password: test-pass
+}
+
+body:json {
+  {
+    "applyMode": "applyAndReset",
+    "config": {
+      "studyName": "Default Study",
+      "siteCount": 2,
+      "subjectCount": 10,
+      "visitCountPerSubject": 3,
+      "formDataPointsPerVisit": 5,
+      "simSpeedMinutesPerDay": 60,
+      "resetOnStartup": false,
+      "randomSeed": 123456,
+      "truncateOdm": false
+    }
+  }
+}
+
+settings {
+  encodeUrl: false
+  timeout: 0
+}

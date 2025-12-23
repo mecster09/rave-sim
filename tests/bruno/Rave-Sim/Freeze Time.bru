@@ -1,0 +1,29 @@
+meta {
+  name: Freeze Time
+  type: http
+  seq: 3
+}
+
+put {
+  url: http://localhost:3000/harness/time
+  body: json
+  auth: basic
+}
+
+headers {
+  Content-Type: application/json
+}
+
+auth:basic {
+  username: test-user
+  password: test-pass
+}
+
+body:json {
+  {"simStudyDay":2.5,"freeze":true}
+}
+
+settings {
+  encodeUrl: false
+  timeout: 0
+}

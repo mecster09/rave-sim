@@ -1,6 +1,8 @@
 import crypto from 'node:crypto';
 import path from 'node:path';
 import { promises as fs } from 'node:fs';
+import { DOMParser } from '@xmldom/xmldom';
+import type { Element as XmlElement } from '@xmldom/xmldom';
 import { buildServer } from '../server';
 import { HarnessConfig, validateConfig } from './config';
 import { HTTPMethods } from 'fastify';
@@ -20,6 +22,7 @@ export interface GoldenScenarioDefinition {
   name: string;
   auth?: boolean;
   request: GoldenScenarioRequest;
+  outputFormat?: ScenarioOutputFormat;
 }
 
 export interface GoldenConfigDefinition {
@@ -40,9 +43,11 @@ export interface ResolvedGoldenScenario {
     payload?: ScenarioPayload;
     expectedStatus: number;
   };
+  outputFormat: ScenarioOutputFormat;
 }
 
 type ScenarioPayload = string | Buffer | NodeJS.ReadableStream | Record<string, unknown> | unknown[];
+type ScenarioOutputFormat = 'xml' | 'clinical-dataset-json';
 
 export interface ResolvedGoldenConfig {
   harnessConfig: HarnessConfig;
@@ -133,6 +138,8 @@ export function resolveGoldenConfig(definition: GoldenConfigDefinition): Resolve
       throw new Error(`scenario[${index}] request.payload must be a string, object, array, buffer, or stream when provided`);
     }
 
+    const outputFormat = normalizeOutputFormat(candidate.outputFormat, index);
+
     return {
       family: candidate.family.trim(),
       name: candidate.name.trim(),
@@ -143,7 +150,8 @@ export function resolveGoldenConfig(definition: GoldenConfigDefinition): Resolve
         headers: { ...(candidate.request.headers ?? {}) },
         payload: candidate.request.payload as ScenarioPayload | undefined,
         expectedStatus
-      }
+      },
+      outputFormat
     };
   });
 
@@ -242,17 +250,18 @@ export async function generateGoldenPayloads(options: GenerateGoldenOptions): Pr
         );
       }
 
-      const buffer = Buffer.isBuffer(response.body) ? response.body : Buffer.from(response.body);
-      const relativeFile = path.join(safeFamily, `${safeName}.xml`);
+      const rawBuffer = Buffer.isBuffer(response.body) ? response.body : Buffer.from(response.body);
+      const transformed = transformResponseBuffer(rawBuffer, scenario.outputFormat);
+      const relativeFile = path.join(safeFamily, `${safeName}${transformed.extension}`);
       const absoluteFile = path.join(normalizedOutput, relativeFile);
       await fs.mkdir(path.dirname(absoluteFile), { recursive: true });
-      await fs.writeFile(absoluteFile, buffer);
+      await fs.writeFile(absoluteFile, transformed.buffer);
 
       manifestEntries.push({
         family: scenario.family,
         name: scenario.name,
         file: toPosixPath(relativeFile),
-        sha256: sha256Hex(buffer),
+        sha256: sha256Hex(transformed.buffer),
         statusCode: response.statusCode
       });
     }
@@ -322,6 +331,150 @@ function performInject(app: FastifyInstance, options: InjectOptions): Promise<In
 
 const ALLOWED_METHODS: readonly HTTPMethods[] = ['DELETE', 'GET', 'HEAD', 'PATCH', 'POST', 'PUT', 'OPTIONS'];
 const FIXED_NOW_EPOCH = Date.UTC(2024, 0, 1, 0, 0, 0, 0);
+const MDSOL_NAMESPACE = 'http://www.mdsol.com/ns/odm/metadata';
+
+interface ClinicalDatasetJson {
+  file: {
+    oid: string;
+    type: string;
+    version: string;
+    created: string;
+  };
+  clinicalData: {
+    study: string;
+    metadataVersion: string;
+    subjects: ClinicalDatasetSubject[];
+  };
+}
+
+interface ClinicalDatasetSubject {
+  subjectKey: string;
+  status: string;
+  site?: string;
+  visits: ClinicalDatasetVisit[];
+}
+
+interface ClinicalDatasetVisit {
+  eventOid: string;
+  forms: Record<string, Record<string, string>>;
+}
+
+function transformResponseBuffer(buffer: Buffer, format: ScenarioOutputFormat) {
+  if (format === 'xml') {
+    return { buffer, extension: '.xml' } as const;
+  }
+
+  if (format === 'clinical-dataset-json') {
+    const jsonStructure = clinicalDatasetXmlToJson(buffer.toString('utf8'));
+    const jsonBuffer = Buffer.from(`${JSON.stringify(jsonStructure, null, 2)}\n`, 'utf8');
+    return { buffer: jsonBuffer, extension: '.json' } as const;
+  }
+
+  const exhaustive: never = format;
+  throw new Error(`Unsupported output format: ${exhaustive}`);
+}
+
+function clinicalDatasetXmlToJson(xml: string): ClinicalDatasetJson {
+  const parser = new DOMParser();
+  const doc = parser.parseFromString(xml, 'application/xml');
+  const parserErrors = doc.getElementsByTagName('parsererror');
+  if (parserErrors.length > 0) {
+    throw new Error('Failed to parse clinical dataset XML payload');
+  }
+
+  const odm = doc.documentElement as XmlElement | null;
+  if (!odm || odm.localName !== 'ODM') {
+    throw new Error('Expected ODM root element in clinical dataset payload');
+  }
+
+  const clinicalData = firstChildByLocalName(odm, 'ClinicalData');
+  if (!clinicalData) {
+    throw new Error('ODM payload missing ClinicalData element');
+  }
+
+  const subjects = childrenByLocalName(clinicalData, 'SubjectData').map(subjectNode => {
+    const visits = childrenByLocalName(subjectNode, 'StudyEventData').map(eventNode => {
+      const forms: Record<string, Record<string, string>> = {};
+      for (const formNode of childrenByLocalName(eventNode, 'FormData')) {
+        const formOid = getRequiredAttribute(formNode, 'FormOID');
+        const items: Record<string, string> = {};
+        for (const itemNode of childrenByLocalName(formNode, 'ItemData')) {
+          const itemOid = getRequiredAttribute(itemNode, 'ItemOID');
+          const value = getRequiredAttribute(itemNode, 'Value');
+          items[itemOid] = value;
+        }
+        forms[formOid] = items;
+      }
+
+      return {
+        eventOid: getRequiredAttribute(eventNode, 'StudyEventOID'),
+        forms
+      } satisfies ClinicalDatasetVisit;
+    });
+
+    const siteNode = firstChildByLocalName(subjectNode, 'SiteRef');
+    return {
+      subjectKey: getRequiredAttribute(subjectNode, 'SubjectKey'),
+      status: getSubjectStatus(subjectNode),
+      site: siteNode ? getRequiredAttribute(siteNode, 'LocationOID') : undefined,
+      visits
+    } satisfies ClinicalDatasetSubject;
+  });
+
+  return {
+    file: {
+      oid: getRequiredAttribute(odm, 'FileOID'),
+      type: getRequiredAttribute(odm, 'FileType'),
+      version: getRequiredAttribute(odm, 'ODMVersion'),
+      created: getRequiredAttribute(odm, 'CreationDateTime')
+    },
+    clinicalData: {
+      study: getRequiredAttribute(clinicalData, 'StudyOID'),
+      metadataVersion: getRequiredAttribute(clinicalData, 'MetaDataVersionOID'),
+      subjects
+    }
+  } satisfies ClinicalDatasetJson;
+}
+
+function childrenByLocalName(node: XmlElement, localName: string): XmlElement[] {
+  const results: XmlElement[] = [];
+  for (let child = node.firstChild; child; child = child.nextSibling) {
+    if (child.nodeType === 1 && (child as XmlElement).localName === localName) {
+      results.push(child as XmlElement);
+    }
+  }
+  return results;
+}
+
+function firstChildByLocalName(node: XmlElement, localName: string): XmlElement | undefined {
+  for (let child = node.firstChild; child; child = child.nextSibling) {
+    if (child.nodeType === 1 && (child as XmlElement).localName === localName) {
+      return child as XmlElement;
+    }
+  }
+  return undefined;
+}
+
+function getRequiredAttribute(node: XmlElement, name: string): string {
+  const value = node.getAttribute(name);
+  if (value === null || value.length === 0) {
+    throw new Error(`Missing required attribute ${name} on <${node.tagName}>`);
+  }
+  return value;
+}
+
+function getSubjectStatus(node: XmlElement): string {
+  const status =
+    node.getAttributeNS(MDSOL_NAMESPACE, 'SubjectStatus') ??
+    node.getAttribute('mdsol:SubjectStatus') ??
+    node.getAttribute('SubjectStatus');
+
+  if (!status) {
+    throw new Error('SubjectData element missing mdsol:SubjectStatus attribute');
+  }
+
+  return status;
+}
 
 function normalizeMethod(raw: string | undefined, index: number): HTTPMethods {
   if (raw === undefined || raw.trim().length === 0) {
@@ -334,6 +487,18 @@ function normalizeMethod(raw: string | undefined, index: number): HTTPMethods {
   }
 
   throw new Error(`scenario[${index}] request.method must be a valid HTTP method`);
+}
+
+function normalizeOutputFormat(raw: string | undefined, index: number): ScenarioOutputFormat {
+  if (raw === undefined) {
+    return 'xml';
+  }
+
+  if (raw === 'xml' || raw === 'clinical-dataset-json') {
+    return raw;
+  }
+
+  throw new Error(`scenario[${index}] outputFormat must be 'xml' or 'clinical-dataset-json' when provided`);
 }
 
 function isScenarioPayload(value: unknown): value is ScenarioPayload {
