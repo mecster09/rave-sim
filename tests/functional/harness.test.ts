@@ -116,6 +116,7 @@ describe('Harness control plane endpoints', () => {
     if (firstSubjectAvailability.visits.length > 1) {
       expect(firstSubjectAvailability.visits[1].isAvailable).toBe(false);
     }
+    expect(statusBody.freeze).toBe(false);
   });
 
   it('updates simulation speed independently', async () => {
@@ -159,6 +160,7 @@ describe('Harness control plane endpoints', () => {
     const statusBody = statusRes.json();
     expect(statusBody.config.simSpeedMinutesPerDay).toBe(120);
     expect(statusBody.simClock.simSpeedMinutesPerDay).toBe(120);
+    expect(statusBody.freeze).toBe(false);
   });
 
   it('returns 400 for invalid applyMode', async () => {
@@ -212,5 +214,97 @@ describe('Harness control plane endpoints', () => {
       forms: expect.any(Number)
     });
     expect(counts.availableVisits + counts.unavailableVisits).toBe(counts.visits);
+  });
+
+  it('allows access to time endpoints without auth', async () => {
+    const app = buildServer();
+
+    const getRes = await app.inject({
+      method: 'GET',
+      url: '/harness/time'
+    });
+    expect(getRes.statusCode).toBe(200);
+
+    const putRes = await app.inject({
+      method: 'PUT',
+      url: '/harness/time',
+      payload: { simStudyDay: 1, freeze: false },
+      headers: {
+        'content-type': 'application/json'
+      }
+    });
+    expect(putRes.statusCode).toBe(200);
+    expect(putRes.json().freeze).toBe(false);
+  });
+
+  it('validates time payload', async () => {
+    const app = buildServer();
+
+    const badDay = await app.inject({
+      method: 'PUT',
+      url: '/harness/time',
+      headers: {
+        authorization: authHeader(),
+        'content-type': 'application/json'
+      },
+      payload: { simStudyDay: -1, freeze: true }
+    });
+    expect(badDay.statusCode).toBe(400);
+
+    const badFreeze = await app.inject({
+      method: 'PUT',
+      url: '/harness/time',
+      headers: {
+        authorization: authHeader(),
+        'content-type': 'application/json'
+      },
+      payload: { simStudyDay: 1, freeze: 'yes' }
+    });
+    expect(badFreeze.statusCode).toBe(400);
+  });
+
+  it('sets and freezes simulation day deterministically', async () => {
+    const app = buildServer();
+
+    const putRes = await app.inject({
+      method: 'PUT',
+      url: '/harness/time',
+      headers: {
+        authorization: authHeader(),
+        'content-type': 'application/json'
+      },
+      payload: { simStudyDay: 2.5, freeze: true }
+    });
+
+    expect(putRes.statusCode).toBe(200);
+    const putBody = putRes.json();
+    expect(putBody.freeze).toBe(true);
+    expect(putBody.simClock.simCurrentStudyDay).toBeCloseTo(2.5, 5);
+
+    const timeRes = await app.inject({
+      method: 'GET',
+      url: '/harness/time',
+      headers: {
+        authorization: authHeader()
+      }
+    });
+
+    expect(timeRes.statusCode).toBe(200);
+    const timeBody = timeRes.json();
+    expect(timeBody.freeze).toBe(true);
+    expect(timeBody.simClock.simCurrentStudyDay).toBeCloseTo(2.5, 5);
+
+    const statusRes = await app.inject({
+      method: 'GET',
+      url: '/harness/status',
+      headers: {
+        authorization: authHeader()
+      }
+    });
+
+    expect(statusRes.statusCode).toBe(200);
+    const statusBody = statusRes.json();
+    expect(statusBody.freeze).toBe(true);
+    expect(statusBody.simClock.simCurrentStudyDay).toBeCloseTo(2.5, 5);
   });
 });

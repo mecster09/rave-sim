@@ -37,7 +37,8 @@ export function isAuthorized(
 
 function needsAuth(request: FastifyRequest): boolean {
   const path = request.raw.url?.split('?')[0] ?? '';
-  return path !== '/health';
+  const publicPaths = new Set(['/health', '/harness/status', '/harness/time']);
+  return !publicPaths.has(path);
 }
 
 async function handleUnauthorized(reply: FastifyReply) {

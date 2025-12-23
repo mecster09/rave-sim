@@ -60,12 +60,21 @@ export function buildServer() {
     };
   };
 
-  const buildStatus = () => {
+  const getTimeState = () => {
     const simClock = simulatorState.getSimClock();
+    return {
+      simClock,
+      freeze: simulatorState.isFrozen(),
+      frozenDay: simulatorState.getFrozenDay()
+    };
+  };
+
+  const buildStatus = () => {
+    const { simClock } = getTimeState();
     const snapshot = simulatorState.getSnapshot();
     const counts = computeCounts(snapshot, simClock.simCurrentStudyDay);
     const availability = simulatorState.getSubjectAvailability(simClock.simCurrentStudyDay);
-    return { simClock, counts, availability };
+    return { simClock, counts, availability, freeze: simulatorState.isFrozen() };
   };
 
   app.get('/health', async () => {
@@ -149,13 +158,40 @@ export function buildServer() {
   });
 
   app.get('/harness/status', async () => {
-    const { simClock, counts, availability } = buildStatus();
+    const { simClock, counts, availability, freeze } = buildStatus();
     return {
       config: currentConfig,
       simClock,
+      freeze,
       counts,
       availability
     };
+  });
+
+  app.get('/harness/time', async () => {
+    return getTimeState();
+  });
+
+  app.put('/harness/time', async (request, reply) => {
+    const body = request.body;
+
+    if (typeof body !== 'object' || body === null || Array.isArray(body)) {
+      return reply.code(400).send({ error: 'Invalid body' });
+    }
+
+    const { simStudyDay, freeze } = body as { simStudyDay?: unknown; freeze?: unknown };
+
+    if (typeof simStudyDay !== 'number' || Number.isNaN(simStudyDay) || simStudyDay < 0) {
+      return reply.code(400).send({ error: 'simStudyDay must be a non-negative number' });
+    }
+
+    if (typeof freeze !== 'boolean') {
+      return reply.code(400).send({ error: 'freeze must be a boolean' });
+    }
+
+    simulatorState.setSimDay(simStudyDay, freeze);
+
+    return getTimeState();
   });
 
   return app;

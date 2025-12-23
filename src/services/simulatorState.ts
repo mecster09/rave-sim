@@ -257,6 +257,22 @@ export class SimulatorState {
       }))
     }));
   }
+
+  isFrozen(): boolean {
+    return this.frozenDay !== null;
+  }
+
+  getFrozenDay(): number | null {
+    return this.frozenDay;
+  }
+
+  setSimDay(simStudyDay: number, freeze: boolean): void {
+    const safeDay = Math.max(0, simStudyDay);
+    const now = this.now();
+    const speed = this.config.simSpeedMinutesPerDay;
+    this.simStartWallClock = now - safeDay * speed * 60000;
+    this.frozenDay = freeze ? safeDay : null;
+  }
 }
 
 export function hashSnapshot(snapshot: SimulatorSnapshot): string {
