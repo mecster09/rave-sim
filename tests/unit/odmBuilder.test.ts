@@ -3,8 +3,10 @@ import { DOMParser } from '@xmldom/xmldom';
 import {
   buildSnapshotODM,
   buildTransactionalODM,
+  buildVersionFoldersODM,
   BuildSnapshotOptions,
-  BuildTransactionalOptions
+  BuildTransactionalOptions,
+  BuildVersionFoldersOptions
 } from '../../src/services/odmBuilder';
 
 function hasParserError(xml: string): boolean {
@@ -92,6 +94,35 @@ describe('odmBuilder', () => {
     ]
   };
 
+  const versionFoldersOptions: BuildVersionFoldersOptions = {
+    studyOid: 'ExampleStudy(Prod)',
+    generatedAt: '2025-12-23T15:00:00Z',
+    truncate: false,
+    versions: [
+      {
+        metadataVersionOid: 'MDV.VERSION-2',
+        name: '2',
+        primaryFormOid: 'VS',
+        studyEvents: [
+          {
+            studyEventOid: 'VISIT-002',
+            name: 'Visit 2',
+            orderNumber: 2,
+            type: 'Common',
+            mandatory: 'No'
+          },
+          {
+            studyEventOid: 'VISIT-001',
+            name: 'Visit 1',
+            orderNumber: 1,
+            type: 'Common',
+            mandatory: 'Yes'
+          }
+        ]
+      }
+    ]
+  };
+
   it('produces parseable snapshot and transactional ODM XML', () => {
     const snapshotXml = buildSnapshotODM(snapshotOptions);
     const transactionalXml = buildTransactionalODM(transactionalOptions);
@@ -122,5 +153,28 @@ describe('odmBuilder', () => {
     const truncated = buildSnapshotODM({ ...snapshotOptions, truncate: true });
     expect(truncated.endsWith('</ODM>')).toBe(false);
     expect(hasParserError(truncated)).toBe(true);
+  });
+
+  it('builds VersionFolders ODM deterministically', () => {
+    const xml = buildVersionFoldersODM(versionFoldersOptions);
+    expect(hasParserError(xml)).toBe(false);
+    expect(xml).toContain('<StudyName>ExampleStudy(Prod)</StudyName>');
+    expect(xml).toContain('<StudyEventRef StudyEventOID="VISIT-001" OrderNumber="1"');
+    expect(xml).toContain('<StudyEventDef OID="VISIT-002"');
+
+    const shuffled = buildVersionFoldersODM({
+      ...versionFoldersOptions,
+      versions: [...versionFoldersOptions.versions].map(version => ({
+        ...version,
+        studyEvents: [...version.studyEvents].reverse()
+      }))
+    });
+
+    expect(shuffled).toBe(xml);
+  });
+
+  it('omits closing ODM when VersionFolders truncation enabled', () => {
+    const truncated = buildVersionFoldersODM({ ...versionFoldersOptions, truncate: true });
+    expect(truncated.trim().endsWith('</ODM>')).toBe(false);
   });
 });

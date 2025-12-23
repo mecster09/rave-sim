@@ -4,7 +4,7 @@ Rave-Sim is a Fastify-based simulator that reproduces a subset of the Rave Web S
 
 ## Key Features
 
-- **Deterministic Harness** – Control study composition (sites, subjects, visits, forms) and simulation time using the `/harness/*` endpoints, including forced streaming failure toggles for clinical datasets.
+- **Deterministic Harness** – Control study composition (sites, subjects, visits, forms) and simulation time using the `/harness/*` endpoints, including forced streaming failure toggles for clinical and administrative datasets.
 - **Dataset Coverage** – Serve Clinical View datasets (regular and raw), versioned snapshots, and the Clinical Audit Records adapter with pagination, enhanced modes, and truncation behaviors matching production quirks.
 - **Golden Payloads** – Generate reproducible XML or JSON datasets for regression testing, backed by manifests with hashes and response metadata.
 - **Scenario Library** – Curated presets (default, partial enrollment, high-volume variants, streaming-failure) that exercise performance, ordering, and transport edge cases.
@@ -20,6 +20,7 @@ Rave-Sim is a Fastify-based simulator that reproduces a subset of the Rave Web S
 | `/RaveWebServices/studies/:studyOid/datasets/raw` | Raw dataset variant supporting `start`, `decodesuffix`, `rawsuffix`, and `versionitem` filters.
 | `/RaveWebServices/studies/:studyOid/versions/:versionId/datasets/(regular|raw)` | Version-locked datasets derived from deterministic seeds.
 | `/RaveWebServices/datasets/ClinicalAuditRecords.odm` | Clinical audit trail with pagination, Unicode toggles, and enhanced mode support.
+| `/RaveWebServices/datasets/VersionFolders.odm` | Version folders metadata export with optional streaming failure simulation.
 | `/RaveWebServices/studies/:studyOid/Subjects` | Subject roster with status/include filters.
 
 All parity endpoints require HTTP Basic Auth with credentials defined via `BASIC_AUTH_USER` / `BASIC_AUTH_PASS`.
@@ -71,7 +72,7 @@ npm run test:watch
 
 Refer to the [requirements summary](docs/requirements.md) for the full problem statement and acceptance criteria, and review the [project constitution](docs/constitution.md) for task-by-task guardrails.
 
-Active and historical work items live in [docs/tasks/task22.md](docs/tasks/task22.md) alongside prior task briefs.
+Active and historical work items live in [docs/tasks/task22.md](docs/tasks/task22.md) and [docs/tasks/task23.md](docs/tasks/task23.md) alongside prior task briefs.
 
 ## Contributing
 

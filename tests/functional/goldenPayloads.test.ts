@@ -331,4 +331,89 @@ describe('golden payload regression', () => {
 
     expect(generated.equals(golden)).toBe(true);
   });
+
+  it('replays VersionFolders VF-001 golden payload', async () => {
+    const configPath = path.resolve('golden-scenarios/version-folders/VF-001.json');
+    const configDefinition = JSON.parse(await fs.readFile(configPath, 'utf8')) as GoldenConfigDefinition;
+    const resolvedConfig = resolveGoldenConfig(configDefinition);
+
+    const workingDir = await createTempDir('golden-regression');
+    const manifestPath = path.join(workingDir, 'manifest.json');
+
+    await generateGoldenPayloads({
+      config: resolvedConfig,
+      outputDir: workingDir,
+      manifestPath,
+      authUser: AUTH_USER,
+      authPass: AUTH_PASS
+    });
+
+    const generatedPath = path.join(workingDir, 'version-folders', 'VF-001.xml');
+    const goldenPath = path.resolve('golden-payloads/version-folders/version-folders/VF-001.xml');
+
+    const [generated, golden] = await Promise.all([
+      fs.readFile(generatedPath),
+      fs.readFile(goldenPath)
+    ]);
+
+    expect(generated.equals(golden)).toBe(true);
+    expect(generated.toString('utf8').trim().endsWith('</ODM>')).toBe(true);
+  });
+
+  it('replays VersionFolders VF-002 streaming failure golden payload', async () => {
+    const configPath = path.resolve('golden-scenarios/version-folders/VF-002.json');
+    const configDefinition = JSON.parse(await fs.readFile(configPath, 'utf8')) as GoldenConfigDefinition;
+    const resolvedConfig = resolveGoldenConfig(configDefinition);
+
+    const workingDir = await createTempDir('golden-regression');
+    const manifestPath = path.join(workingDir, 'manifest.json');
+
+    await generateGoldenPayloads({
+      config: resolvedConfig,
+      outputDir: workingDir,
+      manifestPath,
+      authUser: AUTH_USER,
+      authPass: AUTH_PASS
+    });
+
+    const generatedPath = path.join(workingDir, 'version-folders', 'VF-002.xml');
+    const goldenPath = path.resolve('golden-payloads/version-folders/version-folders/VF-002.xml');
+
+    const [generated, golden] = await Promise.all([
+      fs.readFile(generatedPath),
+      fs.readFile(goldenPath)
+    ]);
+
+    expect(generated.equals(golden)).toBe(true);
+    expect(generated.toString('utf8').trim().endsWith('</ODM>')).toBe(false);
+  });
+
+  it('replays VersionFolders VF-003 unauthorized golden payload', async () => {
+    const configPath = path.resolve('golden-scenarios/version-folders/VF-003.json');
+    const configDefinition = JSON.parse(await fs.readFile(configPath, 'utf8')) as GoldenConfigDefinition;
+    const resolvedConfig = resolveGoldenConfig(configDefinition);
+
+    const workingDir = await createTempDir('golden-regression');
+    const manifestPath = path.join(workingDir, 'manifest.json');
+
+    await generateGoldenPayloads({
+      config: resolvedConfig,
+      outputDir: workingDir,
+      manifestPath,
+      authUser: AUTH_USER,
+      authPass: AUTH_PASS
+    });
+
+    const generatedPath = path.join(workingDir, 'version-folders', 'VF-003.json');
+    const goldenPath = path.resolve('golden-payloads/version-folders/version-folders/VF-003.json');
+
+    const [generated, golden] = await Promise.all([
+      fs.readFile(generatedPath),
+      fs.readFile(goldenPath)
+    ]);
+
+    expect(generated.equals(golden)).toBe(true);
+    const parsed = JSON.parse(generated.toString('utf8')) as { error: string };
+    expect(parsed.error).toBe('Unauthorized');
+  });
 });

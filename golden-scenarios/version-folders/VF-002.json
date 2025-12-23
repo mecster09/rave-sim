@@ -1,0 +1,27 @@
+{
+  "harnessConfig": {
+    "studyName": "Default Study",
+    "siteCount": 2,
+    "subjectCount": 10,
+    "visitCountPerSubject": 3,
+    "formDataPointsPerVisit": 5,
+    "simSpeedMinutesPerDay": 60,
+    "resetOnStartup": false,
+    "randomSeed": 123456,
+    "truncateOdm": false,
+    "forceClinicalViewStreamFailure": false,
+    "forceVersionFoldersStreamFailure": true
+  },
+  "simStudyDay": 2.5,
+  "freeze": true,
+  "scenarios": [
+    {
+      "family": "version-folders",
+      "name": "VF-002",
+      "request": {
+        "method": "GET",
+        "url": "/RaveWebServices/datasets/VersionFolders.odm?studyoid=Default%20Study"
+      }
+    }
+  ]
+}

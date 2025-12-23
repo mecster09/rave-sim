@@ -47,7 +47,7 @@ export interface ResolvedGoldenScenario {
 }
 
 type ScenarioPayload = string | Buffer | NodeJS.ReadableStream | Record<string, unknown> | unknown[];
-type ScenarioOutputFormat = 'xml' | 'clinical-dataset-json';
+type ScenarioOutputFormat = 'xml' | 'clinical-dataset-json' | 'json';
 
 export interface ResolvedGoldenConfig {
   harnessConfig: HarnessConfig;
@@ -370,6 +370,16 @@ function transformResponseBuffer(buffer: Buffer, format: ScenarioOutputFormat) {
     return { buffer: jsonBuffer, extension: '.json' } as const;
   }
 
+  if (format === 'json') {
+    try {
+      const parsed = JSON.parse(buffer.toString('utf8'));
+      const normalized = Buffer.from(`${JSON.stringify(parsed, null, 2)}\n`, 'utf8');
+      return { buffer: normalized, extension: '.json' } as const;
+    } catch {
+      return { buffer, extension: '.json' } as const;
+    }
+  }
+
   const exhaustive: never = format;
   throw new Error(`Unsupported output format: ${exhaustive}`);
 }
@@ -494,11 +504,11 @@ function normalizeOutputFormat(raw: string | undefined, index: number): Scenario
     return 'xml';
   }
 
-  if (raw === 'xml' || raw === 'clinical-dataset-json') {
+  if (raw === 'xml' || raw === 'clinical-dataset-json' || raw === 'json') {
     return raw;
   }
 
-  throw new Error(`scenario[${index}] outputFormat must be 'xml' or 'clinical-dataset-json' when provided`);
+  throw new Error(`scenario[${index}] outputFormat must be 'xml', 'json', or 'clinical-dataset-json' when provided`);
 }
 
 function isScenarioPayload(value: unknown): value is ScenarioPayload {

@@ -1,0 +1,19 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<ODM FileOID="aaff52aa501a38deac196583c52d22a4bb3b57cbfd79ff97c5228a7dec95407f" FileType="Snapshot" ODMVersion="1.3.1" CreationDateTime="2024-01-01T00:00:00.000Z" xmlns="http://www.cdisc.org/ns/odm/v1.3" xmlns:mdsol="http://www.mdsol.com/ns/odm/metadata">
+  <Study OID="Default Study">
+    <GlobalVariables>
+      <StudyName>Default Study</StudyName>
+      <ProtocolName>Default Study</ProtocolName>
+    </GlobalVariables>
+    <MetaDataVersion OID="MDV.VERSION-1" Name="1" mdsol:PrimaryFormOID="DM">
+      <Protocol>
+        <StudyEventRef StudyEventOID="VISIT-001" OrderNumber="1" Mandatory="No" mdsol:StudyEventDefName="Visit 1"/>
+        <StudyEventRef StudyEventOID="VISIT-002" OrderNumber="2" Mandatory="No" mdsol:StudyEventDefName="Visit 2"/>
+        <StudyEventRef StudyEventOID="VISIT-003" OrderNumber="3" Mandatory="No" mdsol:StudyEventDefName="Visit 3"/>
+      </Protocol>
+      <StudyEventDef OID="VISIT-001" Name="Visit 1" Repeating="No" Type="Common"/>
+      <StudyEventDef OID="VISIT-002" Name="Visit 2" Repeating="No" Type="Common"/>
+      <StudyEventDef OID="VISIT-003" Name="Visit 3" Repeating="No" Type="Common"/>
+    </MetaDataVersion>
+  </Study>
+</ODM>

@@ -13,7 +13,8 @@ const baseConfig: HarnessConfig = {
   resetOnStartup: false,
   randomSeed: 222222,
   truncateOdm: false,
-  forceClinicalViewStreamFailure: false
+  forceClinicalViewStreamFailure: false,
+  forceVersionFoldersStreamFailure: false
 };
 
 describe('auditLog', () => {

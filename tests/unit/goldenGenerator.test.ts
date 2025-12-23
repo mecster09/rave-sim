@@ -20,7 +20,8 @@ const BASE_CONFIG: GoldenConfigDefinition = {
     resetOnStartup: false,
     randomSeed: 24680,
     truncateOdm: false,
-    forceClinicalViewStreamFailure: false
+    forceClinicalViewStreamFailure: false,
+    forceVersionFoldersStreamFailure: false
   },
   simStudyDay: 1,
   freeze: true,

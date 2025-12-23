@@ -9,6 +9,7 @@ export interface HarnessConfig {
   randomSeed: number;
   truncateOdm: boolean;
   forceClinicalViewStreamFailure: boolean;
+  forceVersionFoldersStreamFailure: boolean;
 }
 
 export const DEFAULT_RANDOM_SEED = 123456;
@@ -46,7 +47,8 @@ export function validateConfig(input: unknown): ValidateConfigResult {
     resetOnStartup,
     randomSeed,
     truncateOdm,
-    forceClinicalViewStreamFailure
+    forceClinicalViewStreamFailure,
+    forceVersionFoldersStreamFailure
   } = input as Partial<HarnessConfig> & Record<string, unknown>;
 
   let normalizedStudyName: string | undefined;
@@ -96,6 +98,13 @@ export function validateConfig(input: unknown): ValidateConfigResult {
     errors.push('forceClinicalViewStreamFailure must be a boolean if provided');
   }
 
+  if (
+    typeof forceVersionFoldersStreamFailure !== 'boolean' &&
+    typeof forceVersionFoldersStreamFailure !== 'undefined'
+  ) {
+    errors.push('forceVersionFoldersStreamFailure must be a boolean if provided');
+  }
+
   if (errors.length > 0) {
     return { error: errors };
   }
@@ -112,7 +121,9 @@ export function validateConfig(input: unknown): ValidateConfigResult {
       randomSeed: typeof randomSeed === 'number' ? randomSeed : DEFAULT_RANDOM_SEED,
       truncateOdm: typeof truncateOdm === 'boolean' ? truncateOdm : false,
       forceClinicalViewStreamFailure:
-        typeof forceClinicalViewStreamFailure === 'boolean' ? forceClinicalViewStreamFailure : false
+        typeof forceClinicalViewStreamFailure === 'boolean' ? forceClinicalViewStreamFailure : false,
+      forceVersionFoldersStreamFailure:
+        typeof forceVersionFoldersStreamFailure === 'boolean' ? forceVersionFoldersStreamFailure : false
     }
   };
 }

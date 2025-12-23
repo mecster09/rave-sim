@@ -9,6 +9,7 @@ interface Site {
 export interface Visit {
   visitOid: string;
   sequenceNumber: number;
+  name: string;
   forms: VisitForm[];
   availableDay: number;
 }
@@ -32,6 +33,7 @@ interface Subject {
 export interface SimulatorSnapshot {
   sites: Site[];
   subjects: Subject[];
+  versionFolders: VersionFolderMetadata[];
 }
 
 export type SubjectStatus = 'Active' | 'Inactive' | 'Deleted';
@@ -44,6 +46,21 @@ export interface SubjectAvailability {
     availableDay: number;
     isAvailable: boolean;
   }>;
+}
+
+export interface VersionFolderMetadata {
+  metadataVersionOid: string;
+  name: string;
+  primaryFormOid: string;
+  studyEvents: VersionFolderStudyEvent[];
+}
+
+export interface VersionFolderStudyEvent {
+  studyEventOid: string;
+  name: string;
+  orderNumber: number;
+  type: string;
+  mandatory: 'Yes' | 'No';
 }
 
 function seededRandom(seed: number): () => number {
@@ -96,19 +113,36 @@ function createSites(config: HarnessConfig): Site[] {
   return sites;
 }
 
-function createVisits(config: HarnessConfig, rng: () => number): Visit[] {
-  const visits: Visit[] = [];
+interface VisitTemplate {
+  visitOid: string;
+  name: string;
+  sequenceNumber: number;
+  availableDay: number;
+}
+
+function buildVisitTemplates(config: HarnessConfig): VisitTemplate[] {
+  const templates: VisitTemplate[] = [];
   for (let i = 0; i < config.visitCountPerSubject; i += 1) {
-    const visitOid = `VISIT-${(i + 1).toString().padStart(3, '0')}`;
-    const forms = createFormData(config, rng);
-    visits.push({
-      visitOid,
-      sequenceNumber: i + 1,
-      forms,
+    const sequenceNumber = i + 1;
+    templates.push({
+      visitOid: `VISIT-${sequenceNumber.toString().padStart(3, '0')}`,
+      name: `Visit ${sequenceNumber}`,
+      sequenceNumber,
       availableDay: i
     });
   }
-  return visits;
+  return templates;
+}
+
+function createVisits(config: HarnessConfig, rng: () => number): Visit[] {
+  const templates = buildVisitTemplates(config);
+  return templates.map(template => ({
+    visitOid: template.visitOid,
+    sequenceNumber: template.sequenceNumber,
+    name: template.name,
+    availableDay: template.availableDay,
+    forms: createFormData(config, rng)
+  }));
 }
 
 function createFormData(config: HarnessConfig, rng: () => number): VisitForm[] {
@@ -209,9 +243,13 @@ export class SimulatorState {
 
   private generateSnapshot(): SimulatorSnapshot {
     const rng = seededRandom(this.seed);
+    const sites = createSites(this.config);
+    const subjects = createSubjects(this.config, rng);
+    const versionFolders = buildVersionMetadata(this.config);
     return {
-      sites: createSites(this.config),
-      subjects: createSubjects(this.config, rng)
+      sites,
+      subjects,
+      versionFolders
     };
   }
 
@@ -350,8 +388,33 @@ export class SimulatorState {
   isAuditBackfillComplete(currentDay = this.getSimClock().simCurrentStudyDay): boolean {
     return currentDay >= this.auditBackfillReadyDay;
   }
+
+  getVersionFolders(): VersionFolderMetadata[] {
+    return this.getSnapshot().versionFolders;
+  }
 }
 
 export function hashSnapshot(snapshot: SimulatorSnapshot): string {
   return snapshotHash(snapshot);
+}
+
+function buildVersionMetadata(config: HarnessConfig): VersionFolderMetadata[] {
+  const templates = buildVisitTemplates(config);
+  const primaryFormOid = 'DM';
+  const studyEvents: VersionFolderStudyEvent[] = templates.map(template => ({
+    studyEventOid: template.visitOid,
+    name: template.name,
+    orderNumber: template.sequenceNumber,
+    type: 'Common',
+    mandatory: 'No'
+  }));
+
+  return [
+    {
+      metadataVersionOid: 'MDV.VERSION-1',
+      name: '1',
+      primaryFormOid,
+      studyEvents
+    }
+  ];
 }

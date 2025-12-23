@@ -51,6 +51,28 @@ export interface BuildOdmErrorOptions {
   generatedAt?: string;
 }
 
+export interface VersionFolderStudyEventDefinition {
+  studyEventOid: string;
+  name: string;
+  orderNumber: number;
+  type: string;
+  mandatory: 'Yes' | 'No';
+}
+
+export interface VersionFolderDefinition {
+  metadataVersionOid: string;
+  name: string;
+  primaryFormOid: string;
+  studyEvents: VersionFolderStudyEventDefinition[];
+}
+
+export interface BuildVersionFoldersOptions {
+  studyOid: string;
+  generatedAt: string;
+  versions: VersionFolderDefinition[];
+  truncate?: boolean;
+}
+
 const ODM_NAMESPACE = 'http://www.cdisc.org/ns/odm/v1.3';
 const MDSOL_NAMESPACE = 'http://www.mdsol.com/ns/odm/metadata';
 
@@ -99,6 +121,70 @@ export function buildSnapshotODM(options: BuildSnapshotOptions): string {
   }
 
   lines.push('  </ClinicalData>');
+  if (!truncate) {
+    lines.push('</ODM>');
+  }
+
+  return lines.join('\n');
+}
+
+export function buildVersionFoldersODM(options: BuildVersionFoldersOptions): string {
+  const { studyOid, generatedAt, versions, truncate } = options;
+  const lines: string[] = [];
+  const protocolName = deriveProtocolName(studyOid);
+
+  lines.push('<?xml version="1.0" encoding="UTF-8"?>');
+  lines.push(
+    `<ODM FileOID="${escapeAttribute(hashVersionFolders(versions))}" FileType="Snapshot" ODMVersion="1.3.1" CreationDateTime="${escapeAttribute(
+      generatedAt
+    )}" xmlns="${ODM_NAMESPACE}" xmlns:mdsol="${MDSOL_NAMESPACE}">`
+  );
+  lines.push(`  <Study OID="${escapeAttribute(studyOid)}">`);
+  lines.push('    <GlobalVariables>');
+  lines.push(`      <StudyName>${escapeText(studyOid)}</StudyName>`);
+  lines.push(`      <ProtocolName>${escapeText(protocolName)}</ProtocolName>`);
+  lines.push('    </GlobalVariables>');
+
+  const sortedVersions = [...versions].sort((a, b) =>
+    a.metadataVersionOid.localeCompare(b.metadataVersionOid)
+  );
+
+  for (const version of sortedVersions) {
+    lines.push(
+      `    <MetaDataVersion OID="${escapeAttribute(version.metadataVersionOid)}" Name="${escapeAttribute(version.name)}" mdsol:PrimaryFormOID="${escapeAttribute(
+        version.primaryFormOid
+      )}">`
+    );
+    lines.push('      <Protocol>');
+
+    const sortedRefs = [...version.studyEvents].sort((a, b) => a.orderNumber - b.orderNumber);
+    for (const event of sortedRefs) {
+      lines.push(
+        `        <StudyEventRef StudyEventOID="${escapeAttribute(event.studyEventOid)}" OrderNumber="${escapeAttribute(
+          String(event.orderNumber)
+        )}" Mandatory="${escapeAttribute(event.mandatory)}" mdsol:StudyEventDefName="${escapeAttribute(event.name)}"/>`
+      );
+    }
+
+    lines.push('      </Protocol>');
+
+    const sortedEvents = [...version.studyEvents].sort((a, b) =>
+      a.studyEventOid.localeCompare(b.studyEventOid)
+    );
+
+    for (const event of sortedEvents) {
+      lines.push(
+        `      <StudyEventDef OID="${escapeAttribute(event.studyEventOid)}" Name="${escapeAttribute(event.name)}" Repeating="No" Type="${escapeAttribute(
+          event.type
+        )}"/>`
+      );
+    }
+
+    lines.push('    </MetaDataVersion>');
+  }
+
+  lines.push('  </Study>');
+
   if (!truncate) {
     lines.push('</ODM>');
   }
@@ -197,6 +283,29 @@ function hashSubjects(subjects: SnapshotSubject[]): string {
   return hash.digest('hex');
 }
 
+function hashVersionFolders(versions: VersionFolderDefinition[]): string {
+  const hash = crypto.createHash('sha256');
+  const normalized = versions
+    .map(version => ({
+      metadataVersionOid: version.metadataVersionOid,
+      name: version.name,
+      primaryFormOid: version.primaryFormOid,
+      events: version.studyEvents
+        .map(event => ({
+          studyEventOid: event.studyEventOid,
+          name: event.name,
+          orderNumber: event.orderNumber,
+          type: event.type,
+          mandatory: event.mandatory
+        }))
+        .sort((a, b) => a.studyEventOid.localeCompare(b.studyEventOid))
+    }))
+    .sort((a, b) => a.metadataVersionOid.localeCompare(b.metadataVersionOid));
+
+  hash.update(JSON.stringify(normalized));
+  return hash.digest('hex');
+}
+
 function hashAuditRecords(entries: AuditRecord[]): string {
   const hash = crypto.createHash('sha256');
   const normalized = entries
@@ -234,4 +343,13 @@ function escapeText(value: string): string {
     .replace(/&/g, '&amp;')
     .replace(/</g, '&lt;')
     .replace(/>/g, '&gt;');
+}
+
+function deriveProtocolName(studyOid: string): string {
+  const parenIndex = studyOid.indexOf('(');
+  if (parenIndex === -1) {
+    return studyOid;
+  }
+  const prefix = studyOid.slice(0, parenIndex).trim();
+  return prefix.length > 0 ? prefix : studyOid;
 }

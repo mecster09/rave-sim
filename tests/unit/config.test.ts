@@ -11,7 +11,8 @@ const baseConfig: HarnessConfig = {
   resetOnStartup: false,
   randomSeed: 123456,
   truncateOdm: false,
-  forceClinicalViewStreamFailure: false
+  forceClinicalViewStreamFailure: false,
+  forceVersionFoldersStreamFailure: false
 };
 
 describe('validateConfig', () => {
@@ -22,7 +23,14 @@ describe('validateConfig', () => {
   });
 
   it('applies defaults when optional flags omitted', () => {
-    const { resetOnStartup, truncateOdm, randomSeed, forceClinicalViewStreamFailure, ...rest } = baseConfig;
+    const {
+      resetOnStartup,
+      truncateOdm,
+      randomSeed,
+      forceClinicalViewStreamFailure,
+      forceVersionFoldersStreamFailure,
+      ...rest
+    } = baseConfig;
     const result = validateConfig(rest);
 
     expect(result).toEqual({
@@ -31,7 +39,8 @@ describe('validateConfig', () => {
         resetOnStartup: false,
         truncateOdm: false,
         randomSeed: 123456,
-        forceClinicalViewStreamFailure: false
+        forceClinicalViewStreamFailure: false,
+        forceVersionFoldersStreamFailure: false
       }
     });
   });
@@ -96,6 +105,15 @@ describe('validateConfig', () => {
     });
 
     expect(result.error).toContain('forceClinicalViewStreamFailure must be a boolean if provided');
+  });
+
+  it('returns error when forceVersionFoldersStreamFailure is not boolean', () => {
+    const result = validateConfig({
+      ...baseConfig,
+      forceVersionFoldersStreamFailure: 'yes' as unknown as boolean
+    });
+
+    expect(result.error).toContain('forceVersionFoldersStreamFailure must be a boolean if provided');
   });
 
   it('returns error when randomSeed is invalid', () => {

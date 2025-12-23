@@ -29,7 +29,8 @@ curl -u test-user:test-pass \
     "resetOnStartup": false,
     "randomSeed": 123456,
     "truncateOdm": false,
-    "forceClinicalViewStreamFailure": false
+    "forceClinicalViewStreamFailure": false,
+    "forceVersionFoldersStreamFailure": false
   }
 }
 JSON
@@ -295,6 +296,110 @@ curl -u test-user:test-pass \
 
 tail -n 20 golden-payloads/streaming-failure/clinical-view/streaming-failure.xml
 # Confirm the closing </ODM> tag is intentionally missing
+```
+
+## Version Folders (`golden-scenarios/version-folders/*.json`)
+
+### VF-001 — Complete ODM
+
+Apply harness:
+
+```bash
+curl -u test-user:test-pass \
+  -X PUT http://localhost:3000/harness/config \
+  -H "Content-Type: application/json" \
+  -d @- <<'JSON'
+{
+  "applyMode": "applyAndReset",
+  "config": {
+    "studyName": "Default Study",
+    "siteCount": 2,
+    "subjectCount": 10,
+    "visitCountPerSubject": 3,
+    "formDataPointsPerVisit": 5,
+    "simSpeedMinutesPerDay": 60,
+    "resetOnStartup": false,
+    "randomSeed": 123456,
+    "truncateOdm": false,
+    "forceClinicalViewStreamFailure": false,
+    "forceVersionFoldersStreamFailure": false
+  }
+}
+JSON
+```
+
+Freeze time (same 2.5 study day as other defaults):
+
+```bash
+curl -X PUT http://localhost:3000/harness/time \
+  -H "Content-Type: application/json" \
+  -d '{"simStudyDay":2.5,"freeze":true}'
+```
+
+Capture ODM:
+
+```bash
+curl -u test-user:test-pass \
+  "http://localhost:3000/RaveWebServices/datasets/VersionFolders.odm?studyoid=Default%20Study" \
+  -o golden-payloads/version-folders/version-folders/VF-001.xml
+```
+
+### VF-002 — Streaming Failure ODM
+
+Apply harness with the streaming toggle enabled:
+
+```bash
+curl -u test-user:test-pass \
+  -X PUT http://localhost:3000/harness/config \
+  -H "Content-Type: application/json" \
+  -d @- <<'JSON'
+{
+  "applyMode": "applyAndReset",
+  "config": {
+    "studyName": "Default Study",
+    "siteCount": 2,
+    "subjectCount": 10,
+    "visitCountPerSubject": 3,
+    "formDataPointsPerVisit": 5,
+    "simSpeedMinutesPerDay": 60,
+    "resetOnStartup": false,
+    "randomSeed": 123456,
+    "truncateOdm": false,
+    "forceClinicalViewStreamFailure": false,
+    "forceVersionFoldersStreamFailure": true
+  }
+}
+JSON
+```
+
+Freeze time:
+
+```bash
+curl -X PUT http://localhost:3000/harness/time \
+  -H "Content-Type: application/json" \
+  -d '{"simStudyDay":2.5,"freeze":true}'
+```
+
+Capture intentionally truncated ODM:
+
+```bash
+curl -u test-user:test-pass \
+  "http://localhost:3000/RaveWebServices/datasets/VersionFolders.odm?studyoid=Default%20Study" \
+  -o golden-payloads/version-folders/version-folders/VF-002.xml
+
+tail -n 10 golden-payloads/version-folders/version-folders/VF-002.xml
+# Confirm the closing </ODM> tag is intentionally missing
+```
+
+### VF-003 — Unauthorized JSON
+
+Reuse the baseline VF-001 configuration (or leave the previous harness config applied), then call without credentials:
+
+```bash
+curl "http://localhost:3000/RaveWebServices/datasets/VersionFolders.odm?studyoid=Default%20Study" \
+  -o golden-payloads/version-folders/version-folders/VF-003.json
+
+cat golden-payloads/version-folders/version-folders/VF-003.json
 ```
 
 ## Tips

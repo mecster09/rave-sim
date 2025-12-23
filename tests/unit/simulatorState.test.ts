@@ -12,7 +12,8 @@ const baseConfig: HarnessConfig = {
   resetOnStartup: false,
   randomSeed: 111111,
   truncateOdm: false,
-  forceClinicalViewStreamFailure: false
+  forceClinicalViewStreamFailure: false,
+  forceVersionFoldersStreamFailure: false
 };
 
 describe('SimulatorState', () => {
@@ -134,5 +135,17 @@ describe('SimulatorState', () => {
     state.setSimDay(1, true);
     const day1Statuses = state.getSnapshot().subjects.map(subject => subject.subjectStatus);
     expect(day1Statuses).toEqual(['Active', 'Active', 'Inactive', 'Active', 'Active', 'Deleted']);
+  });
+
+  it('exposes deterministic version folder metadata', () => {
+    const state = new SimulatorState(baseConfig, 2024);
+    const versionFolders = state.getVersionFolders();
+
+    expect(versionFolders).toHaveLength(1);
+    const version = versionFolders[0];
+    expect(version.metadataVersionOid).toBe('MDV.VERSION-1');
+    expect(version.primaryFormOid).toBe('DM');
+    const studyEventOids = version.studyEvents.map(event => event.studyEventOid);
+    expect(studyEventOids).toEqual(['VISIT-001', 'VISIT-002']);
   });
 });

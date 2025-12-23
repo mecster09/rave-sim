@@ -58,6 +58,7 @@ The service must support **pre-run configuration** via either environment/config
 | `resetOnStartup` | No | boolean | default false | If true, clear all persisted generated data at startup |
 | `truncateOdm` | No | boolean | default false | Truncates Clinical View datasets when the request opts into truncation |
 | `forceClinicalViewStreamFailure` | No | boolean | default false | Forces Clinical View regular datasets to end without a closing `</ODM>` to simulate a streaming failure |
+| `forceVersionFoldersStreamFailure` | No | boolean | default false | Forces VersionFolders.odm to omit the closing `</ODM>` so clients can exercise streaming-failure handling |
 
 ### A1.2 Derived/Implicit Simulator Behaviors
 - The simulator must establish a **simulation clock** (see A4) and a “study day” concept.
@@ -589,9 +590,9 @@ GET /RaveWebServices/studies/{study-oid}/Subjects
 
 | Scenario ID | Match Inputs | Simulator Preconditions | Expected Result | Golden Payload |
 |-----------|--------------|------------------------|----------------|---------------|
-| VF-001 | `studyoid` only | Study exists; at least one CRF version in use | 200 + complete ODM listing folders per in-use CRF version | `VersionFolders/VF-001.xml` |
-| VF-002 | `studyoid` only | Streaming failure toggle enabled | 200 + **incomplete ODM** (ODM not closed) | `VersionFolders/VF-002.xml` |
-| VF-003 | Unauthorized | Auth fails | 4xx | `VersionFolders/VF-003.xml` (if body required) |
+| VF-001 | `studyoid` only | Study exists; at least one CRF version in use | 200 + complete ODM listing folders per in-use CRF version | `version-folders/VF-001.xml` |
+| VF-002 | `studyoid` only | `forceVersionFoldersStreamFailure` enabled | 200 + **incomplete ODM** (ODM not closed) | `version-folders/VF-002.xml` |
+| VF-003 | Unauthorized | Auth fails | 4xx | `version-folders/VF-003.json` (JSON error payload) |
 
 ---
 
@@ -915,7 +916,7 @@ Golden payloads should be stored using the following convention:
 ## 3.5 Golden Payloads — VersionFolders.odm
 
 ### Scenario VF-001 — Version Folders Export (Complete ODM)
-**File:** `VersionFolders/VF-001.xml`
+**File:** `version-folders/VF-001.xml`
 
 ```xml
 <ODM ODMVersion="1.3.1" CreationDateTime="2024-01-01T00:00:00">
@@ -940,7 +941,7 @@ Golden payloads should be stored using the following convention:
 ---
 
 ### Scenario VF-002 — Partial ODM (Streaming Failure)
-**File:** `VersionFolders/VF-002.xml`
+**File:** `version-folders/VF-002.xml`
 
 ```xml
 <ODM ODMVersion="1.3.1">
@@ -951,6 +952,15 @@ Golden payloads should be stored using the following convention:
 ```
 
 **NOTE:** The ODM element is intentionally **not closed** to emulate streaming failure behavior.
+
+---
+
+### Scenario VF-003 — Unauthorized Response
+**File:** `version-folders/VF-003.json`
+
+```json
+{ "error": "Unauthorized" }
+```
 
 ---
 

@@ -70,7 +70,8 @@ describe('Harness control plane endpoints', () => {
       resetOnStartup: true,
       randomSeed: 654321,
       truncateOdm: true,
-      forceClinicalViewStreamFailure: false
+      forceClinicalViewStreamFailure: false,
+      forceVersionFoldersStreamFailure: false
     };
 
     const updateRes = await app.inject({
@@ -199,7 +200,8 @@ describe('Harness control plane endpoints', () => {
           resetOnStartup: false,
           randomSeed: 42,
           truncateOdm: false,
-          forceClinicalViewStreamFailure: false
+          forceClinicalViewStreamFailure: false,
+          forceVersionFoldersStreamFailure: false
         }
       }
     });

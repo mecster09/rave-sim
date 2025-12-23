@@ -3,7 +3,7 @@ import { URL } from 'node:url';
 import basicAuthPlugin from './plugins/basicAuth';
 import { DEFAULT_RANDOM_SEED, HarnessConfig, validateConfig } from './services/config';
 import { SimulatorSnapshot, SimulatorState, SubjectStatus } from './services/simulatorState';
-import { buildSnapshotODM, buildTransactionalODM, buildOdmError } from './services/odmBuilder';
+import { buildSnapshotODM, buildTransactionalODM, buildOdmError, buildVersionFoldersODM } from './services/odmBuilder';
 import { buildClinicalViewSubjects } from './services/clinicalViewBuilder';
 import { buildAuditPage } from './services/auditLog';
 
@@ -17,7 +17,8 @@ const DEFAULT_CONFIG_INPUT = {
   resetOnStartup: false,
   randomSeed: DEFAULT_RANDOM_SEED,
   truncateOdm: false,
-  forceClinicalViewStreamFailure: false
+  forceClinicalViewStreamFailure: false,
+  forceVersionFoldersStreamFailure: false
 };
 
 const DEFAULT_CONFIG_RESULT = validateConfig(DEFAULT_CONFIG_INPUT);
@@ -760,6 +761,32 @@ export function buildServer() {
       request.query as Record<string, unknown>,
       { versionId }
     );
+  });
+
+  app.get('/RaveWebServices/datasets/VersionFolders.odm', async (request, reply) => {
+    const query = request.query as { studyoid?: unknown };
+    const studyOid = typeof query.studyoid === 'string' ? query.studyoid.trim() : '';
+
+    if (!studyOid) {
+      return reply.code(400).send({ error: 'studyoid is required' });
+    }
+
+    const { generatedAt } = computeGeneratedAt();
+    const versions = simulatorState.getVersionFolders();
+
+    if (versions.length === 0) {
+      return reply.code(404).send({ error: 'Version folders unavailable' });
+    }
+
+    const xml = buildVersionFoldersODM({
+      studyOid,
+      generatedAt,
+      versions,
+      truncate: currentConfig.forceVersionFoldersStreamFailure
+    });
+
+    reply.header('content-type', 'application/xml');
+    return reply.send(xml);
   });
 
   app.get('/RaveWebServices/datasets/ClinicalAuditRecords.odm', async (request, reply) => {
