@@ -3,6 +3,7 @@ import basicAuthPlugin from './plugins/basicAuth';
 import { HarnessConfig, validateConfig } from './services/config';
 import { SimulatorSnapshot, SimulatorState, SubjectStatus } from './services/simulatorState';
 import { buildSnapshotODM } from './services/odmBuilder';
+import { buildClinicalViewSubjects } from './services/clinicalViewBuilder';
 
 const DEFAULT_CONFIG_INPUT = {
   studyName: 'Default Study',
@@ -69,6 +70,16 @@ export function buildServer() {
       simClock,
       freeze: simulatorState.isFrozen(),
       frozenDay: simulatorState.getFrozenDay()
+    };
+  };
+
+  const computeGeneratedAt = () => {
+    const simClock = simulatorState.getSimClock();
+    const timestamp =
+      simClock.simStartWallClock + simClock.simCurrentStudyDay * simClock.simSpeedMinutesPerDay * 60000;
+    return {
+      simClock,
+      generatedAt: new Date(timestamp).toISOString()
     };
   };
 
@@ -241,16 +252,112 @@ export function buildServer() {
         }))
       }));
 
-    const simClock = simulatorState.getSimClock();
-    const generatedAt = new Date(
-      simClock.simStartWallClock + simClock.simCurrentStudyDay * simClock.simSpeedMinutesPerDay * 60000
-    ).toISOString();
+    const { simClock, generatedAt } = computeGeneratedAt();
 
     const xml = buildSnapshotODM({
       studyOid,
       metadataVersionOid: 'MDV.DEFAULT',
       generatedAt,
       subjects: filteredSubjects
+    });
+
+    reply.header('content-type', 'application/xml');
+    return reply.send(xml);
+  });
+
+  app.get('/RaveWebServices/studies/:studyOid/datasets/regular', async (request, reply) => {
+    const params = request.params as { studyOid?: unknown };
+    const studyOid = typeof params.studyOid === 'string' ? params.studyOid : '';
+
+    if (!studyOid) {
+      return reply.code(400).send({ error: 'Invalid studyOid' });
+    }
+
+    const snapshot = simulatorState.getSnapshot();
+    const { simClock, generatedAt } = computeGeneratedAt();
+    const subjects = buildClinicalViewSubjects(snapshot, {
+      currentStudyDay: simClock.simCurrentStudyDay
+    });
+
+    const xml = buildSnapshotODM({
+      studyOid,
+      metadataVersionOid: 'MDV.DEFAULT',
+      generatedAt,
+      subjects
+    });
+
+    reply.header('content-type', 'application/xml');
+    return reply.send(xml);
+  });
+
+  app.get('/RaveWebServices/studies/:studyOid/datasets/regular/:formOid', async (request, reply) => {
+    const params = request.params as { studyOid?: unknown; formOid?: unknown };
+    const studyOid = typeof params.studyOid === 'string' ? params.studyOid : '';
+    const formOidRaw = typeof params.formOid === 'string' ? params.formOid : '';
+    const formOid = formOidRaw.trim();
+
+    if (!studyOid) {
+      return reply.code(400).send({ error: 'Invalid studyOid' });
+    }
+
+    if (!formOid) {
+      return reply.code(400).send({ error: 'Invalid formOid' });
+    }
+
+    const snapshot = simulatorState.getSnapshot();
+    const { simClock, generatedAt } = computeGeneratedAt();
+    const subjects = buildClinicalViewSubjects(snapshot, {
+      currentStudyDay: simClock.simCurrentStudyDay,
+      formOid
+    });
+
+    const xml = buildSnapshotODM({
+      studyOid,
+      metadataVersionOid: 'MDV.DEFAULT',
+      generatedAt,
+      subjects
+    });
+
+    reply.header('content-type', 'application/xml');
+    return reply.send(xml);
+  });
+
+  app.get('/RaveWebServices/studies/:studyOid/subjects/:subjectKey/datasets/regular', async (request, reply) => {
+    const params = request.params as { studyOid?: unknown; subjectKey?: unknown };
+    const studyOid = typeof params.studyOid === 'string' ? params.studyOid : '';
+    const subjectKeyValue = typeof params.subjectKey === 'string' ? params.subjectKey : '';
+
+    if (!studyOid) {
+      return reply.code(400).send({ error: 'Invalid studyOid' });
+    }
+
+    if (!subjectKeyValue || subjectKeyValue.trim().length === 0) {
+      return reply.code(400).send({ error: 'Invalid subjectKey' });
+    }
+
+    const numericSubjectKey = Number(subjectKeyValue);
+    if (!Number.isInteger(numericSubjectKey) || Number.isNaN(numericSubjectKey) || numericSubjectKey <= 0) {
+      return reply.code(400).send({ error: 'Invalid subjectKey' });
+    }
+
+    const snapshot = simulatorState.getSnapshot();
+    const subjectExists = snapshot.subjects.some(subject => subject.subjectKey === numericSubjectKey);
+
+    if (!subjectExists) {
+      return reply.code(404).send({ error: 'Subject not found' });
+    }
+
+    const { simClock, generatedAt } = computeGeneratedAt();
+    const subjects = buildClinicalViewSubjects(snapshot, {
+      currentStudyDay: simClock.simCurrentStudyDay,
+      subjectKey: numericSubjectKey
+    });
+
+    const xml = buildSnapshotODM({
+      studyOid,
+      metadataVersionOid: 'MDV.DEFAULT',
+      generatedAt,
+      subjects
     });
 
     reply.header('content-type', 'application/xml');
