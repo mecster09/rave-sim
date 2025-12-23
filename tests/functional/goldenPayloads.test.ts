@@ -145,4 +145,41 @@ describe('golden payload regression', () => {
 
     expect(generated.equals(golden)).toBe(true);
   });
+
+  it('replays high form data dataset scenario deterministically', async () => {
+    const configPath = path.resolve('golden-scenarios/high-form-data/config.json');
+    const configDefinition = JSON.parse(await fs.readFile(configPath, 'utf8')) as GoldenConfigDefinition;
+    const resolvedConfig = resolveGoldenConfig(configDefinition);
+
+    const targetScenario = resolvedConfig.scenarios.find(
+      scenario => scenario.family === 'datasets' && scenario.name === 'high-form-snapshot'
+    );
+    expect(targetScenario).toBeDefined();
+
+    const workingDir = await createTempDir('golden-regression');
+    const manifestPath = path.join(workingDir, 'manifest.json');
+
+    await generateGoldenPayloads({
+      config: {
+        harnessConfig: resolvedConfig.harnessConfig,
+        simStudyDay: resolvedConfig.simStudyDay,
+        freeze: resolvedConfig.freeze,
+        scenarios: [targetScenario!]
+      },
+      outputDir: workingDir,
+      manifestPath,
+      authUser: AUTH_USER,
+      authPass: AUTH_PASS
+    });
+
+    const generatedPath = path.join(workingDir, 'datasets', 'high-form-snapshot.xml');
+    const goldenPath = path.resolve('golden-payloads/high-form-data/datasets/high-form-snapshot.xml');
+
+    const [generated, golden] = await Promise.all([
+      fs.readFile(generatedPath),
+      fs.readFile(goldenPath)
+    ]);
+
+    expect(generated.equals(golden)).toBe(true);
+  });
 });

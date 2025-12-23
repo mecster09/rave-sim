@@ -1,0 +1,25 @@
+{
+  "harnessConfig": {
+    "studyName": "RWS_HIGH_FORM_DATA",
+    "siteCount": 3,
+    "subjectCount": 20,
+    "visitCountPerSubject": 4,
+    "formDataPointsPerVisit": 18,
+    "simSpeedMinutesPerDay": 60,
+    "resetOnStartup": false,
+    "randomSeed": 246810,
+    "truncateOdm": false
+  },
+  "simStudyDay": 2.75,
+  "freeze": true,
+  "scenarios": [
+    {
+      "family": "datasets",
+      "name": "high-form-snapshot",
+      "request": {
+        "method": "GET",
+        "url": "/RaveWebServices/studies/RWS_HIGH_FORM_DATA/datasets/regular"
+      }
+    }
+  ]
+}
