@@ -27,6 +27,7 @@
   },
   "homepage": "https://github.com/mecster09/rave-sim#readme",
   "dependencies": {
+    "@fastify/swagger": "^9.4.0",
     "fastify": "^5.6.2"
   },
   "devDependencies": {
