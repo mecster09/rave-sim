@@ -9,18 +9,21 @@ interface Site {
 export interface Visit {
   visitOid: string;
   sequenceNumber: number;
-  forms: FormDataPoint[];
+  forms: VisitForm[];
   availableDay: number;
 }
 
-interface FormDataPoint {
+interface VisitForm {
   formOid: string;
-  fieldOid: string;
-  value: string | number;
+  data: Record<string, PrimitiveValue>;
 }
+
+type PrimitiveValue = string | number;
 
 interface Subject {
   subjectKey: number;
+  siteLocationOid: string;
+  subjectStatus: SubjectStatus;
   visits: Visit[];
 }
 
@@ -28,6 +31,8 @@ export interface SimulatorSnapshot {
   sites: Site[];
   subjects: Subject[];
 }
+
+export type SubjectStatus = 'Active' | 'Inactive' | 'Deleted';
 
 export interface SubjectAvailability {
   subjectKey: number;
@@ -104,7 +109,7 @@ function createVisits(config: HarnessConfig, rng: () => number): Visit[] {
   return visits;
 }
 
-function createFormData(config: HarnessConfig, rng: () => number): FormDataPoint[] {
+function createFormData(config: HarnessConfig, rng: () => number): VisitForm[] {
   const templates: Array<{ formOid: string; fieldOid: string }> = [
     { formOid: 'DM', fieldOid: 'SEX' },
     { formOid: 'DM', fieldOid: 'AGE' },
@@ -113,8 +118,18 @@ function createFormData(config: HarnessConfig, rng: () => number): FormDataPoint
     { formOid: 'AE', fieldOid: 'SEVERITY' }
   ];
 
-  const datapoints: FormDataPoint[] = [];
-  for (let i = 0; i < config.formDataPointsPerVisit; i += 1) {
+  const formsMap = new Map<string, Record<string, PrimitiveValue>>();
+
+  const ensureForm = (formOid: string) => {
+    if (!formsMap.has(formOid)) {
+      formsMap.set(formOid, {});
+    }
+    return formsMap.get(formOid)!;
+  };
+
+  const totalPoints = config.formDataPointsPerVisit;
+
+  for (let i = 0; i < totalPoints; i += 1) {
     const template =
       i < templates.length
         ? templates[i]
@@ -122,13 +137,26 @@ function createFormData(config: HarnessConfig, rng: () => number): FormDataPoint
             formOid: 'AE',
             fieldOid: `TERM-${(i - templates.length + 1).toString().padStart(3, '0')}`
           };
-    datapoints.push({
-      formOid: template.formOid,
-      fieldOid: template.fieldOid,
-      value: deterministicValue(rng, template.formOid, template.fieldOid)
-    });
+
+    const form = ensureForm(template.formOid);
+    form[template.fieldOid] = deterministicValue(rng, template.formOid, template.fieldOid);
   }
-  return datapoints;
+
+  const forms: VisitForm[] = Array.from(formsMap.entries())
+    .filter(([, fields]) => Object.keys(fields).length > 0)
+    .map(([formOid, data]) => ({
+      formOid,
+      data
+    }))
+    .sort((a, b) => a.formOid.localeCompare(b.formOid));
+
+  return forms;
+}
+
+const SUBJECT_STATUS_CYCLE: SubjectStatus[] = ['Active', 'Active', 'Inactive', 'Active', 'Active', 'Deleted'];
+
+function determineSubjectStatus(index: number): SubjectStatus {
+  return SUBJECT_STATUS_CYCLE[index % SUBJECT_STATUS_CYCLE.length];
 }
 
 function createSubjects(config: HarnessConfig, rng: () => number): Subject[] {
@@ -137,7 +165,10 @@ function createSubjects(config: HarnessConfig, rng: () => number): Subject[] {
   for (let i = 0; i < config.subjectCount; i += 1) {
     const subjectKey = baseSubjectKey + i + 1;
     const visits = createVisits(config, rng);
-    subjects.push({ subjectKey, visits });
+    const siteIndex = i % config.siteCount;
+    const siteLocationOid = `SITE-${(siteIndex + 1).toString().padStart(3, '0')}`;
+    const subjectStatus = determineSubjectStatus(i);
+    subjects.push({ subjectKey, visits, siteLocationOid, subjectStatus });
   }
   return subjects;
 }

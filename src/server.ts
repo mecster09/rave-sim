@@ -1,7 +1,8 @@
 import Fastify from 'fastify';
 import basicAuthPlugin from './plugins/basicAuth';
 import { HarnessConfig, validateConfig } from './services/config';
-import { SimulatorSnapshot, SimulatorState } from './services/simulatorState';
+import { SimulatorSnapshot, SimulatorState, SubjectStatus } from './services/simulatorState';
+import { buildSnapshotODM } from './services/odmBuilder';
 
 const DEFAULT_CONFIG_INPUT = {
   studyName: 'Default Study',
@@ -43,7 +44,9 @@ export function buildServer() {
     for (const subject of snapshot.subjects) {
       visits += subject.visits.length;
       for (const visit of subject.visits) {
-        forms += visit.forms.length;
+        for (const form of visit.forms) {
+          forms += Object.keys(form.data).length;
+        }
         if (simulatorState.isVisitAvailable(visit, currentDay)) {
           availableVisits += 1;
         }
@@ -192,6 +195,66 @@ export function buildServer() {
     simulatorState.setSimDay(simStudyDay, freeze);
 
     return getTimeState();
+  });
+
+  app.get('/RaveWebServices/studies/:studyOid/Subjects', async (request, reply) => {
+    const params = request.params as { studyOid?: unknown };
+    const query = request.query as { include?: unknown; status?: unknown };
+
+    const studyOid = typeof params.studyOid === 'string' ? params.studyOid : '';
+    if (!studyOid) {
+      return reply.code(400).send({ error: 'Invalid studyOid' });
+    }
+
+    const include = typeof query.include === 'string' ? query.include : undefined;
+    const status = typeof query.status === 'string' ? query.status : undefined;
+
+    const allowedIncludes = new Set(['inactive', 'inactiveAndDeleted']);
+    if (include && !allowedIncludes.has(include)) {
+      return reply.code(400).send({ error: 'Invalid include parameter' });
+    }
+
+    if (status && status !== 'all') {
+      return reply.code(400).send({ error: 'Invalid status parameter' });
+    }
+
+    let allowedStatuses: SubjectStatus[] = ['Active'];
+    if (status === 'all' || include === 'inactiveAndDeleted') {
+      allowedStatuses = ['Active', 'Inactive', 'Deleted'];
+    } else if (include === 'inactive') {
+      allowedStatuses = ['Active', 'Inactive'];
+    }
+
+    const snapshot = simulatorState.getSnapshot();
+    const filteredSubjects = snapshot.subjects
+      .filter(subject => allowedStatuses.includes(subject.subjectStatus))
+      .map(subject => ({
+        subjectKey: String(subject.subjectKey),
+        siteLocationOid: subject.siteLocationOid,
+        subjectStatus: subject.subjectStatus,
+        visits: subject.visits.map(visit => ({
+          visitOid: visit.visitOid,
+          forms: visit.forms.map(form => ({
+            formOid: form.formOid,
+            data: { ...form.data }
+          }))
+        }))
+      }));
+
+    const simClock = simulatorState.getSimClock();
+    const generatedAt = new Date(
+      simClock.simStartWallClock + simClock.simCurrentStudyDay * simClock.simSpeedMinutesPerDay * 60000
+    ).toISOString();
+
+    const xml = buildSnapshotODM({
+      studyOid,
+      metadataVersionOid: 'MDV.DEFAULT',
+      generatedAt,
+      subjects: filteredSubjects
+    });
+
+    reply.header('content-type', 'application/xml');
+    return reply.send(xml);
   });
 
   return app;

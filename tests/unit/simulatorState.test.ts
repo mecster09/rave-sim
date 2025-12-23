@@ -42,7 +42,7 @@ describe('SimulatorState', () => {
     expect(postResetHash).toBe(state.getSnapshotHash());
   });
 
-  it('produces deterministic fallback form values and snapshot hashes', () => {
+  it('produces deterministic aggregated form values and snapshot hashes', () => {
     const config: HarnessConfig = {
       ...baseConfig,
       subjectCount: 1,
@@ -56,10 +56,17 @@ describe('SimulatorState', () => {
     const snapshotA = stateA.getSnapshot();
     const snapshotB = stateB.getSnapshot();
 
-    expect(snapshotA.subjects[0].visits[0].forms).toHaveLength(7);
-    const fallbackValue = snapshotA.subjects[0].visits[0].forms[6].value;
+    const visit = snapshotA.subjects[0].visits[0];
+    const totalDataPoints = visit.forms.reduce((sum, form) => sum + Object.keys(form.data).length, 0);
+    expect(totalDataPoints).toBe(config.formDataPointsPerVisit);
+
+    const aeForm = visit.forms.find(form => form.formOid === 'AE');
+    expect(aeForm).toBeDefined();
+    const termKeys = Object.keys(aeForm!.data).filter(key => key.startsWith('TERM-'));
+    expect(termKeys.length).toBeGreaterThan(0);
+    const fallbackValue = aeForm!.data[termKeys[termKeys.length - 1]];
     expect(typeof fallbackValue).toBe('string');
-    expect(fallbackValue).toMatch(/^VAL-AE-TERM-/);
+    expect(String(fallbackValue)).toMatch(/^VAL-AE-TERM-/);
     expect(snapshotA).toEqual(snapshotB);
     expect(hashSnapshot(snapshotA)).toBe(hashSnapshot(snapshotB));
   });
