@@ -97,12 +97,25 @@ describe('Harness control plane endpoints', () => {
     expect(statusRes.statusCode).toBe(200);
     const statusBody = statusRes.json();
     expect(statusBody.config).toMatchObject(newConfig);
+    const totalVisits = newConfig.subjectCount * newConfig.visitCountPerSubject;
     expect(statusBody.counts).toEqual({
       sites: newConfig.siteCount,
       subjects: newConfig.subjectCount,
-      visits: newConfig.subjectCount * newConfig.visitCountPerSubject,
-      forms: newConfig.subjectCount * newConfig.visitCountPerSubject * newConfig.formDataPointsPerVisit
+      visits: totalVisits,
+      availableVisits: newConfig.subjectCount,
+      unavailableVisits: totalVisits - newConfig.subjectCount,
+      forms: totalVisits * newConfig.formDataPointsPerVisit
     });
+    expect(typeof statusBody.simClock.simStartWallClock).toBe('number');
+    expect(typeof statusBody.simClock.simCurrentStudyDay).toBe('number');
+    expect(statusBody.simClock.simSpeedMinutesPerDay).toBe(newConfig.simSpeedMinutesPerDay);
+    expect(Array.isArray(statusBody.availability)).toBe(true);
+    expect(statusBody.availability.length).toBe(newConfig.subjectCount);
+    const firstSubjectAvailability = statusBody.availability[0];
+    expect(firstSubjectAvailability.visits[0].isAvailable).toBe(true);
+    if (firstSubjectAvailability.visits.length > 1) {
+      expect(firstSubjectAvailability.visits[1].isAvailable).toBe(false);
+    }
   });
 
   it('updates simulation speed independently', async () => {
@@ -143,7 +156,9 @@ describe('Harness control plane endpoints', () => {
     });
 
     expect(statusRes.statusCode).toBe(200);
-    expect(statusRes.json().config.simSpeedMinutesPerDay).toBe(120);
+    const statusBody = statusRes.json();
+    expect(statusBody.config.simSpeedMinutesPerDay).toBe(120);
+    expect(statusBody.simClock.simSpeedMinutesPerDay).toBe(120);
   });
 
   it('returns 400 for invalid applyMode', async () => {
@@ -187,6 +202,15 @@ describe('Harness control plane endpoints', () => {
 
     expect(resetRes.statusCode).toBe(200);
     expect(resetRes.json().status).toBe('reset');
-    expect(resetRes.json().counts).toBeDefined();
+    const counts = resetRes.json().counts;
+    expect(counts).toMatchObject({
+      sites: expect.any(Number),
+      subjects: expect.any(Number),
+      visits: expect.any(Number),
+      availableVisits: expect.any(Number),
+      unavailableVisits: expect.any(Number),
+      forms: expect.any(Number)
+    });
+    expect(counts.availableVisits + counts.unavailableVisits).toBe(counts.visits);
   });
 });

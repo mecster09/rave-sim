@@ -6,10 +6,11 @@ interface Site {
   name: string;
 }
 
-interface Visit {
+export interface Visit {
   visitOid: string;
   sequenceNumber: number;
   forms: FormDataPoint[];
+  availableDay: number;
 }
 
 interface FormDataPoint {
@@ -26,6 +27,16 @@ interface Subject {
 export interface SimulatorSnapshot {
   sites: Site[];
   subjects: Subject[];
+}
+
+export interface SubjectAvailability {
+  subjectKey: number;
+  visits: Array<{
+    visitOid: string;
+    sequenceNumber: number;
+    availableDay: number;
+    isAvailable: boolean;
+  }>;
 }
 
 function seededRandom(seed: number): () => number {
@@ -86,7 +97,8 @@ function createVisits(config: HarnessConfig, rng: () => number): Visit[] {
     visits.push({
       visitOid,
       sequenceNumber: i + 1,
-      forms
+      forms,
+      availableDay: i
     });
   }
   return visits;
@@ -138,7 +150,19 @@ function snapshotHash(snapshot: SimulatorSnapshot): string {
 export class SimulatorState {
   private snapshot: SimulatorSnapshot | null = null;
 
-  constructor(private readonly config: HarnessConfig, private readonly seed = 123456) {}
+  private simStartWallClock: number;
+
+  private frozenDay: number | null = null;
+
+  private config: HarnessConfig;
+
+  private readonly now: () => number;
+
+  constructor(config: HarnessConfig, private readonly seed = 123456, nowProvider: () => number = () => Date.now()) {
+    this.config = { ...config };
+    this.now = nowProvider;
+    this.simStartWallClock = this.now();
+  }
 
   private generateSnapshot(): SimulatorSnapshot {
     const rng = seededRandom(this.seed);
@@ -146,6 +170,20 @@ export class SimulatorState {
       sites: createSites(this.config),
       subjects: createSubjects(this.config, rng)
     };
+  }
+
+  private computeStudyDay(timeMs: number, ignoreFreeze = false): number {
+    if (!ignoreFreeze && this.frozenDay !== null) {
+      return this.frozenDay;
+    }
+
+    const elapsedMinutes = Math.max(0, timeMs - this.simStartWallClock) / 60000;
+    const speed = this.config.simSpeedMinutesPerDay;
+    if (speed <= 0) {
+      return 0;
+    }
+
+    return Math.max(0, elapsedMinutes / speed);
   }
 
   getSnapshot(): SimulatorSnapshot {
@@ -157,11 +195,67 @@ export class SimulatorState {
 
   reset(): SimulatorSnapshot {
     this.snapshot = this.generateSnapshot();
+    this.simStartWallClock = this.now();
+    this.frozenDay = null;
     return this.snapshot;
   }
 
   getSnapshotHash(): string {
     return snapshotHash(this.getSnapshot());
+  }
+
+  getSimClock(now = this.now()): {
+    simStartWallClock: number;
+    simCurrentStudyDay: number;
+    simSpeedMinutesPerDay: number;
+  } {
+    const simCurrentStudyDay = this.computeStudyDay(now);
+    return {
+      simStartWallClock: this.simStartWallClock,
+      simCurrentStudyDay,
+      simSpeedMinutesPerDay: this.config.simSpeedMinutesPerDay
+    };
+  }
+
+  freeze(day = this.computeStudyDay(this.now(), true)): void {
+    this.frozenDay = day;
+  }
+
+  unfreeze(): void {
+    if (this.frozenDay === null) {
+      return;
+    }
+    const referenceDay = this.frozenDay;
+    this.frozenDay = null;
+    const now = this.now();
+    this.simStartWallClock = now - referenceDay * this.config.simSpeedMinutesPerDay * 60000;
+  }
+
+  updateSimSpeed(simSpeedMinutesPerDay: number): void {
+    const now = this.now();
+    const referenceDay = this.computeStudyDay(now, true);
+    this.config = { ...this.config, simSpeedMinutesPerDay };
+    this.simStartWallClock = now - referenceDay * simSpeedMinutesPerDay * 60000;
+    if (this.frozenDay !== null) {
+      this.frozenDay = referenceDay;
+    }
+  }
+
+  isVisitAvailable(visit: Visit, currentDay: number): boolean {
+    return Math.floor(currentDay) >= visit.availableDay;
+  }
+
+  getSubjectAvailability(currentDay = this.getSimClock().simCurrentStudyDay): SubjectAvailability[] {
+    const snapshot = this.getSnapshot();
+    return snapshot.subjects.map(subject => ({
+      subjectKey: subject.subjectKey,
+      visits: subject.visits.map(visit => ({
+        visitOid: visit.visitOid,
+        sequenceNumber: visit.sequenceNumber,
+        availableDay: visit.availableDay,
+        isAvailable: this.isVisitAvailable(visit, currentDay)
+      }))
+    }));
   }
 }
 

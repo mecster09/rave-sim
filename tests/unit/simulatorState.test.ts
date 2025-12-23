@@ -63,4 +63,48 @@ describe('SimulatorState', () => {
     expect(snapshotA).toEqual(snapshotB);
     expect(hashSnapshot(snapshotA)).toBe(hashSnapshot(snapshotB));
   });
+
+  it('computes study day from wall clock and supports freezing', () => {
+    let currentTime = 0;
+    const nowProvider = () => currentTime;
+    const config: HarnessConfig = { ...baseConfig, simSpeedMinutesPerDay: 30 };
+    const state = new SimulatorState(config, 42, nowProvider);
+
+    expect(state.getSimClock().simCurrentStudyDay).toBe(0);
+
+    currentTime += 30 * 60000;
+    expect(state.getSimClock().simCurrentStudyDay).toBeCloseTo(1);
+
+    currentTime += 15 * 60000;
+    expect(state.getSimClock().simCurrentStudyDay).toBeCloseTo(1.5);
+
+    state.freeze();
+    currentTime += 60 * 60000;
+    expect(state.getSimClock().simCurrentStudyDay).toBeCloseTo(1.5);
+
+    state.unfreeze();
+    expect(state.getSimClock().simCurrentStudyDay).toBeCloseTo(1.5);
+
+    currentTime += 30 * 60000;
+    expect(state.getSimClock().simCurrentStudyDay).toBeCloseTo(2.5);
+  });
+
+  it('enforces sequential visit availability dependencies', () => {
+    const config: HarnessConfig = {
+      ...baseConfig,
+      subjectCount: 1,
+      visitCountPerSubject: 3
+    };
+
+    const state = new SimulatorState(config, 77);
+
+    const day0 = state.getSubjectAvailability(0)[0].visits.map(v => v.isAvailable);
+    expect(day0).toEqual([true, false, false]);
+
+    const day1 = state.getSubjectAvailability(1)[0].visits.map(v => v.isAvailable);
+    expect(day1).toEqual([true, true, false]);
+
+    const day2 = state.getSubjectAvailability(2)[0].visits.map(v => v.isAvailable);
+    expect(day2).toEqual([true, true, true]);
+  });
 });

@@ -29,29 +29,24 @@ export function buildServer() {
 
   let currentConfig: HarnessConfig = { ...DEFAULT_CONFIG };
   let simulatorState = createSimulatorState(currentConfig);
-  let cachedSnapshot: SimulatorSnapshot | null = null;
 
-  const resetState = () => {
+  const recreateState = () => {
     simulatorState = createSimulatorState(currentConfig);
-    cachedSnapshot = null;
+    simulatorState.getSnapshot();
   };
 
-  const getSnapshot = (): SimulatorSnapshot => {
-    if (!cachedSnapshot) {
-      cachedSnapshot = simulatorState.getSnapshot();
-    }
-    return cachedSnapshot;
-  };
-
-  const getCounts = () => {
-    const snapshot = getSnapshot();
+  const computeCounts = (snapshot: SimulatorSnapshot, currentDay: number) => {
     let visits = 0;
     let forms = 0;
+    let availableVisits = 0;
 
     for (const subject of snapshot.subjects) {
       visits += subject.visits.length;
       for (const visit of subject.visits) {
         forms += visit.forms.length;
+        if (simulatorState.isVisitAvailable(visit, currentDay)) {
+          availableVisits += 1;
+        }
       }
     }
 
@@ -59,8 +54,18 @@ export function buildServer() {
       sites: snapshot.sites.length,
       subjects: snapshot.subjects.length,
       visits,
+      availableVisits,
+      unavailableVisits: visits - availableVisits,
       forms
     };
+  };
+
+  const buildStatus = () => {
+    const simClock = simulatorState.getSimClock();
+    const snapshot = simulatorState.getSnapshot();
+    const counts = computeCounts(snapshot, simClock.simCurrentStudyDay);
+    const availability = simulatorState.getSubjectAvailability(simClock.simCurrentStudyDay);
+    return { simClock, counts, availability };
   };
 
   app.get('/health', async () => {
@@ -98,8 +103,7 @@ export function buildServer() {
     currentConfig = result.value;
 
     if (applyMode === 'applyAndReset') {
-      resetState();
-      getSnapshot();
+      recreateState();
     }
 
     return { config: currentConfig, applyMode };
@@ -130,23 +134,27 @@ export function buildServer() {
 
     currentConfig = result.value;
 
+    simulatorState.updateSimSpeed(currentConfig.simSpeedMinutesPerDay);
+
     return { simSpeedMinutesPerDay: currentConfig.simSpeedMinutesPerDay };
   });
 
   app.post('/harness/reset', async () => {
-    resetState();
-    getSnapshot();
+    simulatorState.reset();
+    const { counts } = buildStatus();
     return {
       status: 'reset',
-      counts: getCounts()
+      counts
     };
   });
 
   app.get('/harness/status', async () => {
+    const { simClock, counts, availability } = buildStatus();
     return {
       config: currentConfig,
-      simClock: { currentDay: 0 },
-      counts: getCounts()
+      simClock,
+      counts,
+      availability
     };
   });
 
