@@ -1,0 +1,19 @@
+{
+  "generatedAt": "2025-12-23T12:37:40.726Z",
+  "scenarios": [
+    {
+      "family": "audit",
+      "name": "clinical-records",
+      "file": "audit/clinical-records.xml",
+      "sha256": "cd30b76e029b6ccc456b61988437309df7fd0285f4ce6cd5d474a860d9baee96",
+      "statusCode": 200
+    },
+    {
+      "family": "clinical-view",
+      "name": "regular-dataset",
+      "file": "clinical-view/regular-dataset.xml",
+      "sha256": "6f9bd2f30312cb2729868fda7318ef1d46fd6e41530e05d46b397ec4408b6b60",
+      "statusCode": 200
+    }
+  ]
+}

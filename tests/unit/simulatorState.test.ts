@@ -10,6 +10,7 @@ const baseConfig: HarnessConfig = {
   formDataPointsPerVisit: 4,
   simSpeedMinutesPerDay: 60,
   resetOnStartup: false,
+  randomSeed: 111111,
   truncateOdm: false
 };
 

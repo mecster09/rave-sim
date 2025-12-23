@@ -1,7 +1,7 @@
 import Fastify from 'fastify';
 import { URL } from 'node:url';
 import basicAuthPlugin from './plugins/basicAuth';
-import { HarnessConfig, validateConfig } from './services/config';
+import { DEFAULT_RANDOM_SEED, HarnessConfig, validateConfig } from './services/config';
 import { SimulatorSnapshot, SimulatorState, SubjectStatus } from './services/simulatorState';
 import { buildSnapshotODM, buildTransactionalODM } from './services/odmBuilder';
 import { buildClinicalViewSubjects } from './services/clinicalViewBuilder';
@@ -15,6 +15,7 @@ const DEFAULT_CONFIG_INPUT = {
   formDataPointsPerVisit: 5,
   simSpeedMinutesPerDay: 60,
   resetOnStartup: false,
+  randomSeed: DEFAULT_RANDOM_SEED,
   truncateOdm: false
 };
 
@@ -25,18 +26,17 @@ if (DEFAULT_CONFIG_RESULT.error) {
 }
 
 const DEFAULT_CONFIG = DEFAULT_CONFIG_RESULT.value;
-const DEFAULT_SEED = 123456;
-
 export function buildServer() {
   const app = Fastify({ logger: true });
 
   app.register(basicAuthPlugin);
 
   let currentConfig: HarnessConfig = { ...DEFAULT_CONFIG };
-  let simulatorState = createSimulatorState(currentConfig);
+  let currentSeed = currentConfig.randomSeed;
+  let simulatorState = createSimulatorState(currentConfig, currentSeed);
 
   const recreateState = () => {
-    simulatorState = createSimulatorState(currentConfig);
+    simulatorState = createSimulatorState(currentConfig, currentSeed);
     simulatorState.getSnapshot();
   };
 
@@ -156,6 +156,7 @@ export function buildServer() {
     }
 
     currentConfig = result.value;
+    currentSeed = currentConfig.randomSeed;
 
     if (applyMode === 'applyAndReset') {
       recreateState();
@@ -195,7 +196,8 @@ export function buildServer() {
   });
 
   app.post('/harness/reset', async () => {
-    simulatorState.reset();
+    simulatorState = createSimulatorState(currentConfig, currentSeed);
+    simulatorState.getSnapshot();
     const { counts } = buildStatus();
     return {
       status: 'reset',
@@ -519,6 +521,6 @@ if (require.main === module) {
 }
 /* c8 ignore stop */
 
-function createSimulatorState(config: HarnessConfig) {
-  return new SimulatorState({ ...config }, DEFAULT_SEED);
+function createSimulatorState(config: HarnessConfig, seed: number) {
+  return new SimulatorState({ ...config }, seed);
 }

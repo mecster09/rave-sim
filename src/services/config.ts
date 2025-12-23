@@ -6,8 +6,11 @@ export interface HarnessConfig {
   formDataPointsPerVisit: number;
   simSpeedMinutesPerDay: number;
   resetOnStartup: boolean;
+  randomSeed: number;
   truncateOdm: boolean;
 }
+
+export const DEFAULT_RANDOM_SEED = 123456;
 
 interface SuccessResult {
   value: HarnessConfig;
@@ -40,6 +43,7 @@ export function validateConfig(input: unknown): ValidateConfigResult {
     formDataPointsPerVisit,
     simSpeedMinutesPerDay,
     resetOnStartup,
+    randomSeed,
     truncateOdm
   } = input as Partial<HarnessConfig> & Record<string, unknown>;
 
@@ -75,6 +79,10 @@ export function validateConfig(input: unknown): ValidateConfigResult {
     errors.push('resetOnStartup must be a boolean if provided');
   }
 
+  if (!isValidRandomSeed(randomSeed) && typeof randomSeed !== 'undefined') {
+    errors.push('randomSeed must be an integer between 0 and 4294967295');
+  }
+
   if (typeof truncateOdm !== 'boolean' && typeof truncateOdm !== 'undefined') {
     errors.push('truncateOdm must be a boolean if provided');
   }
@@ -92,6 +100,7 @@ export function validateConfig(input: unknown): ValidateConfigResult {
       formDataPointsPerVisit: formDataPointsPerVisit as number,
       simSpeedMinutesPerDay: simSpeedMinutesPerDay as number,
       resetOnStartup: typeof resetOnStartup === 'boolean' ? resetOnStartup : false,
+      randomSeed: typeof randomSeed === 'number' ? randomSeed : DEFAULT_RANDOM_SEED,
       truncateOdm: typeof truncateOdm === 'boolean' ? truncateOdm : false
     }
   };
@@ -109,4 +118,8 @@ function isValidSimSpeed(value: unknown): value is number {
     value <= 1440 &&
     value % 15 === 0
   );
+}
+
+function isValidRandomSeed(value: unknown): value is number {
+  return typeof value === 'number' && Number.isInteger(value) && value >= 0 && value <= 0xffffffff;
 }

@@ -9,6 +9,7 @@ const baseConfig: HarnessConfig = {
   formDataPointsPerVisit: 5,
   simSpeedMinutesPerDay: 60,
   resetOnStartup: false,
+  randomSeed: 123456,
   truncateOdm: false
 };
 
@@ -20,10 +21,10 @@ describe('validateConfig', () => {
   });
 
   it('applies defaults when optional flags omitted', () => {
-    const { resetOnStartup, truncateOdm, ...rest } = baseConfig;
+    const { resetOnStartup, truncateOdm, randomSeed, ...rest } = baseConfig;
     const result = validateConfig(rest);
 
-    expect(result).toEqual({ value: { ...rest, resetOnStartup: false, truncateOdm: false } });
+    expect(result).toEqual({ value: { ...rest, resetOnStartup: false, truncateOdm: false, randomSeed: 123456 } });
   });
 
   it('returns error when input is not an object', () => {
@@ -77,5 +78,13 @@ describe('validateConfig', () => {
     const result = validateConfig({ ...baseConfig, truncateOdm: 'true' as unknown as boolean });
 
     expect(result.error).toContain('truncateOdm must be a boolean if provided');
+  });
+
+  it('returns error when randomSeed is invalid', () => {
+    const negative = validateConfig({ ...baseConfig, randomSeed: -1 });
+    expect(negative.error).toContain('randomSeed must be an integer between 0 and 4294967295');
+
+    const huge = validateConfig({ ...baseConfig, randomSeed: 0xffffffff + 1 });
+    expect(huge.error).toContain('randomSeed must be an integer between 0 and 4294967295');
   });
 });

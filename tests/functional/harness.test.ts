@@ -68,6 +68,7 @@ describe('Harness control plane endpoints', () => {
       formDataPointsPerVisit: 6,
       simSpeedMinutesPerDay: 90,
       resetOnStartup: true,
+      randomSeed: 654321,
       truncateOdm: true
     };
 
@@ -195,6 +196,7 @@ describe('Harness control plane endpoints', () => {
           formDataPointsPerVisit: 1,
           simSpeedMinutesPerDay: 15,
           resetOnStartup: false,
+          randomSeed: 42,
           truncateOdm: false
         }
       }

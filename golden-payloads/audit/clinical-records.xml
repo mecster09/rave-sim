@@ -1,0 +1,54 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<ODM FileOID="6780ff0549d29d2ba5152b8fa144e6494c70b8541bd8b9d1a8706c85cc6f6cb5" FileType="Transactional" ODMVersion="1.3.2" CreationDateTime="2025-12-23T12:37:40.722Z" xmlns="http://www.cdisc.org/ns/odm/v1.3" xmlns:mdsol="http://www.mdsol.com/ns/odm/metadata">
+  <ClinicalData StudyOID="Default Study" MetaDataVersionOID="MDV.DEFAULT">
+    <AuditRecords>
+      <AuditRecord AuditRecordID="045c143c" UserOID="coordinator" DateTimeStamp="2021-12-06T16:58:14Z">
+        <ReasonForChange>Data entry</ReasonForChange>
+        <mdsol:Values>
+          <mdsol:Value ItemOID="FORM" Value="VS"/>
+          <mdsol:Value ItemOID="ITEM" Value="DIA"/>
+          <mdsol:Value ItemOID="SUBJECT" Value="100008"/>
+          <mdsol:Value ItemOID="VALUE" Value="85"/>
+          <mdsol:Value ItemOID="VISIT" Value="VISIT-003"/>
+        </mdsol:Values>
+      </AuditRecord>
+      <AuditRecord AuditRecordID="05dbe0f5" UserOID="system" DateTimeStamp="2023-03-12T09:44:56Z">
+        <mdsol:Values>
+          <mdsol:Value ItemOID="FORM" Value="DM"/>
+          <mdsol:Value ItemOID="ITEM" Value="AGE"/>
+          <mdsol:Value ItemOID="SUBJECT" Value="100009"/>
+          <mdsol:Value ItemOID="VALUE" Value="39"/>
+          <mdsol:Value ItemOID="VISIT" Value="VISIT-001"/>
+        </mdsol:Values>
+      </AuditRecord>
+      <AuditRecord AuditRecordID="069740ec" UserOID="investigator" DateTimeStamp="2022-10-16T17:28:52Z">
+        <ReasonForChange>Data entry</ReasonForChange>
+        <mdsol:Values>
+          <mdsol:Value ItemOID="FORM" Value="DM"/>
+          <mdsol:Value ItemOID="ITEM" Value="SEX"/>
+          <mdsol:Value ItemOID="SUBJECT" Value="100002"/>
+          <mdsol:Value ItemOID="VALUE" Value="M"/>
+          <mdsol:Value ItemOID="VISIT" Value="VISIT-001"/>
+        </mdsol:Values>
+      </AuditRecord>
+      <AuditRecord AuditRecordID="07884ccb" UserOID="coordinator" DateTimeStamp="2022-02-11T01:42:25Z">
+        <mdsol:Values>
+          <mdsol:Value ItemOID="FORM" Value="DM"/>
+          <mdsol:Value ItemOID="ITEM" Value="SEX"/>
+          <mdsol:Value ItemOID="SUBJECT" Value="100001"/>
+          <mdsol:Value ItemOID="VALUE" Value="M"/>
+          <mdsol:Value ItemOID="VISIT" Value="VISIT-003"/>
+        </mdsol:Values>
+      </AuditRecord>
+      <AuditRecord AuditRecordID="079542cb" UserOID="coordinator" DateTimeStamp="2020-02-11T13:21:20Z">
+        <mdsol:Values>
+          <mdsol:Value ItemOID="FORM" Value="VS"/>
+          <mdsol:Value ItemOID="ITEM" Value="SYS"/>
+          <mdsol:Value ItemOID="SUBJECT" Value="100001"/>
+          <mdsol:Value ItemOID="VALUE" Value="111"/>
+          <mdsol:Value ItemOID="VISIT" Value="VISIT-002"/>
+        </mdsol:Values>
+      </AuditRecord>
+    </AuditRecords>
+  </ClinicalData>
+</ODM>

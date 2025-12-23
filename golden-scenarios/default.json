@@ -1,0 +1,33 @@
+{
+  "harnessConfig": {
+    "studyName": "Default Study",
+    "siteCount": 2,
+    "subjectCount": 10,
+    "visitCountPerSubject": 3,
+    "formDataPointsPerVisit": 5,
+    "simSpeedMinutesPerDay": 60,
+    "resetOnStartup": false,
+    "randomSeed": 123456,
+    "truncateOdm": false
+  },
+  "simStudyDay": 2.5,
+  "freeze": true,
+  "scenarios": [
+    {
+      "family": "clinical-view",
+      "name": "regular-dataset",
+      "request": {
+        "method": "GET",
+        "url": "/RaveWebServices/studies/Default%20Study/datasets/regular"
+      }
+    },
+    {
+      "family": "audit",
+      "name": "clinical-records",
+      "request": {
+        "method": "GET",
+        "url": "/RaveWebServices/datasets/ClinicalAuditRecords.odm?studyoid=Default%20Study&per_page=5"
+      }
+    }
+  ]
+}
