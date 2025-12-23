@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<ODM FileOID="8bb11ebe4a4f955672a071a2dfab570b2917e79766e8cae0a06b7a4244863cd2" FileType="Snapshot" ODMVersion="1.3.2" CreationDateTime="2024-01-01T00:00:00.000Z" xmlns="http://www.cdisc.org/ns/odm/v1.3" xmlns:mdsol="http://www.mdsol.com/ns/odm/metadata">
+<ODM FileOID="cffe2776baebf28c6aa3cecd25328248daf04ba892ed257a34ba8ca215bdbe8c" FileType="Snapshot" ODMVersion="1.3.2" CreationDateTime="2024-01-01T00:00:00.000Z" xmlns="http://www.cdisc.org/ns/odm/v1.3" xmlns:mdsol="http://www.mdsol.com/ns/odm/metadata">
   <ClinicalData StudyOID="Default Study" MetaDataVersionOID="MDV.DEFAULT">
     <SubjectData SubjectKey="100001" mdsol:SubjectStatus="Active">
       <SiteRef LocationOID="SITE-001"/>
@@ -253,7 +253,7 @@
         </FormData>
       </StudyEventData>
     </SubjectData>
-    <SubjectData SubjectKey="100007" mdsol:SubjectStatus="Active">
+    <SubjectData SubjectKey="100007" mdsol:SubjectStatus="Inactive">
       <SiteRef LocationOID="SITE-001"/>
       <StudyEventData StudyEventOID="VISIT-001">
         <FormData FormOID="AE">
@@ -295,7 +295,7 @@
         </FormData>
       </StudyEventData>
     </SubjectData>
-    <SubjectData SubjectKey="100008" mdsol:SubjectStatus="Active">
+    <SubjectData SubjectKey="100008" mdsol:SubjectStatus="Inactive">
       <SiteRef LocationOID="SITE-002"/>
       <StudyEventData StudyEventOID="VISIT-001">
         <FormData FormOID="AE">
@@ -379,7 +379,7 @@
         </FormData>
       </StudyEventData>
     </SubjectData>
-    <SubjectData SubjectKey="100010" mdsol:SubjectStatus="Active">
+    <SubjectData SubjectKey="100010" mdsol:SubjectStatus="Inactive">
       <SiteRef LocationOID="SITE-002"/>
       <StudyEventData StudyEventOID="VISIT-001">
         <FormData FormOID="AE">

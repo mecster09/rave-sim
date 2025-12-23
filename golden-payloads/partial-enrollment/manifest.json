@@ -1,0 +1,26 @@
+{
+  "generatedAt": "2025-12-23T13:02:15.390Z",
+  "scenarios": [
+    {
+      "family": "subjects",
+      "name": "active-only",
+      "file": "subjects/active-only.xml",
+      "sha256": "0989f029a83d08a086a2e29e71a0610078fcf4b7654b0bb5cc5e685b6305be5d",
+      "statusCode": 200
+    },
+    {
+      "family": "subjects",
+      "name": "status-all",
+      "file": "subjects/status-all.xml",
+      "sha256": "00570631969947b4ee52c18c2990071f19575335241d4a526b05ee853d15a395",
+      "statusCode": 200
+    },
+    {
+      "family": "subjects",
+      "name": "with-inactive",
+      "file": "subjects/with-inactive.xml",
+      "sha256": "50822fd592670801c7332cd5a7320f19f1e220e397a909c90ea484aa34a5e508",
+      "statusCode": 200
+    }
+  ]
+}

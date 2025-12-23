@@ -12,7 +12,7 @@
     "test:watch": "vitest",
     "build": "tsc",
     "start": "node dist/server.js",
-    "generate:golden": "ts-node -T scripts/generateGoldenPayloads.ts --config golden-scenarios/default.json"
+    "generate:golden": "ts-node -T scripts/generateGoldenPayloads.ts --config golden-scenarios/default/config.json --output golden-payloads/default --manifest manifest.json"
   },
   "repository": {
     "type": "git",

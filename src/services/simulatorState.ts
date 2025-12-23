@@ -24,6 +24,8 @@ interface Subject {
   subjectKey: number;
   siteLocationOid: string;
   subjectStatus: SubjectStatus;
+  finalStatus: SubjectStatus;
+  enrollmentDay: number;
   visits: Visit[];
 }
 
@@ -155,6 +157,11 @@ function createFormData(config: HarnessConfig, rng: () => number): VisitForm[] {
 
 const SUBJECT_STATUS_CYCLE: SubjectStatus[] = ['Active', 'Active', 'Inactive', 'Active', 'Active', 'Deleted'];
 
+function computeEnrollmentDay(index: number, config: HarnessConfig): number {
+  const subjectsPerDay = Math.max(1, config.siteCount);
+  return Math.floor(index / subjectsPerDay);
+}
+
 function determineSubjectStatus(index: number): SubjectStatus {
   return SUBJECT_STATUS_CYCLE[index % SUBJECT_STATUS_CYCLE.length];
 }
@@ -167,8 +174,10 @@ function createSubjects(config: HarnessConfig, rng: () => number): Subject[] {
     const visits = createVisits(config, rng);
     const siteIndex = i % config.siteCount;
     const siteLocationOid = `SITE-${(siteIndex + 1).toString().padStart(3, '0')}`;
-    const subjectStatus = determineSubjectStatus(i);
-    subjects.push({ subjectKey, visits, siteLocationOid, subjectStatus });
+    const finalStatus = determineSubjectStatus(i);
+    const enrollmentDay = computeEnrollmentDay(i, config);
+    const subjectStatus = finalStatus;
+    subjects.push({ subjectKey, visits, siteLocationOid, subjectStatus, finalStatus, enrollmentDay });
   }
   return subjects;
 }
@@ -203,6 +212,32 @@ export class SimulatorState {
     };
   }
 
+  private deriveStatus(subject: Subject, currentDay: number): SubjectStatus {
+    if (subject.finalStatus === 'Deleted') {
+      return 'Deleted';
+    }
+
+    if (Math.floor(currentDay) < subject.enrollmentDay) {
+      return 'Inactive';
+    }
+
+    if (subject.finalStatus === 'Inactive') {
+      return 'Inactive';
+    }
+
+    return 'Active';
+  }
+
+  private updateSubjectStatuses(currentDay: number): void {
+    if (!this.snapshot) {
+      return;
+    }
+
+    for (const subject of this.snapshot.subjects) {
+      subject.subjectStatus = this.deriveStatus(subject, currentDay);
+    }
+  }
+
   private computeStudyDay(timeMs: number, ignoreFreeze = false): number {
     if (!ignoreFreeze && this.frozenDay !== null) {
       return this.frozenDay;
@@ -221,6 +256,8 @@ export class SimulatorState {
     if (!this.snapshot) {
       this.snapshot = this.generateSnapshot();
     }
+    const currentDay = this.getSimClock().simCurrentStudyDay;
+    this.updateSubjectStatuses(currentDay);
     return this.snapshot;
   }
 
@@ -228,6 +265,7 @@ export class SimulatorState {
     this.snapshot = this.generateSnapshot();
     this.simStartWallClock = this.now();
     this.frozenDay = null;
+    this.updateSubjectStatuses(0);
     return this.snapshot;
   }
 
@@ -303,6 +341,7 @@ export class SimulatorState {
     const speed = this.config.simSpeedMinutesPerDay;
     this.simStartWallClock = now - safeDay * speed * 60000;
     this.frozenDay = freeze ? safeDay : null;
+    this.updateSubjectStatuses(safeDay);
   }
 }
 

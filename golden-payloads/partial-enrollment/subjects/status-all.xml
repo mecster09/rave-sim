@@ -1,0 +1,302 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<ODM FileOID="1c1985fb5879fd0b9ed67b5d87896a3815af1eb9df92abc0d4ab2f28e28ce368" FileType="Snapshot" ODMVersion="1.3.2" CreationDateTime="2024-01-01T00:00:00.000Z" xmlns="http://www.cdisc.org/ns/odm/v1.3" xmlns:mdsol="http://www.mdsol.com/ns/odm/metadata">
+  <ClinicalData StudyOID="RWS_PARTIAL_ENROLLMENT" MetaDataVersionOID="MDV.DEFAULT">
+    <SubjectData SubjectKey="100001" mdsol:SubjectStatus="Active">
+      <SiteRef LocationOID="SITE-001"/>
+      <StudyEventData StudyEventOID="VISIT-001">
+        <FormData FormOID="DM">
+          <ItemData ItemOID="AGE" Value="55"/>
+          <ItemData ItemOID="SEX" Value="M"/>
+        </FormData>
+        <FormData FormOID="VS">
+          <ItemData ItemOID="DIA" Value="82"/>
+          <ItemData ItemOID="SYS" Value="141"/>
+        </FormData>
+      </StudyEventData>
+      <StudyEventData StudyEventOID="VISIT-002">
+        <FormData FormOID="DM">
+          <ItemData ItemOID="AGE" Value="76"/>
+          <ItemData ItemOID="SEX" Value="F"/>
+        </FormData>
+        <FormData FormOID="VS">
+          <ItemData ItemOID="DIA" Value="68"/>
+          <ItemData ItemOID="SYS" Value="117"/>
+        </FormData>
+      </StudyEventData>
+      <StudyEventData StudyEventOID="VISIT-003">
+        <FormData FormOID="DM">
+          <ItemData ItemOID="AGE" Value="56"/>
+          <ItemData ItemOID="SEX" Value="M"/>
+        </FormData>
+        <FormData FormOID="VS">
+          <ItemData ItemOID="DIA" Value="92"/>
+          <ItemData ItemOID="SYS" Value="113"/>
+        </FormData>
+      </StudyEventData>
+    </SubjectData>
+    <SubjectData SubjectKey="100002" mdsol:SubjectStatus="Active">
+      <SiteRef LocationOID="SITE-002"/>
+      <StudyEventData StudyEventOID="VISIT-001">
+        <FormData FormOID="DM">
+          <ItemData ItemOID="AGE" Value="71"/>
+          <ItemData ItemOID="SEX" Value="F"/>
+        </FormData>
+        <FormData FormOID="VS">
+          <ItemData ItemOID="DIA" Value="87"/>
+          <ItemData ItemOID="SYS" Value="138"/>
+        </FormData>
+      </StudyEventData>
+      <StudyEventData StudyEventOID="VISIT-002">
+        <FormData FormOID="DM">
+          <ItemData ItemOID="AGE" Value="73"/>
+          <ItemData ItemOID="SEX" Value="F"/>
+        </FormData>
+        <FormData FormOID="VS">
+          <ItemData ItemOID="DIA" Value="70"/>
+          <ItemData ItemOID="SYS" Value="117"/>
+        </FormData>
+      </StudyEventData>
+      <StudyEventData StudyEventOID="VISIT-003">
+        <FormData FormOID="DM">
+          <ItemData ItemOID="AGE" Value="28"/>
+          <ItemData ItemOID="SEX" Value="M"/>
+        </FormData>
+        <FormData FormOID="VS">
+          <ItemData ItemOID="DIA" Value="75"/>
+          <ItemData ItemOID="SYS" Value="112"/>
+        </FormData>
+      </StudyEventData>
+    </SubjectData>
+    <SubjectData SubjectKey="100003" mdsol:SubjectStatus="Inactive">
+      <SiteRef LocationOID="SITE-003"/>
+      <StudyEventData StudyEventOID="VISIT-001">
+        <FormData FormOID="DM">
+          <ItemData ItemOID="AGE" Value="23"/>
+          <ItemData ItemOID="SEX" Value="F"/>
+        </FormData>
+        <FormData FormOID="VS">
+          <ItemData ItemOID="DIA" Value="64"/>
+          <ItemData ItemOID="SYS" Value="133"/>
+        </FormData>
+      </StudyEventData>
+      <StudyEventData StudyEventOID="VISIT-002">
+        <FormData FormOID="DM">
+          <ItemData ItemOID="AGE" Value="71"/>
+          <ItemData ItemOID="SEX" Value="F"/>
+        </FormData>
+        <FormData FormOID="VS">
+          <ItemData ItemOID="DIA" Value="76"/>
+          <ItemData ItemOID="SYS" Value="126"/>
+        </FormData>
+      </StudyEventData>
+      <StudyEventData StudyEventOID="VISIT-003">
+        <FormData FormOID="DM">
+          <ItemData ItemOID="AGE" Value="49"/>
+          <ItemData ItemOID="SEX" Value="M"/>
+        </FormData>
+        <FormData FormOID="VS">
+          <ItemData ItemOID="DIA" Value="81"/>
+          <ItemData ItemOID="SYS" Value="136"/>
+        </FormData>
+      </StudyEventData>
+    </SubjectData>
+    <SubjectData SubjectKey="100004" mdsol:SubjectStatus="Inactive">
+      <SiteRef LocationOID="SITE-001"/>
+      <StudyEventData StudyEventOID="VISIT-001">
+        <FormData FormOID="DM">
+          <ItemData ItemOID="AGE" Value="59"/>
+          <ItemData ItemOID="SEX" Value="F"/>
+        </FormData>
+        <FormData FormOID="VS">
+          <ItemData ItemOID="DIA" Value="74"/>
+          <ItemData ItemOID="SYS" Value="142"/>
+        </FormData>
+      </StudyEventData>
+      <StudyEventData StudyEventOID="VISIT-002">
+        <FormData FormOID="DM">
+          <ItemData ItemOID="AGE" Value="64"/>
+          <ItemData ItemOID="SEX" Value="F"/>
+        </FormData>
+        <FormData FormOID="VS">
+          <ItemData ItemOID="DIA" Value="86"/>
+          <ItemData ItemOID="SYS" Value="144"/>
+        </FormData>
+      </StudyEventData>
+      <StudyEventData StudyEventOID="VISIT-003">
+        <FormData FormOID="DM">
+          <ItemData ItemOID="AGE" Value="20"/>
+          <ItemData ItemOID="SEX" Value="F"/>
+        </FormData>
+        <FormData FormOID="VS">
+          <ItemData ItemOID="DIA" Value="80"/>
+          <ItemData ItemOID="SYS" Value="133"/>
+        </FormData>
+      </StudyEventData>
+    </SubjectData>
+    <SubjectData SubjectKey="100005" mdsol:SubjectStatus="Inactive">
+      <SiteRef LocationOID="SITE-002"/>
+      <StudyEventData StudyEventOID="VISIT-001">
+        <FormData FormOID="DM">
+          <ItemData ItemOID="AGE" Value="31"/>
+          <ItemData ItemOID="SEX" Value="M"/>
+        </FormData>
+        <FormData FormOID="VS">
+          <ItemData ItemOID="DIA" Value="80"/>
+          <ItemData ItemOID="SYS" Value="123"/>
+        </FormData>
+      </StudyEventData>
+      <StudyEventData StudyEventOID="VISIT-002">
+        <FormData FormOID="DM">
+          <ItemData ItemOID="AGE" Value="66"/>
+          <ItemData ItemOID="SEX" Value="F"/>
+        </FormData>
+        <FormData FormOID="VS">
+          <ItemData ItemOID="DIA" Value="92"/>
+          <ItemData ItemOID="SYS" Value="131"/>
+        </FormData>
+      </StudyEventData>
+      <StudyEventData StudyEventOID="VISIT-003">
+        <FormData FormOID="DM">
+          <ItemData ItemOID="AGE" Value="24"/>
+          <ItemData ItemOID="SEX" Value="M"/>
+        </FormData>
+        <FormData FormOID="VS">
+          <ItemData ItemOID="DIA" Value="82"/>
+          <ItemData ItemOID="SYS" Value="142"/>
+        </FormData>
+      </StudyEventData>
+    </SubjectData>
+    <SubjectData SubjectKey="100006" mdsol:SubjectStatus="Deleted">
+      <SiteRef LocationOID="SITE-003"/>
+      <StudyEventData StudyEventOID="VISIT-001">
+        <FormData FormOID="DM">
+          <ItemData ItemOID="AGE" Value="34"/>
+          <ItemData ItemOID="SEX" Value="F"/>
+        </FormData>
+        <FormData FormOID="VS">
+          <ItemData ItemOID="DIA" Value="88"/>
+          <ItemData ItemOID="SYS" Value="119"/>
+        </FormData>
+      </StudyEventData>
+      <StudyEventData StudyEventOID="VISIT-002">
+        <FormData FormOID="DM">
+          <ItemData ItemOID="AGE" Value="68"/>
+          <ItemData ItemOID="SEX" Value="F"/>
+        </FormData>
+        <FormData FormOID="VS">
+          <ItemData ItemOID="DIA" Value="69"/>
+          <ItemData ItemOID="SYS" Value="132"/>
+        </FormData>
+      </StudyEventData>
+      <StudyEventData StudyEventOID="VISIT-003">
+        <FormData FormOID="DM">
+          <ItemData ItemOID="AGE" Value="33"/>
+          <ItemData ItemOID="SEX" Value="M"/>
+        </FormData>
+        <FormData FormOID="VS">
+          <ItemData ItemOID="DIA" Value="92"/>
+          <ItemData ItemOID="SYS" Value="129"/>
+        </FormData>
+      </StudyEventData>
+    </SubjectData>
+    <SubjectData SubjectKey="100007" mdsol:SubjectStatus="Inactive">
+      <SiteRef LocationOID="SITE-001"/>
+      <StudyEventData StudyEventOID="VISIT-001">
+        <FormData FormOID="DM">
+          <ItemData ItemOID="AGE" Value="56"/>
+          <ItemData ItemOID="SEX" Value="M"/>
+        </FormData>
+        <FormData FormOID="VS">
+          <ItemData ItemOID="DIA" Value="66"/>
+          <ItemData ItemOID="SYS" Value="101"/>
+        </FormData>
+      </StudyEventData>
+      <StudyEventData StudyEventOID="VISIT-002">
+        <FormData FormOID="DM">
+          <ItemData ItemOID="AGE" Value="59"/>
+          <ItemData ItemOID="SEX" Value="F"/>
+        </FormData>
+        <FormData FormOID="VS">
+          <ItemData ItemOID="DIA" Value="66"/>
+          <ItemData ItemOID="SYS" Value="146"/>
+        </FormData>
+      </StudyEventData>
+      <StudyEventData StudyEventOID="VISIT-003">
+        <FormData FormOID="DM">
+          <ItemData ItemOID="AGE" Value="47"/>
+          <ItemData ItemOID="SEX" Value="M"/>
+        </FormData>
+        <FormData FormOID="VS">
+          <ItemData ItemOID="DIA" Value="73"/>
+          <ItemData ItemOID="SYS" Value="148"/>
+        </FormData>
+      </StudyEventData>
+    </SubjectData>
+    <SubjectData SubjectKey="100008" mdsol:SubjectStatus="Inactive">
+      <SiteRef LocationOID="SITE-002"/>
+      <StudyEventData StudyEventOID="VISIT-001">
+        <FormData FormOID="DM">
+          <ItemData ItemOID="AGE" Value="49"/>
+          <ItemData ItemOID="SEX" Value="F"/>
+        </FormData>
+        <FormData FormOID="VS">
+          <ItemData ItemOID="DIA" Value="87"/>
+          <ItemData ItemOID="SYS" Value="111"/>
+        </FormData>
+      </StudyEventData>
+      <StudyEventData StudyEventOID="VISIT-002">
+        <FormData FormOID="DM">
+          <ItemData ItemOID="AGE" Value="41"/>
+          <ItemData ItemOID="SEX" Value="M"/>
+        </FormData>
+        <FormData FormOID="VS">
+          <ItemData ItemOID="DIA" Value="95"/>
+          <ItemData ItemOID="SYS" Value="132"/>
+        </FormData>
+      </StudyEventData>
+      <StudyEventData StudyEventOID="VISIT-003">
+        <FormData FormOID="DM">
+          <ItemData ItemOID="AGE" Value="65"/>
+          <ItemData ItemOID="SEX" Value="M"/>
+        </FormData>
+        <FormData FormOID="VS">
+          <ItemData ItemOID="DIA" Value="63"/>
+          <ItemData ItemOID="SYS" Value="129"/>
+        </FormData>
+      </StudyEventData>
+    </SubjectData>
+    <SubjectData SubjectKey="100009" mdsol:SubjectStatus="Inactive">
+      <SiteRef LocationOID="SITE-003"/>
+      <StudyEventData StudyEventOID="VISIT-001">
+        <FormData FormOID="DM">
+          <ItemData ItemOID="AGE" Value="73"/>
+          <ItemData ItemOID="SEX" Value="M"/>
+        </FormData>
+        <FormData FormOID="VS">
+          <ItemData ItemOID="DIA" Value="97"/>
+          <ItemData ItemOID="SYS" Value="142"/>
+        </FormData>
+      </StudyEventData>
+      <StudyEventData StudyEventOID="VISIT-002">
+        <FormData FormOID="DM">
+          <ItemData ItemOID="AGE" Value="29"/>
+          <ItemData ItemOID="SEX" Value="F"/>
+        </FormData>
+        <FormData FormOID="VS">
+          <ItemData ItemOID="DIA" Value="91"/>
+          <ItemData ItemOID="SYS" Value="130"/>
+        </FormData>
+      </StudyEventData>
+      <StudyEventData StudyEventOID="VISIT-003">
+        <FormData FormOID="DM">
+          <ItemData ItemOID="AGE" Value="27"/>
+          <ItemData ItemOID="SEX" Value="M"/>
+        </FormData>
+        <FormData FormOID="VS">
+          <ItemData ItemOID="DIA" Value="99"/>
+          <ItemData ItemOID="SYS" Value="126"/>
+        </FormData>
+      </StudyEventData>
+    </SubjectData>
+  </ClinicalData>
+</ODM>

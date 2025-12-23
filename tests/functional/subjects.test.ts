@@ -1,5 +1,8 @@
 import { afterEach, beforeEach, describe, expect, it } from 'vitest';
+import path from 'node:path';
+import { promises as fs } from 'node:fs';
 import { buildServer } from '../../src/server';
+import { resolveGoldenConfig, type GoldenConfigDefinition } from '../../src/services/goldenGenerator';
 
 const USER = 'test-user';
 const PASS = 'test-pass';
@@ -153,5 +156,87 @@ describe('Subjects listing endpoint', () => {
 
     expect(res.statusCode).toBe(400);
     expect(res.json().error).toBe('Invalid status parameter');
+  });
+
+  it('supports partial enrollment with deterministic subject activation', async () => {
+    const app = buildServer();
+    const configPath = path.resolve('golden-scenarios/partial-enrollment/config.json');
+    const configRaw = await fs.readFile(configPath, 'utf8');
+    const configDefinition = JSON.parse(configRaw) as GoldenConfigDefinition;
+    const resolvedConfig = resolveGoldenConfig(configDefinition);
+
+    await app.inject({
+      method: 'PUT',
+      url: '/harness/config',
+      headers: {
+        authorization: authHeader(),
+        'content-type': 'application/json'
+      },
+      payload: {
+        applyMode: 'applyAndReset',
+        config: resolvedConfig.harnessConfig
+      }
+    });
+
+    await app.inject({
+      method: 'POST',
+      url: '/harness/reset',
+      headers: {
+        authorization: authHeader()
+      }
+    });
+
+    await app.inject({
+      method: 'PUT',
+      url: '/harness/time',
+      headers: {
+        'content-type': 'application/json'
+      },
+      payload: {
+        simStudyDay: resolvedConfig.simStudyDay,
+        freeze: resolvedConfig.freeze
+      }
+    });
+
+    const activeRes = await app.inject({
+      method: 'GET',
+      url: `/RaveWebServices/studies/${encodeURIComponent(resolvedConfig.harnessConfig.studyName)}/Subjects`,
+      headers: {
+        authorization: authHeader()
+      }
+    });
+
+    expect(activeRes.statusCode).toBe(200);
+    const activeKeys = extractSubjectKeys(activeRes.body);
+    expect(activeKeys.length).toBeGreaterThan(0);
+    expect(activeKeys.length).toBeLessThan(resolvedConfig.harnessConfig.subjectCount);
+
+    const inactiveRes = await app.inject({
+      method: 'GET',
+      url: `/RaveWebServices/studies/${encodeURIComponent(resolvedConfig.harnessConfig.studyName)}/Subjects?include=inactive`,
+      headers: {
+        authorization: authHeader()
+      }
+    });
+
+    expect(inactiveRes.statusCode).toBe(200);
+    const inactiveStatuses = extractStatuses(inactiveRes.body);
+    expect(new Set(inactiveStatuses)).toEqual(new Set(['Active', 'Inactive']));
+    const inactiveKeys = extractSubjectKeys(inactiveRes.body);
+    expect(inactiveKeys.length).toBeGreaterThan(activeKeys.length);
+
+    const allRes = await app.inject({
+      method: 'GET',
+      url: `/RaveWebServices/studies/${encodeURIComponent(resolvedConfig.harnessConfig.studyName)}/Subjects?include=inactive&status=all`,
+      headers: {
+        authorization: authHeader()
+      }
+    });
+
+    expect(allRes.statusCode).toBe(200);
+    const allStatuses = new Set(extractStatuses(allRes.body));
+    expect(allStatuses).toEqual(new Set(['Active', 'Inactive', 'Deleted']));
+    const allKeys = extractSubjectKeys(allRes.body);
+    expect(allKeys.length).toBe(resolvedConfig.harnessConfig.subjectCount);
   });
 });

@@ -1,0 +1,41 @@
+{
+  "harnessConfig": {
+    "studyName": "RWS_PARTIAL_ENROLLMENT",
+    "siteCount": 3,
+    "subjectCount": 9,
+    "visitCountPerSubject": 3,
+    "formDataPointsPerVisit": 4,
+    "simSpeedMinutesPerDay": 60,
+    "resetOnStartup": false,
+    "randomSeed": 424242,
+    "truncateOdm": false
+  },
+  "simStudyDay": 0.5,
+  "freeze": true,
+  "scenarios": [
+    {
+      "family": "subjects",
+      "name": "active-only",
+      "request": {
+        "method": "GET",
+        "url": "/RaveWebServices/studies/RWS_PARTIAL_ENROLLMENT/Subjects"
+      }
+    },
+    {
+      "family": "subjects",
+      "name": "with-inactive",
+      "request": {
+        "method": "GET",
+        "url": "/RaveWebServices/studies/RWS_PARTIAL_ENROLLMENT/Subjects?include=inactive"
+      }
+    },
+    {
+      "family": "subjects",
+      "name": "status-all",
+      "request": {
+        "method": "GET",
+        "url": "/RaveWebServices/studies/RWS_PARTIAL_ENROLLMENT/Subjects?include=inactive&status=all"
+      }
+    }
+  ]
+}

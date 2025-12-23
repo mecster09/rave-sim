@@ -28,7 +28,7 @@ afterAll(async () => {
 
 describe('golden payload regression', () => {
   it('replays clinical-view scenario and matches golden payload', async () => {
-    const configPath = path.resolve('golden-scenarios/default.json');
+    const configPath = path.resolve('golden-scenarios/default/config.json');
     const configDefinition = JSON.parse(await fs.readFile(configPath, 'utf8')) as GoldenConfigDefinition;
     const resolvedConfig = resolveGoldenConfig(configDefinition);
 
@@ -54,7 +54,7 @@ describe('golden payload regression', () => {
     });
 
     const generatedPath = path.join(tempDir, 'clinical-view', 'regular-dataset.xml');
-    const goldenPath = path.resolve('golden-payloads/clinical-view/regular-dataset.xml');
+    const goldenPath = path.resolve('golden-payloads/default/clinical-view/regular-dataset.xml');
 
     const [generated, golden] = await Promise.all([
       fs.readFile(generatedPath),

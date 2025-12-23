@@ -116,4 +116,22 @@ describe('SimulatorState', () => {
     const day2 = state.getSubjectAvailability(2)[0].visits.map(v => v.isAvailable);
     expect(day2).toEqual([true, true, true]);
   });
+
+  it('applies deterministic enrollment schedule to subject statuses', () => {
+    const config: HarnessConfig = {
+      ...baseConfig,
+      siteCount: 3,
+      subjectCount: 6
+    };
+
+    const state = new SimulatorState(config, 2024);
+
+    state.setSimDay(0, true);
+    const day0Statuses = state.getSnapshot().subjects.map(subject => subject.subjectStatus);
+    expect(day0Statuses).toEqual(['Active', 'Active', 'Inactive', 'Inactive', 'Inactive', 'Deleted']);
+
+    state.setSimDay(1, true);
+    const day1Statuses = state.getSnapshot().subjects.map(subject => subject.subjectStatus);
+    expect(day1Statuses).toEqual(['Active', 'Active', 'Inactive', 'Active', 'Active', 'Deleted']);
+  });
 });
