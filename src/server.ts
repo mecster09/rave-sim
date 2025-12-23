@@ -1,9 +1,11 @@
 import Fastify from 'fastify';
+import { URL } from 'node:url';
 import basicAuthPlugin from './plugins/basicAuth';
 import { HarnessConfig, validateConfig } from './services/config';
 import { SimulatorSnapshot, SimulatorState, SubjectStatus } from './services/simulatorState';
-import { buildSnapshotODM } from './services/odmBuilder';
+import { buildSnapshotODM, buildTransactionalODM } from './services/odmBuilder';
 import { buildClinicalViewSubjects } from './services/clinicalViewBuilder';
+import { buildAuditPage } from './services/auditLog';
 
 const DEFAULT_CONFIG_INPUT = {
   studyName: 'Default Study',
@@ -81,6 +83,13 @@ export function buildServer() {
       simClock,
       generatedAt: new Date(timestamp).toISOString()
     };
+  };
+
+  const buildNextLink = (request: import('fastify').FastifyRequest, nextId: string, perPage: number) => {
+    const url = new URL(request.raw.url ?? '', 'http://local');
+    url.searchParams.set('startid', nextId);
+    url.searchParams.set('per_page', String(perPage));
+    return url.pathname + (url.search ? url.search : '');
   };
 
   const buildStatus = () => {
@@ -359,6 +368,69 @@ export function buildServer() {
       generatedAt,
       subjects
     });
+
+    reply.header('content-type', 'application/xml');
+    return reply.send(xml);
+  });
+
+  app.get('/RaveWebServices/datasets/ClinicalAuditRecords.odm', async (request, reply) => {
+    const query = request.query as {
+      studyoid?: unknown;
+      startid?: unknown;
+      per_page?: unknown;
+      mode?: unknown;
+      unicode?: unknown;
+    };
+
+    const studyOid = typeof query.studyoid === 'string' ? query.studyoid.trim() : '';
+    if (!studyOid) {
+      return reply.code(400).send({ error: 'studyoid is required' });
+    }
+
+    const startId = typeof query.startid === 'string' ? query.startid.trim() : '';
+    const perPageRaw = query.per_page;
+    const modeRaw = typeof query.mode === 'string' ? query.mode.trim().toLowerCase() : 'normal';
+    const unicodeRaw = typeof query.unicode === 'string' ? query.unicode.trim().toLowerCase() : undefined;
+
+    const perPage = typeof perPageRaw === 'number' ? perPageRaw : Number(perPageRaw ?? 50);
+    if (!Number.isInteger(perPage) || perPage < 1 || perPage > 100) {
+      return reply.code(400).send({ error: 'per_page must be an integer between 1 and 100' });
+    }
+
+    const allowedModes = new Set(['normal', 'enhanced', 'all']);
+    if (!allowedModes.has(modeRaw)) {
+      return reply.code(400).send({ error: 'Invalid mode parameter' });
+    }
+
+    const unicode = unicodeRaw === 'true';
+    const { simClock } = computeGeneratedAt();
+    const metadataVersionOid = 'MDV.DEFAULT';
+
+    const backfillComplete = modeRaw === 'all';
+
+    const { auditRecords, nextId } = buildAuditPage(simulatorState, {
+      studyOid,
+      metadataVersionOid,
+      unicode,
+      mode: modeRaw as 'normal' | 'enhanced' | 'all',
+      startId,
+      pageSize: perPage,
+      backfillComplete
+    });
+
+    if (modeRaw === 'enhanced' && !backfillComplete && auditRecords.length === 0) {
+      return reply.code(204).send();
+    }
+
+    const xml = buildTransactionalODM({
+      studyOid,
+      metadataVersionOid,
+      entries: auditRecords
+    });
+
+    if (nextId) {
+      reply.header('Link', `<${buildNextLink(request, nextId, perPage)}>; rel="next"`);
+    }
 
     reply.header('content-type', 'application/xml');
     return reply.send(xml);
