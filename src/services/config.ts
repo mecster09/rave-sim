@@ -41,8 +41,12 @@ export function validateConfig(input: unknown): ValidateConfigResult {
     resetOnStartup
   } = input as Partial<HarnessConfig> & Record<string, unknown>;
 
+  let normalizedStudyName: string | undefined;
+
   if (typeof studyName !== 'string' || studyName.trim().length === 0) {
     errors.push('studyName must be a non-empty string');
+  } else {
+    normalizedStudyName = studyName.trim();
   }
 
   if (!isValidPositiveInteger(siteCount)) {
@@ -75,7 +79,7 @@ export function validateConfig(input: unknown): ValidateConfigResult {
 
   return {
     value: {
-      studyName: studyName.trim(),
+      studyName: normalizedStudyName!,
       siteCount: siteCount as number,
       subjectCount: subjectCount as number,
       visitCountPerSubject: visitCountPerSubject as number,
