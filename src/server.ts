@@ -1,10 +1,17 @@
 import Fastify from 'fastify';
+import basicAuthPlugin from './plugins/basicAuth';
 
 export function buildServer() {
   const app = Fastify({ logger: true });
 
+  app.register(basicAuthPlugin);
+
   app.get('/health', async () => {
     return { status: 'ok' };
+  });
+
+  app.get('/protected-ping', async () => {
+    return { ok: true };
   });
 
   return app;

@@ -36,7 +36,7 @@ Deliverables Per Task
   2) commands to run tests and view coverage,
   3) at least one curl example (or inject example) to validate behavior,
   4) a brief explanation of how the tests prove correctness.
-  5) a commit message for git
+  5) a commit subject and body message for git for the task.
 
 Stop Condition
 - Stop after implementing the requested task and making all tests pass with coverage >= 70%.
