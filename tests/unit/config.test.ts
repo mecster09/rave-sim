@@ -10,7 +10,8 @@ const baseConfig: HarnessConfig = {
   simSpeedMinutesPerDay: 60,
   resetOnStartup: false,
   randomSeed: 123456,
-  truncateOdm: false
+  truncateOdm: false,
+  forceClinicalViewStreamFailure: false
 };
 
 describe('validateConfig', () => {
@@ -21,10 +22,18 @@ describe('validateConfig', () => {
   });
 
   it('applies defaults when optional flags omitted', () => {
-    const { resetOnStartup, truncateOdm, randomSeed, ...rest } = baseConfig;
+    const { resetOnStartup, truncateOdm, randomSeed, forceClinicalViewStreamFailure, ...rest } = baseConfig;
     const result = validateConfig(rest);
 
-    expect(result).toEqual({ value: { ...rest, resetOnStartup: false, truncateOdm: false, randomSeed: 123456 } });
+    expect(result).toEqual({
+      value: {
+        ...rest,
+        resetOnStartup: false,
+        truncateOdm: false,
+        randomSeed: 123456,
+        forceClinicalViewStreamFailure: false
+      }
+    });
   });
 
   it('returns error when input is not an object', () => {
@@ -78,6 +87,15 @@ describe('validateConfig', () => {
     const result = validateConfig({ ...baseConfig, truncateOdm: 'true' as unknown as boolean });
 
     expect(result.error).toContain('truncateOdm must be a boolean if provided');
+  });
+
+  it('returns error when forceClinicalViewStreamFailure is not boolean', () => {
+    const result = validateConfig({
+      ...baseConfig,
+      forceClinicalViewStreamFailure: 'yes' as unknown as boolean
+    });
+
+    expect(result.error).toContain('forceClinicalViewStreamFailure must be a boolean if provided');
   });
 
   it('returns error when randomSeed is invalid', () => {

@@ -19,7 +19,8 @@ const BASE_CONFIG: GoldenConfigDefinition = {
     simSpeedMinutesPerDay: 60,
     resetOnStartup: false,
     randomSeed: 24680,
-    truncateOdm: false
+    truncateOdm: false,
+    forceClinicalViewStreamFailure: false
   },
   simStudyDay: 1,
   freeze: true,

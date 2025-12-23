@@ -16,7 +16,8 @@ const DEFAULT_CONFIG_INPUT = {
   simSpeedMinutesPerDay: 60,
   resetOnStartup: false,
   randomSeed: DEFAULT_RANDOM_SEED,
-  truncateOdm: false
+  truncateOdm: false,
+  forceClinicalViewStreamFailure: false
 };
 
 const DEFAULT_CONFIG_RESULT = validateConfig(DEFAULT_CONFIG_INPUT);
@@ -448,7 +449,9 @@ export function buildServer() {
       rawSuffix
     });
 
-    const shouldTruncate = currentConfig.truncateOdm || parseResult.value.truncateRequested;
+    const forcedStreamFailure =
+      datasetType === 'regular' && currentConfig.forceClinicalViewStreamFailure;
+    const shouldTruncate = currentConfig.truncateOdm || parseResult.value.truncateRequested || forcedStreamFailure;
 
     const xml = buildSnapshotODM({
       studyOid,

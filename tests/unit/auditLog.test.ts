@@ -12,7 +12,8 @@ const baseConfig: HarnessConfig = {
   simSpeedMinutesPerDay: 60,
   resetOnStartup: false,
   randomSeed: 222222,
-  truncateOdm: false
+  truncateOdm: false,
+  forceClinicalViewStreamFailure: false
 };
 
 describe('auditLog', () => {

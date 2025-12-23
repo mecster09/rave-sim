@@ -8,6 +8,7 @@ export interface HarnessConfig {
   resetOnStartup: boolean;
   randomSeed: number;
   truncateOdm: boolean;
+  forceClinicalViewStreamFailure: boolean;
 }
 
 export const DEFAULT_RANDOM_SEED = 123456;
@@ -44,7 +45,8 @@ export function validateConfig(input: unknown): ValidateConfigResult {
     simSpeedMinutesPerDay,
     resetOnStartup,
     randomSeed,
-    truncateOdm
+    truncateOdm,
+    forceClinicalViewStreamFailure
   } = input as Partial<HarnessConfig> & Record<string, unknown>;
 
   let normalizedStudyName: string | undefined;
@@ -87,6 +89,13 @@ export function validateConfig(input: unknown): ValidateConfigResult {
     errors.push('truncateOdm must be a boolean if provided');
   }
 
+  if (
+    typeof forceClinicalViewStreamFailure !== 'boolean' &&
+    typeof forceClinicalViewStreamFailure !== 'undefined'
+  ) {
+    errors.push('forceClinicalViewStreamFailure must be a boolean if provided');
+  }
+
   if (errors.length > 0) {
     return { error: errors };
   }
@@ -101,7 +110,9 @@ export function validateConfig(input: unknown): ValidateConfigResult {
       simSpeedMinutesPerDay: simSpeedMinutesPerDay as number,
       resetOnStartup: typeof resetOnStartup === 'boolean' ? resetOnStartup : false,
       randomSeed: typeof randomSeed === 'number' ? randomSeed : DEFAULT_RANDOM_SEED,
-      truncateOdm: typeof truncateOdm === 'boolean' ? truncateOdm : false
+      truncateOdm: typeof truncateOdm === 'boolean' ? truncateOdm : false,
+      forceClinicalViewStreamFailure:
+        typeof forceClinicalViewStreamFailure === 'boolean' ? forceClinicalViewStreamFailure : false
     }
   };
 }

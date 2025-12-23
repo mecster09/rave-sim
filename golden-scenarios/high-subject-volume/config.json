@@ -8,7 +8,8 @@
     "simSpeedMinutesPerDay": 60,
     "resetOnStartup": false,
     "randomSeed": 314159,
-    "truncateOdm": false
+    "truncateOdm": false,
+    "forceClinicalViewStreamFailure": false
   },
   "simStudyDay": 1.25,
   "freeze": true,

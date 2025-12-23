@@ -181,6 +181,50 @@ describe('Clinical view datasets', () => {
     expect(res.body.trim().endsWith('</ODM>')).toBe(false);
   });
 
+  it('omits closing ODM tag when streaming failure flag enabled', async () => {
+    const app = buildServer();
+
+    const currentRes = await app.inject({
+      method: 'GET',
+      url: '/harness/config',
+      headers: {
+        authorization: authHeader()
+      }
+    });
+
+    expect(currentRes.statusCode).toBe(200);
+    const currentConfig = currentRes.json().config;
+
+    const updateRes = await app.inject({
+      method: 'PUT',
+      url: '/harness/config',
+      headers: {
+        authorization: authHeader(),
+        'content-type': 'application/json'
+      },
+      payload: {
+        applyMode: 'apply',
+        config: {
+          ...currentConfig,
+          forceClinicalViewStreamFailure: true
+        }
+      }
+    });
+
+    expect(updateRes.statusCode).toBe(200);
+
+    const res = await app.inject({
+      method: 'GET',
+      url: '/RaveWebServices/studies/Default%20Study/datasets/regular',
+      headers: {
+        authorization: authHeader()
+      }
+    });
+
+    expect(res.statusCode).toBe(200);
+    expect(res.body.trim().endsWith('</ODM>')).toBe(false);
+  });
+
   it('rejects invalid truncate query value', async () => {
     const app = buildServer();
 

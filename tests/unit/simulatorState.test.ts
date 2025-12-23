@@ -11,7 +11,8 @@ const baseConfig: HarnessConfig = {
   simSpeedMinutesPerDay: 60,
   resetOnStartup: false,
   randomSeed: 111111,
-  truncateOdm: false
+  truncateOdm: false,
+  forceClinicalViewStreamFailure: false
 };
 
 describe('SimulatorState', () => {

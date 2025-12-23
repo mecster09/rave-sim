@@ -28,7 +28,8 @@ curl -u test-user:test-pass \
     "simSpeedMinutesPerDay": 60,
     "resetOnStartup": false,
     "randomSeed": 123456,
-    "truncateOdm": false
+    "truncateOdm": false,
+    "forceClinicalViewStreamFailure": false
   }
 }
 JSON
@@ -52,6 +53,22 @@ curl -u test-user:test-pass \
 curl -u test-user:test-pass \
   "http://localhost:3000/RaveWebServices/datasets/ClinicalAuditRecords.odm?studyoid=Default%20Study&per_page=5" \
   -o golden-payloads/default/audit/clinical-records.xml
+
+curl -u test-user:test-pass \
+  "http://localhost:3000/RaveWebServices/datasets/ClinicalAuditRecords.odm?studyoid=Default%20Study&mode=enhanced&per_page=5" \
+  -o golden-payloads/default/audit/clinical-records-enhanced.xml
+
+curl -u test-user:test-pass \
+  "http://localhost:3000/RaveWebServices/studies/Default%20Study/datasets/raw?start=2023-12-31T22:30:00Z&decodesuffix=_DEC&rawsuffix=_RAW&versionitem=VERSION" \
+  -o golden-payloads/default/datasets/raw-options.json
+
+curl -u test-user:test-pass \
+  "http://localhost:3000/RaveWebServices/studies/Default%20Study/versions/V1/datasets/regular?start=2023-12-31T22:30:00Z&decodesuffix=_DEC&versionitem=VERSION" \
+  -o golden-payloads/default/datasets/versioned-regular.xml
+
+curl -u test-user:test-pass \
+  "http://localhost:3000/RaveWebServices/studies/Default%20Study/versions/V1/datasets/raw?start=2023-12-31T22:30:00Z&decodesuffix=_DEC&rawsuffix=_RAW&versionitem=VERSION" \
+  -o golden-payloads/default/datasets/versioned-raw.json
 ```
 
 ## Partial Enrollment (`golden-scenarios/partial-enrollment/config.json`)
@@ -232,6 +249,52 @@ Capture payload:
 curl -u test-user:test-pass \
   "http://localhost:3000/RaveWebServices/studies/RWS_HIGH_FORM_DATA/datasets/regular" \
   -o golden-payloads/high-form-data/datasets/high-form-snapshot.xml
+```
+
+## Streaming Failure Clinical View (`golden-scenarios/streaming-failure/config.json`)
+
+Apply harness:
+
+```bash
+curl -u test-user:test-pass \
+  -X PUT http://localhost:3000/harness/config \
+  -H "Content-Type: application/json" \
+  -d @- <<'JSON'
+{
+  "applyMode": "applyAndReset",
+  "config": {
+    "studyName": "Default Study",
+    "siteCount": 2,
+    "subjectCount": 10,
+    "visitCountPerSubject": 3,
+    "formDataPointsPerVisit": 5,
+    "simSpeedMinutesPerDay": 60,
+    "resetOnStartup": false,
+    "randomSeed": 123456,
+    "truncateOdm": false,
+    "forceClinicalViewStreamFailure": true
+  }
+}
+JSON
+```
+
+Freeze time:
+
+```bash
+curl -X PUT http://localhost:3000/harness/time \
+  -H "Content-Type: application/json" \
+  -d '{"simStudyDay":2.5,"freeze":true}'
+```
+
+Capture truncated payload:
+
+```bash
+curl -u test-user:test-pass \
+  "http://localhost:3000/RaveWebServices/studies/Default%20Study/datasets/regular" \
+  -o golden-payloads/streaming-failure/clinical-view/streaming-failure.xml
+
+tail -n 20 golden-payloads/streaming-failure/clinical-view/streaming-failure.xml
+# Confirm the closing </ODM> tag is intentionally missing
 ```
 
 ## Tips

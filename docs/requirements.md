@@ -7,6 +7,8 @@
 >**IMPORTANT:** Consumers of this document are assumed to have **no access** to the original Rave API reference. Therefore, *all required dependencies, parameters, behaviors, schemas, and examples are fully documented here*.
 >
 >**Primary goal:** Enable deterministic, production-faithful testing by exactly matching endpoint behavior, response codes, and XML (ODM 1.3) payloads based on request parameters.
+>
+>Refer to [docs/constitution.md](docs/constitution.md) for coding constraints, testing thresholds, and task-level governance that apply to every change.
 
 ---
 
@@ -54,6 +56,8 @@ The service must support **pre-run configuration** via either environment/config
 | `formDataPointsPerVisit` | Yes | integer | >= 1 | Number of form datapoints captured per visit |
 | `simSpeedMinutesPerDay` | Yes | integer | 15..1440 in increments of 15 | Maps “1 study day” to N minutes of wall-clock time. Default 1440 (1 day = 1 day). Fastest 15 (1 day = 15 minutes). |
 | `resetOnStartup` | No | boolean | default false | If true, clear all persisted generated data at startup |
+| `truncateOdm` | No | boolean | default false | Truncates Clinical View datasets when the request opts into truncation |
+| `forceClinicalViewStreamFailure` | No | boolean | default false | Forces Clinical View regular datasets to end without a closing `</ODM>` to simulate a streaming failure |
 
 ### A1.2 Derived/Implicit Simulator Behaviors
 - The simulator must establish a **simulation clock** (see A4) and a “study day” concept.
@@ -441,28 +445,38 @@ GET https://{host}/RaveWebServices/datasets/VersionFolders.odm?studyoid=Mediflex
 
 ### Endpoints
 ```
-GET /RaveWebServices/studies/{study-oid}/datasets/{regular-or-raw}
-GET /RaveWebServices/studies/{study-oid}/datasets/{regular-or-raw}/{form-oid}
-GET /RaveWebServices/studies/{study-oid}/versions/{version-id}/datasets/{regular-or-raw}
-GET /RaveWebServices/studies/{study-oid}/subjects/{subject-name}/datasets/{regular-or-raw}
+GET /RaveWebServices/studies/{study-oid}/datasets/regular
+GET /RaveWebServices/studies/{study-oid}/datasets/regular/{form-oid}
+GET /RaveWebServices/studies/{study-oid}/subjects/{subject-key}/datasets/regular
+GET /RaveWebServices/studies/{study-oid}/versions/{version-id}/datasets/regular
+GET /RaveWebServices/studies/{study-oid}/versions/{version-id}/datasets/regular/{form-oid}
+GET /RaveWebServices/studies/{study-oid}/versions/{version-id}/subjects/{subject-key}/datasets/regular
+
+GET /RaveWebServices/studies/{study-oid}/datasets/raw
+GET /RaveWebServices/studies/{study-oid}/datasets/raw/{form-oid}
+GET /RaveWebServices/studies/{study-oid}/subjects/{subject-key}/datasets/raw
+GET /RaveWebServices/studies/{study-oid}/versions/{version-id}/datasets/raw
+GET /RaveWebServices/studies/{study-oid}/versions/{version-id}/datasets/raw/{form-oid}
+GET /RaveWebServices/studies/{study-oid}/versions/{version-id}/subjects/{subject-key}/datasets/raw
 ```
 
 ---
 
 ### Query Parameters
 
-| Name | Required | Description |
-|----|--------|------------|
-| `start` | No | Start datetime for incremental extract |
-| `versionitem` | No | Adds CRF version item |
-| `decodesuffix` | No | Adds decoded values |
-| `rawsuffix` | No | Adds raw entered values |
+| Name | Applies To | Description |
+|----|------------|------------|
+| `truncate` | Regular datasets | Boolean flag requesting ODM truncation while retaining HTTP 200 responses |
+| `start` | Raw datasets, versioned datasets | ISO-8601 datetime indicating the lower bound for incremental extracts |
+| `versionitem` | Raw datasets, versioned datasets | Adds CRF version item metadata to ItemData elements |
+| `decodesuffix` | Raw datasets, versioned datasets | Adds decoded ItemData values using the provided suffix |
+| `rawsuffix` | Raw datasets, versioned datasets | Adds raw ItemData values using the provided suffix; rejected on regular datasets |
 
 ---
 
 ### Response
 - **HTTP 200**
-- ODM 1.3 **snapshot** document
+- ODM 1.3 **snapshot** document by default (scenario harnesses may serialize JSON for certain raw captures used in regression testing)
 
 ---
 
@@ -470,7 +484,8 @@ GET /RaveWebServices/studies/{study-oid}/subjects/{subject-name}/datasets/{regul
 - Form-level filtering
 - Subject-level filtering
 - Optional inclusion of extension ItemData elements
-- Exact element ordering
+ - Exact element ordering
+ - Deterministic truncation when `truncate=true` or when `forceClinicalViewStreamFailure` is enabled via the harness configuration
 
 ---
 

@@ -23,7 +23,8 @@ A config file is a JSON object with the shape:
     "simSpeedMinutesPerDay": 60,
     "resetOnStartup": false,
     "randomSeed": 246810,
-    "truncateOdm": false
+    "truncateOdm": false,
+    "forceClinicalViewStreamFailure": false
   },
   "simStudyDay": 2.75,
   "freeze": true,
@@ -46,9 +47,10 @@ Key sections:
   - `siteCount`, `subjectCount`, `visitCountPerSubject`, and `formDataPointsPerVisit` scale the generated study.
   - `randomSeed` keeps outputs deterministic. Change only when you intentionally want a new data shape.
   - `truncateOdm` toggles ODM truncation when the downstream request sets `truncate=true`.
+  - `forceClinicalViewStreamFailure` forces the Clinical View regular dataset to end early, simulating a streaming failure by omitting the closing ODM tag.
 - `simStudyDay` — Day to advance the simulator clock before capturing.
 - `freeze` — When `true`, the harness locks simulated time during the replay to prevent drift.
-- `scenarios` — Each entry defines one capture. Scenarios share the seeded harness state and produce one payload file named `<family>/<name>.xml`.
+- `scenarios` — Each entry defines one capture. Scenarios share the seeded harness state and produce one payload file named `<family>/<name>.xml` (JSON for raw dataset captures when configured).
 
 ## Environment and Auth
 
@@ -78,6 +80,13 @@ The script will:
 - Write captured bodies under the output directory following `<family>/<name>.xml`.
 - Update the manifest with the HTTP status, byte size, and sha256 hash for each dataset.
 
+### Scenario Families
+
+- `clinical-view` — Standard snapshots of the Clinical View datasets. Includes the `streaming-failure` capture that enables `forceClinicalViewStreamFailure` to truncate ODM output intentionally.
+- `datasets` — Harness-driven extracts for raw and versioned datasets as XML or JSON depending on the scenario definition.
+- `subjects` — Subject roster variations across enrollment states (active-only, with inactive, status=all).
+- `audit` — Clinical Audit Records payloads covering pagination and enhanced modes.
+
 ## Adding New Scenarios
 
 1. Duplicate an existing config and adjust `harnessConfig` values so the generated study matches the target volume.
@@ -85,5 +94,7 @@ The script will:
 3. Append new `scenarios` entries for each request you want to capture. Keep `name` unique within its `family`.
 4. Run the generator command pointing at the new config and commit both the config and the resulting payload files.
 5. Extend functional tests (for example under `tests/functional/`) to validate ordering, determinism, and authentication for the new payloads.
+
+Use `golden-scenarios/streaming-failure/config.json` when you need to regenerate the truncated Clinical View payload; the harness config enables `forceClinicalViewStreamFailure` so the capture reproduces the simulated streaming failure.
 
 Following this workflow keeps the simulator data reproducible and ensures every golden payload has a documented origin.

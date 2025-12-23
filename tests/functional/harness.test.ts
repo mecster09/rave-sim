@@ -69,7 +69,8 @@ describe('Harness control plane endpoints', () => {
       simSpeedMinutesPerDay: 90,
       resetOnStartup: true,
       randomSeed: 654321,
-      truncateOdm: true
+      truncateOdm: true,
+      forceClinicalViewStreamFailure: false
     };
 
     const updateRes = await app.inject({
@@ -197,7 +198,8 @@ describe('Harness control plane endpoints', () => {
           simSpeedMinutesPerDay: 15,
           resetOnStartup: false,
           randomSeed: 42,
-          truncateOdm: false
+          truncateOdm: false,
+          forceClinicalViewStreamFailure: false
         }
       }
     });
