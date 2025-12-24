@@ -129,6 +129,9 @@ describe('odmBuilder', () => {
 
     expect(hasParserError(snapshotXml)).toBe(false);
     expect(hasParserError(transactionalXml)).toBe(false);
+    expect(snapshotXml).toContain(
+      '<MeasurementUnitRef MeasurementUnitOID="MU.UNITS"/>'
+    );
   });
 
   it('maintains stable ordering regardless of input order', () => {

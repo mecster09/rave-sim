@@ -123,13 +123,16 @@ export function buildSnapshotODM(options: BuildSnapshotOptions): string {
         lines.push(`        <FormData FormOID="${escapeAttribute(form.formOid)}">`);
         const sortedItems = [...form.items].sort((a, b) => a.itemOid.localeCompare(b.itemOid));
         for (const item of sortedItems) {
-          const measurementAttr =
-            item.measurementUnitOid !== undefined
-              ? ` MeasurementUnitOID="${escapeAttribute(item.measurementUnitOid)}"`
-              : '';
-          lines.push(
-            `          <ItemData ItemOID="${escapeAttribute(item.itemOid)}"${measurementAttr} Value="${escapeAttribute(String(item.value))}"/>`
-          );
+          const baseLine = `          <ItemData ItemOID="${escapeAttribute(item.itemOid)}" Value="${escapeAttribute(String(item.value))}"`;
+          if (item.measurementUnitOid) {
+            lines.push(`${baseLine}>`);
+            lines.push(
+              `            <MeasurementUnitRef MeasurementUnitOID="${escapeAttribute(item.measurementUnitOid)}"/>`
+            );
+            lines.push('          </ItemData>');
+          } else {
+            lines.push(`${baseLine}/>`);
+          }
         }
         lines.push('        </FormData>');
       }

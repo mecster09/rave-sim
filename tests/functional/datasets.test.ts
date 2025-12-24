@@ -261,7 +261,9 @@ describe('Clinical view datasets', () => {
     const visits = extractVisitOids(body);
     expect(new Set(visits)).toEqual(new Set(['VISIT-002', 'VISIT-003']));
     expect(body).toContain('ItemOID="SYS_DEC"');
-    expect(body).toMatch(/ItemOID="SYS"[^>]*MeasurementUnitOID="MU.MMHG"[^>]*Value="\d+ mmHg"/);
+    expect(body).toMatch(
+      /<ItemData ItemOID="SYS" Value="\d+ mmHg">\s*<MeasurementUnitRef MeasurementUnitOID="MU\.MMHG"\/>\s*<\/ItemData>/
+    );
     expect(body).toMatch(/ItemOID="BRTHDTC"[^>]*Value="\d{2} [A-Z]{3} \d{4}"/);
     expect(body).toContain('ItemOID="VS.VERSION"');
   });
@@ -361,7 +363,9 @@ describe('Clinical view datasets', () => {
     const visits = extractVisitOids(body);
     expect(new Set(visits)).toEqual(new Set(['VISIT-002', 'VISIT-003']));
     expect(body).toContain('ItemOID="SYS_DEC"');
-    expect(body).toMatch(/ItemOID="SYS"[^>]*MeasurementUnitOID="MU.MMHG"[^>]*Value="\d+ mmHg"/);
+    expect(body).toMatch(
+      /<ItemData ItemOID="SYS" Value="\d+ mmHg">\s*<MeasurementUnitRef MeasurementUnitOID="MU\.MMHG"\/>\s*<\/ItemData>/
+    );
     expect(body).toContain('ItemOID="VS.VERSION"');
   });
 

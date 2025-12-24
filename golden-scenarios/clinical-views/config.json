@@ -1,0 +1,43 @@
+{
+  "harnessConfig": {
+    "studyName": "Default Study",
+    "siteCount": 2,
+    "subjectCount": 10,
+    "visitCountPerSubject": 3,
+    "formDataPointsPerVisit": 5,
+    "simSpeedMinutesPerDay": 60,
+    "resetOnStartup": false,
+    "randomSeed": 123456,
+    "truncateOdm": false,
+    "forceClinicalViewStreamFailure": false,
+    "forceVersionFoldersStreamFailure": false
+  },
+  "simStudyDay": 2.5,
+  "freeze": true,
+  "scenarios": [
+    {
+      "family": "ClinicalViews",
+      "name": "CV-REG-001",
+      "request": {
+        "method": "GET",
+        "url": "/RaveWebServices/studies/Default%20Study/subjects/100001/datasets/regular"
+      }
+    },
+    {
+      "family": "ClinicalViews",
+      "name": "CV-RAW-001",
+      "request": {
+        "method": "GET",
+        "url": "/RaveWebServices/studies/Default%20Study/subjects/100001/datasets/raw?start=2023-12-31T22:30:00Z&decodesuffix=_DEC&versionitem=VERSION"
+      }
+    },
+    {
+      "family": "ClinicalViews",
+      "name": "CV-REG-RAW-001",
+      "request": {
+        "method": "GET",
+        "url": "/RaveWebServices/studies/Default%20Study/subjects/100001/datasets/regular?rawsuffix=_RAW"
+      }
+    }
+  ]
+}

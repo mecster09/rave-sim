@@ -1,0 +1,68 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<ODM FileOID="ed2407d7162d9b25f924c71cdc0689ff052ca39c257bf66adf286da6c63f97f4" FileType="Snapshot" ODMVersion="1.3.2" CreationDateTime="2024-01-01T00:00:00.000Z" xmlns="http://www.cdisc.org/ns/odm/v1.3" xmlns:mdsol="http://www.mdsol.com/ns/odm/metadata">
+  <ClinicalData StudyOID="Default Study" MetaDataVersionOID="1">
+    <SubjectData SubjectKey="100001" mdsol:SubjectStatus="Active">
+      <SiteRef LocationOID="SITE-001"/>
+      <StudyEventData StudyEventOID="VISIT-001">
+        <FormData FormOID="DM">
+          <ItemData ItemOID="AGE" Value="56"/>
+          <ItemData ItemOID="AGE_RAW" Value="56"/>
+          <ItemData ItemOID="BRTHDTC" Value="1964-02-16"/>
+          <ItemData ItemOID="BRTHDTC_RAW" Value="16 FEB 1964"/>
+          <ItemData ItemOID="SEX" Value="F"/>
+          <ItemData ItemOID="SEX_RAW" Value="F"/>
+        </FormData>
+        <FormData FormOID="VS">
+          <ItemData ItemOID="DIA" Value="78"/>
+          <ItemData ItemOID="DIA_RAW" Value="78 mmHg">
+            <MeasurementUnitRef MeasurementUnitOID="MU.MMHG"/>
+          </ItemData>
+          <ItemData ItemOID="SYS" Value="100"/>
+          <ItemData ItemOID="SYS_RAW" Value="100 mmHg">
+            <MeasurementUnitRef MeasurementUnitOID="MU.MMHG"/>
+          </ItemData>
+        </FormData>
+      </StudyEventData>
+      <StudyEventData StudyEventOID="VISIT-002">
+        <FormData FormOID="DM">
+          <ItemData ItemOID="AGE" Value="72"/>
+          <ItemData ItemOID="AGE_RAW" Value="72"/>
+          <ItemData ItemOID="BRTHDTC" Value="1974-12-27"/>
+          <ItemData ItemOID="BRTHDTC_RAW" Value="27 DEC 1974"/>
+          <ItemData ItemOID="SEX" Value="F"/>
+          <ItemData ItemOID="SEX_RAW" Value="F"/>
+        </FormData>
+        <FormData FormOID="VS">
+          <ItemData ItemOID="DIA" Value="79"/>
+          <ItemData ItemOID="DIA_RAW" Value="79 mmHg">
+            <MeasurementUnitRef MeasurementUnitOID="MU.MMHG"/>
+          </ItemData>
+          <ItemData ItemOID="SYS" Value="149"/>
+          <ItemData ItemOID="SYS_RAW" Value="149 mmHg">
+            <MeasurementUnitRef MeasurementUnitOID="MU.MMHG"/>
+          </ItemData>
+        </FormData>
+      </StudyEventData>
+      <StudyEventData StudyEventOID="VISIT-003">
+        <FormData FormOID="DM">
+          <ItemData ItemOID="AGE" Value="41"/>
+          <ItemData ItemOID="AGE_RAW" Value="41"/>
+          <ItemData ItemOID="BRTHDTC" Value="1989-07-25"/>
+          <ItemData ItemOID="BRTHDTC_RAW" Value="25 JUL 1989"/>
+          <ItemData ItemOID="SEX" Value="F"/>
+          <ItemData ItemOID="SEX_RAW" Value="F"/>
+        </FormData>
+        <FormData FormOID="VS">
+          <ItemData ItemOID="DIA" Value="74"/>
+          <ItemData ItemOID="DIA_RAW" Value="74 mmHg">
+            <MeasurementUnitRef MeasurementUnitOID="MU.MMHG"/>
+          </ItemData>
+          <ItemData ItemOID="SYS" Value="102"/>
+          <ItemData ItemOID="SYS_RAW" Value="102 mmHg">
+            <MeasurementUnitRef MeasurementUnitOID="MU.MMHG"/>
+          </ItemData>
+        </FormData>
+      </StudyEventData>
+    </SubjectData>
+  </ClinicalData>
+</ODM>

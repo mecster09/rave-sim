@@ -1,0 +1,26 @@
+{
+  "generatedAt": "2025-12-24T12:22:41.740Z",
+  "scenarios": [
+    {
+      "family": "ClinicalViews",
+      "name": "CV-RAW-001",
+      "file": "ClinicalViews/CV-RAW-001.xml",
+      "sha256": "2faa12f4bb2d7a78d1c8cde19644f3acc53d8476ed5fcda19acc790c4327813a",
+      "statusCode": 200
+    },
+    {
+      "family": "ClinicalViews",
+      "name": "CV-REG-001",
+      "file": "ClinicalViews/CV-REG-001.xml",
+      "sha256": "f855b09ddbd63578d79cb70cb8bffdaa49fc0a0478f29985d3c1d93b9d0b792b",
+      "statusCode": 200
+    },
+    {
+      "family": "ClinicalViews",
+      "name": "CV-REG-RAW-001",
+      "file": "ClinicalViews/CV-REG-RAW-001.xml",
+      "sha256": "e80275eab3529ffffe55e019109921c4223443d2c73e8f82b42e1353540b9e62",
+      "statusCode": 200
+    }
+  ]
+}
