@@ -18,7 +18,7 @@ Rave-Sim is a Fastify-based simulator that reproduces a subset of the Rave Web S
 | `/harness/config`, `/harness/reset`, `/harness/time`, `/harness/speed`, `/harness/status` | Authenticated simulator controls for configuration, reset, clock freeze, and diagnostics.
 | `/RaveWebServices/studies/:studyOid/datasets/regular` | Clinical View regular dataset with query options such as `truncate`, `formOid`, and `subjectKey`.
 | `/RaveWebServices/studies/:studyOid/datasets/raw` | Raw dataset variant supporting `start`, `decodesuffix`, `rawsuffix`, and `versionitem` filters.
-| `/RaveWebServices/studies/:studyOid/versions/:versionId/datasets/(regular|raw)` | Version-locked datasets derived from deterministic seeds.
+| `/RaveWebServices/studies/:studyOid/versions/:versionId/datasets/(regular or raw)` | Version-locked datasets derived from deterministic seeds.
 | `/RaveWebServices/datasets/ClinicalAuditRecords.odm` | Clinical audit trail with pagination, Unicode toggles, and enhanced mode support.
 | `/RaveWebServices/datasets/VersionFolders.odm` | Version folders metadata export with optional streaming failure simulation.
 | `/RaveWebServices/studies/:studyOid/Subjects` | Subject roster with status/include filters.
