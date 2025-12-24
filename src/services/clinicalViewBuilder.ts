@@ -1,5 +1,5 @@
-import { SimulatorSnapshot, Visit } from './simulatorState';
-import { SnapshotSubject } from './odmBuilder';
+import { SimulatorSnapshot, Visit, VisitFormDataPoint } from './simulatorState';
+import { SnapshotSubject, SnapshotItemData } from './odmBuilder';
 
 export interface ClinicalViewOptions {
   currentStudyDay: number;
@@ -9,6 +9,7 @@ export interface ClinicalViewOptions {
   versionItem?: string;
   decodeSuffix?: string;
   rawSuffix?: string;
+  mode: 'regular' | 'raw';
 }
 
 function isVisitAvailableForDay(visit: Visit, currentStudyDay: number): boolean {
@@ -16,7 +17,7 @@ function isVisitAvailableForDay(visit: Visit, currentStudyDay: number): boolean 
 }
 
 export function buildClinicalViewSubjects(snapshot: SimulatorSnapshot, options: ClinicalViewOptions): SnapshotSubject[] {
-  const { currentStudyDay, formOid, subjectKey, startStudyDay, versionItem, decodeSuffix, rawSuffix } = options;
+  const { currentStudyDay, formOid, subjectKey, startStudyDay, versionItem, decodeSuffix, rawSuffix, mode } = options;
   const normalizedFormOid = formOid?.trim() || undefined;
   const results: SnapshotSubject[] = [];
 
@@ -26,6 +27,7 @@ export function buildClinicalViewSubjects(snapshot: SimulatorSnapshot, options: 
     }
 
     const visitEntries: SnapshotSubject['visits'] = [];
+    let subjectHasMeasurementUnits = false;
 
     for (const visit of subject.visits) {
       if (!isVisitAvailableForDay(visit, currentStudyDay)) {
@@ -40,16 +42,21 @@ export function buildClinicalViewSubjects(snapshot: SimulatorSnapshot, options: 
         .filter(form => !normalizedFormOid || form.formOid === normalizedFormOid)
         .map(form => ({
           formOid: form.formOid,
-          data: augmentFormData(form.formOid, form.data, {
+          items: buildSnapshotItems(form.formOid, form.data, {
+            mode,
             versionItem,
             decodeSuffix,
             rawSuffix
           })
         }))
-        .filter(form => Object.keys(form.data).length > 0);
+        .filter(form => form.items.length > 0);
 
       if (forms.length === 0) {
         continue;
+      }
+
+      if (!subjectHasMeasurementUnits && forms.some(form => form.items.some(item => item.measurementUnitOid))) {
+        subjectHasMeasurementUnits = true;
       }
 
       visitEntries.push({
@@ -59,6 +66,11 @@ export function buildClinicalViewSubjects(snapshot: SimulatorSnapshot, options: 
     }
 
     if (visitEntries.length === 0) {
+      continue;
+    }
+
+    if (mode === 'raw' && !subjectHasMeasurementUnits) {
+      // Ensure raw datasets preserve at least one unit-bearing item.
       continue;
     }
 
@@ -74,36 +86,60 @@ export function buildClinicalViewSubjects(snapshot: SimulatorSnapshot, options: 
 }
 
 interface AugmentOptions {
+  mode: 'regular' | 'raw';
   versionItem?: string;
   decodeSuffix?: string;
   rawSuffix?: string;
 }
 
-function augmentFormData(
+function buildSnapshotItems(
   formOid: string,
-  source: Record<string, string | number>,
+  source: Record<string, VisitFormDataPoint>,
   options: AugmentOptions
-): Record<string, string | number> {
-  const { versionItem, decodeSuffix, rawSuffix } = options;
-  const result: Record<string, string | number> = { ...source };
-
-  const fieldKeys = Object.keys(source);
+): SnapshotItemData[] {
+  const { mode, versionItem, decodeSuffix, rawSuffix } = options;
+  const items: SnapshotItemData[] = [];
+  const fieldKeys = Object.keys(source).sort();
 
   for (const key of fieldKeys) {
-    const value = source[key];
-    if (decodeSuffix) {
-      result[`${key}${decodeSuffix}`] = `DECODED-${String(value)}`;
+    const point = source[key];
+    if (mode === 'raw' && typeof point.valueRaw === 'undefined') {
+      continue;
     }
-    if (rawSuffix) {
-      result[`${key}${rawSuffix}`] = `RAW-${String(value)}`;
+
+    const baseValue = mode === 'raw' ? point.valueRaw : point.valueRegular;
+    const measurementUnitOid = mode === 'raw' ? point.measurementUnitOid : undefined;
+
+    items.push({
+      itemOid: key,
+      value: baseValue,
+      measurementUnitOid
+    });
+
+    if (mode === 'regular' && rawSuffix && typeof point.valueRaw !== 'undefined') {
+      items.push({
+        itemOid: `${key}${rawSuffix}`,
+        value: point.valueRaw,
+        measurementUnitOid: point.measurementUnitOid
+      });
+    }
+
+    if (decodeSuffix) {
+      items.push({
+        itemOid: `${key}${decodeSuffix}`,
+        value: `DECODED-${String(baseValue)}`
+      });
     }
   }
 
   if (versionItem) {
-    result[`${formOid}.${versionItem}`] = `${computeVersionValue(formOid)}`;
+    items.push({
+      itemOid: `${formOid}.${versionItem}`,
+      value: `${computeVersionValue(formOid)}`
+    });
   }
 
-  return result;
+  return items;
 }
 
 function computeVersionValue(formOid: string): number {

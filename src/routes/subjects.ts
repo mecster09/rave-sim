@@ -1,7 +1,7 @@
 import { FastifyInstance } from 'fastify';
 import { HarnessConfig } from '../services/config';
-import { buildSnapshotODM } from '../services/odmBuilder';
-import { SimulatorState, SubjectStatus } from '../services/simulatorState';
+import { buildSnapshotODM, SnapshotItemData } from '../services/odmBuilder';
+import { SimulatorState, SubjectStatus, VisitFormDataPoint } from '../services/simulatorState';
 import { computeGeneratedAt } from '../services/simulatorHelpers';
 import { parseTruncateFlag } from '../utils/flags';
 
@@ -57,7 +57,7 @@ export function registerSubjectRoutes(app: FastifyInstance, deps: SubjectsRouteD
           visitOid: visit.visitOid,
           forms: visit.forms.map(form => ({
             formOid: form.formOid,
-            data: { ...form.data }
+            items: mapRegularItems(form.data)
           }))
         }))
       }));
@@ -77,4 +77,13 @@ export function registerSubjectRoutes(app: FastifyInstance, deps: SubjectsRouteD
     reply.header('content-type', 'application/xml');
     return reply.send(xml);
   });
+}
+
+function mapRegularItems(data: Record<string, VisitFormDataPoint>): SnapshotItemData[] {
+  return Object.keys(data)
+    .sort()
+    .map(itemOid => ({
+      itemOid,
+      value: data[itemOid].valueRegular
+    }));
 }

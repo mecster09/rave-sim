@@ -37,10 +37,10 @@ describe('odmBuilder', () => {
             forms: [
               {
                 formOid: 'FORM-B',
-                data: {
-                  FIELD2: 'value2',
-                  FIELD1: 'value1'
-                }
+                items: [
+                  { itemOid: 'FIELD2', value: 'value2', measurementUnitOid: 'MU.UNITS' },
+                  { itemOid: 'FIELD1', value: 'value1' }
+                ]
               }
             ]
           }
@@ -55,10 +55,10 @@ describe('odmBuilder', () => {
             forms: [
               {
                 formOid: 'FORM-A',
-                data: {
-                  FIELD1: 'alpha',
-                  FIELD2: 123
-                }
+                items: [
+                  { itemOid: 'FIELD1', value: 'alpha' },
+                  { itemOid: 'FIELD2', value: 123 }
+                ]
               }
             ]
           }

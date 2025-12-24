@@ -1,6 +1,6 @@
 {
   "file": {
-    "oid": "efb112442b710745e8e214aa6f7eabf6e867e3c18d8e10462d74c34bbcc3fafd",
+    "oid": "bf440ac5256df14bd1ce135ffa92ff94fc25e1e7119b75275219979e78e9ec68",
     "type": "Snapshot",
     "version": "1.3.2",
     "created": "2024-01-01T00:00:00.000Z"
@@ -17,28 +17,20 @@
           {
             "eventOid": "VISIT-002",
             "forms": {
-              "AE": {
-                "AE.VERSION": "9",
-                "SEVERITY": "SEVERE",
-                "SEVERITY_DEC": "DECODED-SEVERE",
-                "SEVERITY_RAW": "RAW-SEVERE"
-              },
               "DM": {
-                "AGE": "45",
-                "AGE_DEC": "DECODED-45",
-                "AGE_RAW": "RAW-45",
+                "AGE": "72",
+                "AGE_DEC": "DECODED-72",
+                "BRTHDTC": "27 DEC 1974",
+                "BRTHDTC_DEC": "DECODED-27 DEC 1974",
                 "DM.VERSION": "2",
                 "SEX": "F",
-                "SEX_DEC": "DECODED-F",
-                "SEX_RAW": "RAW-F"
+                "SEX_DEC": "DECODED-F"
               },
               "VS": {
-                "DIA": "77",
-                "DIA_DEC": "DECODED-77",
-                "DIA_RAW": "RAW-77",
-                "SYS": "111",
-                "SYS_DEC": "DECODED-111",
-                "SYS_RAW": "RAW-111",
+                "DIA": "79 mmHg",
+                "DIA_DEC": "DECODED-79 mmHg",
+                "SYS": "149 mmHg",
+                "SYS_DEC": "DECODED-149 mmHg",
                 "VS.VERSION": "8"
               }
             }
@@ -46,28 +38,20 @@
           {
             "eventOid": "VISIT-003",
             "forms": {
-              "AE": {
-                "AE.VERSION": "9",
-                "SEVERITY": "MILD",
-                "SEVERITY_DEC": "DECODED-MILD",
-                "SEVERITY_RAW": "RAW-MILD"
-              },
               "DM": {
-                "AGE": "72",
-                "AGE_DEC": "DECODED-72",
-                "AGE_RAW": "RAW-72",
+                "AGE": "41",
+                "AGE_DEC": "DECODED-41",
+                "BRTHDTC": "25 JUL 1989",
+                "BRTHDTC_DEC": "DECODED-25 JUL 1989",
                 "DM.VERSION": "2",
-                "SEX": "M",
-                "SEX_DEC": "DECODED-M",
-                "SEX_RAW": "RAW-M"
+                "SEX": "F",
+                "SEX_DEC": "DECODED-F"
               },
               "VS": {
-                "DIA": "79",
-                "DIA_DEC": "DECODED-79",
-                "DIA_RAW": "RAW-79",
-                "SYS": "149",
-                "SYS_DEC": "DECODED-149",
-                "SYS_RAW": "RAW-149",
+                "DIA": "74 mmHg",
+                "DIA_DEC": "DECODED-74 mmHg",
+                "SYS": "102 mmHg",
+                "SYS_DEC": "DECODED-102 mmHg",
                 "VS.VERSION": "8"
               }
             }
@@ -82,28 +66,20 @@
           {
             "eventOid": "VISIT-002",
             "forms": {
-              "AE": {
-                "AE.VERSION": "9",
-                "SEVERITY": "MODERATE",
-                "SEVERITY_DEC": "DECODED-MODERATE",
-                "SEVERITY_RAW": "RAW-MODERATE"
-              },
               "DM": {
-                "AGE": "26",
-                "AGE_DEC": "DECODED-26",
-                "AGE_RAW": "RAW-26",
+                "AGE": "22",
+                "AGE_DEC": "DECODED-22",
+                "BRTHDTC": "23 JUL 1956",
+                "BRTHDTC_DEC": "DECODED-23 JUL 1956",
                 "DM.VERSION": "2",
-                "SEX": "F",
-                "SEX_DEC": "DECODED-F",
-                "SEX_RAW": "RAW-F"
+                "SEX": "M",
+                "SEX_DEC": "DECODED-M"
               },
               "VS": {
-                "DIA": "68",
-                "DIA_DEC": "DECODED-68",
-                "DIA_RAW": "RAW-68",
-                "SYS": "132",
-                "SYS_DEC": "DECODED-132",
-                "SYS_RAW": "RAW-132",
+                "DIA": "67 mmHg",
+                "DIA_DEC": "DECODED-67 mmHg",
+                "SYS": "108 mmHg",
+                "SYS_DEC": "DECODED-108 mmHg",
                 "VS.VERSION": "8"
               }
             }
@@ -111,28 +87,20 @@
           {
             "eventOid": "VISIT-003",
             "forms": {
-              "AE": {
-                "AE.VERSION": "9",
-                "SEVERITY": "MILD",
-                "SEVERITY_DEC": "DECODED-MILD",
-                "SEVERITY_RAW": "RAW-MILD"
-              },
               "DM": {
-                "AGE": "47",
-                "AGE_DEC": "DECODED-47",
-                "AGE_RAW": "RAW-47",
+                "AGE": "18",
+                "AGE_DEC": "DECODED-18",
+                "BRTHDTC": "18 MAR 1991",
+                "BRTHDTC_DEC": "DECODED-18 MAR 1991",
                 "DM.VERSION": "2",
-                "SEX": "F",
-                "SEX_DEC": "DECODED-F",
-                "SEX_RAW": "RAW-F"
+                "SEX": "M",
+                "SEX_DEC": "DECODED-M"
               },
               "VS": {
-                "DIA": "86",
-                "DIA_DEC": "DECODED-86",
-                "DIA_RAW": "RAW-86",
-                "SYS": "132",
-                "SYS_DEC": "DECODED-132",
-                "SYS_RAW": "RAW-132",
+                "DIA": "61 mmHg",
+                "DIA_DEC": "DECODED-61 mmHg",
+                "SYS": "145 mmHg",
+                "SYS_DEC": "DECODED-145 mmHg",
                 "VS.VERSION": "8"
               }
             }
@@ -147,28 +115,20 @@
           {
             "eventOid": "VISIT-002",
             "forms": {
-              "AE": {
-                "AE.VERSION": "9",
-                "SEVERITY": "MILD",
-                "SEVERITY_DEC": "DECODED-MILD",
-                "SEVERITY_RAW": "RAW-MILD"
-              },
               "DM": {
-                "AGE": "66",
-                "AGE_DEC": "DECODED-66",
-                "AGE_RAW": "RAW-66",
+                "AGE": "33",
+                "AGE_DEC": "DECODED-33",
+                "BRTHDTC": "27 NOV 1965",
+                "BRTHDTC_DEC": "DECODED-27 NOV 1965",
                 "DM.VERSION": "2",
                 "SEX": "M",
-                "SEX_DEC": "DECODED-M",
-                "SEX_RAW": "RAW-M"
+                "SEX_DEC": "DECODED-M"
               },
               "VS": {
-                "DIA": "84",
-                "DIA_DEC": "DECODED-84",
-                "DIA_RAW": "RAW-84",
-                "SYS": "108",
-                "SYS_DEC": "DECODED-108",
-                "SYS_RAW": "RAW-108",
+                "DIA": "99 mmHg",
+                "DIA_DEC": "DECODED-99 mmHg",
+                "SYS": "141 mmHg",
+                "SYS_DEC": "DECODED-141 mmHg",
                 "VS.VERSION": "8"
               }
             }
@@ -176,28 +136,20 @@
           {
             "eventOid": "VISIT-003",
             "forms": {
-              "AE": {
-                "AE.VERSION": "9",
-                "SEVERITY": "MILD",
-                "SEVERITY_DEC": "DECODED-MILD",
-                "SEVERITY_RAW": "RAW-MILD"
-              },
               "DM": {
-                "AGE": "20",
-                "AGE_DEC": "DECODED-20",
-                "AGE_RAW": "RAW-20",
+                "AGE": "38",
+                "AGE_DEC": "DECODED-38",
+                "BRTHDTC": "07 SEP 1989",
+                "BRTHDTC_DEC": "DECODED-07 SEP 1989",
                 "DM.VERSION": "2",
                 "SEX": "M",
-                "SEX_DEC": "DECODED-M",
-                "SEX_RAW": "RAW-M"
+                "SEX_DEC": "DECODED-M"
               },
               "VS": {
-                "DIA": "82",
-                "DIA_DEC": "DECODED-82",
-                "DIA_RAW": "RAW-82",
-                "SYS": "133",
-                "SYS_DEC": "DECODED-133",
-                "SYS_RAW": "RAW-133",
+                "DIA": "63 mmHg",
+                "DIA_DEC": "DECODED-63 mmHg",
+                "SYS": "148 mmHg",
+                "SYS_DEC": "DECODED-148 mmHg",
                 "VS.VERSION": "8"
               }
             }
@@ -212,28 +164,20 @@
           {
             "eventOid": "VISIT-002",
             "forms": {
-              "AE": {
-                "AE.VERSION": "9",
-                "SEVERITY": "SEVERE",
-                "SEVERITY_DEC": "DECODED-SEVERE",
-                "SEVERITY_RAW": "RAW-SEVERE"
-              },
               "DM": {
-                "AGE": "69",
-                "AGE_DEC": "DECODED-69",
-                "AGE_RAW": "RAW-69",
+                "AGE": "61",
+                "AGE_DEC": "DECODED-61",
+                "BRTHDTC": "15 DEC 1965",
+                "BRTHDTC_DEC": "DECODED-15 DEC 1965",
                 "DM.VERSION": "2",
                 "SEX": "F",
-                "SEX_DEC": "DECODED-F",
-                "SEX_RAW": "RAW-F"
+                "SEX_DEC": "DECODED-F"
               },
               "VS": {
-                "DIA": "70",
-                "DIA_DEC": "DECODED-70",
-                "DIA_RAW": "RAW-70",
-                "SYS": "147",
-                "SYS_DEC": "DECODED-147",
-                "SYS_RAW": "RAW-147",
+                "DIA": "66 mmHg",
+                "DIA_DEC": "DECODED-66 mmHg",
+                "SYS": "128 mmHg",
+                "SYS_DEC": "DECODED-128 mmHg",
                 "VS.VERSION": "8"
               }
             }
@@ -241,28 +185,20 @@
           {
             "eventOid": "VISIT-003",
             "forms": {
-              "AE": {
-                "AE.VERSION": "9",
-                "SEVERITY": "MILD",
-                "SEVERITY_DEC": "DECODED-MILD",
-                "SEVERITY_RAW": "RAW-MILD"
-              },
               "DM": {
-                "AGE": "53",
-                "AGE_DEC": "DECODED-53",
-                "AGE_RAW": "RAW-53",
+                "AGE": "72",
+                "AGE_DEC": "DECODED-72",
+                "BRTHDTC": "01 MAY 1961",
+                "BRTHDTC_DEC": "DECODED-01 MAY 1961",
                 "DM.VERSION": "2",
-                "SEX": "M",
-                "SEX_DEC": "DECODED-M",
-                "SEX_RAW": "RAW-M"
+                "SEX": "F",
+                "SEX_DEC": "DECODED-F"
               },
               "VS": {
-                "DIA": "87",
-                "DIA_DEC": "DECODED-87",
-                "DIA_RAW": "RAW-87",
-                "SYS": "138",
-                "SYS_DEC": "DECODED-138",
-                "SYS_RAW": "RAW-138",
+                "DIA": "96 mmHg",
+                "DIA_DEC": "DECODED-96 mmHg",
+                "SYS": "115 mmHg",
+                "SYS_DEC": "DECODED-115 mmHg",
                 "VS.VERSION": "8"
               }
             }
@@ -277,28 +213,20 @@
           {
             "eventOid": "VISIT-002",
             "forms": {
-              "AE": {
-                "AE.VERSION": "9",
-                "SEVERITY": "MODERATE",
-                "SEVERITY_DEC": "DECODED-MODERATE",
-                "SEVERITY_RAW": "RAW-MODERATE"
-              },
               "DM": {
-                "AGE": "40",
-                "AGE_DEC": "DECODED-40",
-                "AGE_RAW": "RAW-40",
+                "AGE": "73",
+                "AGE_DEC": "DECODED-73",
+                "BRTHDTC": "01 NOV 1969",
+                "BRTHDTC_DEC": "DECODED-01 NOV 1969",
                 "DM.VERSION": "2",
-                "SEX": "M",
-                "SEX_DEC": "DECODED-M",
-                "SEX_RAW": "RAW-M"
+                "SEX": "F",
+                "SEX_DEC": "DECODED-F"
               },
               "VS": {
-                "DIA": "83",
-                "DIA_DEC": "DECODED-83",
-                "DIA_RAW": "RAW-83",
-                "SYS": "104",
-                "SYS_DEC": "DECODED-104",
-                "SYS_RAW": "RAW-104",
+                "DIA": "94 mmHg",
+                "DIA_DEC": "DECODED-94 mmHg",
+                "SYS": "137 mmHg",
+                "SYS_DEC": "DECODED-137 mmHg",
                 "VS.VERSION": "8"
               }
             }
@@ -306,28 +234,20 @@
           {
             "eventOid": "VISIT-003",
             "forms": {
-              "AE": {
-                "AE.VERSION": "9",
-                "SEVERITY": "SEVERE",
-                "SEVERITY_DEC": "DECODED-SEVERE",
-                "SEVERITY_RAW": "RAW-SEVERE"
-              },
               "DM": {
-                "AGE": "32",
-                "AGE_DEC": "DECODED-32",
-                "AGE_RAW": "RAW-32",
+                "AGE": "75",
+                "AGE_DEC": "DECODED-75",
+                "BRTHDTC": "02 NOV 1993",
+                "BRTHDTC_DEC": "DECODED-02 NOV 1993",
                 "DM.VERSION": "2",
                 "SEX": "F",
-                "SEX_DEC": "DECODED-F",
-                "SEX_RAW": "RAW-F"
+                "SEX_DEC": "DECODED-F"
               },
               "VS": {
-                "DIA": "81",
-                "DIA_DEC": "DECODED-81",
-                "DIA_RAW": "RAW-81",
-                "SYS": "149",
-                "SYS_DEC": "DECODED-149",
-                "SYS_RAW": "RAW-149",
+                "DIA": "92 mmHg",
+                "DIA_DEC": "DECODED-92 mmHg",
+                "SYS": "112 mmHg",
+                "SYS_DEC": "DECODED-112 mmHg",
                 "VS.VERSION": "8"
               }
             }
@@ -342,28 +262,20 @@
           {
             "eventOid": "VISIT-002",
             "forms": {
-              "AE": {
-                "AE.VERSION": "9",
-                "SEVERITY": "MODERATE",
-                "SEVERITY_DEC": "DECODED-MODERATE",
-                "SEVERITY_RAW": "RAW-MODERATE"
-              },
               "DM": {
-                "AGE": "72",
-                "AGE_DEC": "DECODED-72",
-                "AGE_RAW": "RAW-72",
+                "AGE": "62",
+                "AGE_DEC": "DECODED-62",
+                "BRTHDTC": "19 JUN 1971",
+                "BRTHDTC_DEC": "DECODED-19 JUN 1971",
                 "DM.VERSION": "2",
-                "SEX": "F",
-                "SEX_DEC": "DECODED-F",
-                "SEX_RAW": "RAW-F"
+                "SEX": "M",
+                "SEX_DEC": "DECODED-M"
               },
               "VS": {
-                "DIA": "96",
-                "DIA_DEC": "DECODED-96",
-                "DIA_RAW": "RAW-96",
-                "SYS": "115",
-                "SYS_DEC": "DECODED-115",
-                "SYS_RAW": "RAW-115",
+                "DIA": "85 mmHg",
+                "DIA_DEC": "DECODED-85 mmHg",
+                "SYS": "112 mmHg",
+                "SYS_DEC": "DECODED-112 mmHg",
                 "VS.VERSION": "8"
               }
             }
@@ -371,28 +283,20 @@
           {
             "eventOid": "VISIT-003",
             "forms": {
-              "AE": {
-                "AE.VERSION": "9",
-                "SEVERITY": "MODERATE",
-                "SEVERITY_DEC": "DECODED-MODERATE",
-                "SEVERITY_RAW": "RAW-MODERATE"
-              },
               "DM": {
-                "AGE": "61",
-                "AGE_DEC": "DECODED-61",
-                "AGE_RAW": "RAW-61",
+                "AGE": "24",
+                "AGE_DEC": "DECODED-24",
+                "BRTHDTC": "24 MAY 1968",
+                "BRTHDTC_DEC": "DECODED-24 MAY 1968",
                 "DM.VERSION": "2",
-                "SEX": "F",
-                "SEX_DEC": "DECODED-F",
-                "SEX_RAW": "RAW-F"
+                "SEX": "M",
+                "SEX_DEC": "DECODED-M"
               },
               "VS": {
-                "DIA": "74",
-                "DIA_DEC": "DECODED-74",
-                "DIA_RAW": "RAW-74",
-                "SYS": "142",
-                "SYS_DEC": "DECODED-142",
-                "SYS_RAW": "RAW-142",
+                "DIA": "75 mmHg",
+                "DIA_DEC": "DECODED-75 mmHg",
+                "SYS": "131 mmHg",
+                "SYS_DEC": "DECODED-131 mmHg",
                 "VS.VERSION": "8"
               }
             }
@@ -407,28 +311,20 @@
           {
             "eventOid": "VISIT-002",
             "forms": {
-              "AE": {
-                "AE.VERSION": "9",
-                "SEVERITY": "SEVERE",
-                "SEVERITY_DEC": "DECODED-SEVERE",
-                "SEVERITY_RAW": "RAW-SEVERE"
-              },
               "DM": {
-                "AGE": "62",
-                "AGE_DEC": "DECODED-62",
-                "AGE_RAW": "RAW-62",
+                "AGE": "31",
+                "AGE_DEC": "DECODED-31",
+                "BRTHDTC": "23 SEP 1966",
+                "BRTHDTC_DEC": "DECODED-23 SEP 1966",
                 "DM.VERSION": "2",
                 "SEX": "M",
-                "SEX_DEC": "DECODED-M",
-                "SEX_RAW": "RAW-M"
+                "SEX_DEC": "DECODED-M"
               },
               "VS": {
-                "DIA": "61",
-                "DIA_DEC": "DECODED-61",
-                "DIA_RAW": "RAW-61",
-                "SYS": "142",
-                "SYS_DEC": "DECODED-142",
-                "SYS_RAW": "RAW-142",
+                "DIA": "99 mmHg",
+                "DIA_DEC": "DECODED-99 mmHg",
+                "SYS": "130 mmHg",
+                "SYS_DEC": "DECODED-130 mmHg",
                 "VS.VERSION": "8"
               }
             }
@@ -436,28 +332,20 @@
           {
             "eventOid": "VISIT-003",
             "forms": {
-              "AE": {
-                "AE.VERSION": "9",
-                "SEVERITY": "SEVERE",
-                "SEVERITY_DEC": "DECODED-SEVERE",
-                "SEVERITY_RAW": "RAW-SEVERE"
-              },
               "DM": {
-                "AGE": "20",
-                "AGE_DEC": "DECODED-20",
-                "AGE_RAW": "RAW-20",
+                "AGE": "75",
+                "AGE_DEC": "DECODED-75",
+                "BRTHDTC": "17 MAR 1956",
+                "BRTHDTC_DEC": "DECODED-17 MAR 1956",
                 "DM.VERSION": "2",
-                "SEX": "M",
-                "SEX_DEC": "DECODED-M",
-                "SEX_RAW": "RAW-M"
+                "SEX": "F",
+                "SEX_DEC": "DECODED-F"
               },
               "VS": {
-                "DIA": "70",
-                "DIA_DEC": "DECODED-70",
-                "DIA_RAW": "RAW-70",
-                "SYS": "147",
-                "SYS_DEC": "DECODED-147",
-                "SYS_RAW": "RAW-147",
+                "DIA": "86 mmHg",
+                "DIA_DEC": "DECODED-86 mmHg",
+                "SYS": "101 mmHg",
+                "SYS_DEC": "DECODED-101 mmHg",
                 "VS.VERSION": "8"
               }
             }
@@ -472,28 +360,20 @@
           {
             "eventOid": "VISIT-002",
             "forms": {
-              "AE": {
-                "AE.VERSION": "9",
-                "SEVERITY": "MODERATE",
-                "SEVERITY_DEC": "DECODED-MODERATE",
-                "SEVERITY_RAW": "RAW-MODERATE"
-              },
               "DM": {
-                "AGE": "18",
-                "AGE_DEC": "DECODED-18",
-                "AGE_RAW": "RAW-18",
+                "AGE": "39",
+                "AGE_DEC": "DECODED-39",
+                "BRTHDTC": "03 SEP 1975",
+                "BRTHDTC_DEC": "DECODED-03 SEP 1975",
                 "DM.VERSION": "2",
-                "SEX": "M",
-                "SEX_DEC": "DECODED-M",
-                "SEX_RAW": "RAW-M"
+                "SEX": "F",
+                "SEX_DEC": "DECODED-F"
               },
               "VS": {
-                "DIA": "75",
-                "DIA_DEC": "DECODED-75",
-                "DIA_RAW": "RAW-75",
-                "SYS": "138",
-                "SYS_DEC": "DECODED-138",
-                "SYS_RAW": "RAW-138",
+                "DIA": "82 mmHg",
+                "DIA_DEC": "DECODED-82 mmHg",
+                "SYS": "113 mmHg",
+                "SYS_DEC": "DECODED-113 mmHg",
                 "VS.VERSION": "8"
               }
             }
@@ -501,28 +381,20 @@
           {
             "eventOid": "VISIT-003",
             "forms": {
-              "AE": {
-                "AE.VERSION": "9",
-                "SEVERITY": "MODERATE",
-                "SEVERITY_DEC": "DECODED-MODERATE",
-                "SEVERITY_RAW": "RAW-MODERATE"
-              },
               "DM": {
-                "AGE": "62",
-                "AGE_DEC": "DECODED-62",
-                "AGE_RAW": "RAW-62",
+                "AGE": "32",
+                "AGE_DEC": "DECODED-32",
+                "BRTHDTC": "19 NOV 1994",
+                "BRTHDTC_DEC": "DECODED-19 NOV 1994",
                 "DM.VERSION": "2",
-                "SEX": "M",
-                "SEX_DEC": "DECODED-M",
-                "SEX_RAW": "RAW-M"
+                "SEX": "F",
+                "SEX_DEC": "DECODED-F"
               },
               "VS": {
-                "DIA": "85",
-                "DIA_DEC": "DECODED-85",
-                "DIA_RAW": "RAW-85",
-                "SYS": "112",
-                "SYS_DEC": "DECODED-112",
-                "SYS_RAW": "RAW-112",
+                "DIA": "82 mmHg",
+                "DIA_DEC": "DECODED-82 mmHg",
+                "SYS": "104 mmHg",
+                "SYS_DEC": "DECODED-104 mmHg",
                 "VS.VERSION": "8"
               }
             }
@@ -537,28 +409,20 @@
           {
             "eventOid": "VISIT-002",
             "forms": {
-              "AE": {
-                "AE.VERSION": "9",
-                "SEVERITY": "SEVERE",
-                "SEVERITY_DEC": "DECODED-SEVERE",
-                "SEVERITY_RAW": "RAW-SEVERE"
-              },
               "DM": {
-                "AGE": "56",
-                "AGE_DEC": "DECODED-56",
-                "AGE_RAW": "RAW-56",
+                "AGE": "24",
+                "AGE_DEC": "DECODED-24",
+                "BRTHDTC": "17 SEP 1975",
+                "BRTHDTC_DEC": "DECODED-17 SEP 1975",
                 "DM.VERSION": "2",
-                "SEX": "F",
-                "SEX_DEC": "DECODED-F",
-                "SEX_RAW": "RAW-F"
+                "SEX": "M",
+                "SEX_DEC": "DECODED-M"
               },
               "VS": {
-                "DIA": "80",
-                "DIA_DEC": "DECODED-80",
-                "DIA_RAW": "RAW-80",
-                "SYS": "109",
-                "SYS_DEC": "DECODED-109",
-                "SYS_RAW": "RAW-109",
+                "DIA": "95 mmHg",
+                "DIA_DEC": "DECODED-95 mmHg",
+                "SYS": "102 mmHg",
+                "SYS_DEC": "DECODED-102 mmHg",
                 "VS.VERSION": "8"
               }
             }
@@ -566,28 +430,20 @@
           {
             "eventOid": "VISIT-003",
             "forms": {
-              "AE": {
-                "AE.VERSION": "9",
-                "SEVERITY": "MILD",
-                "SEVERITY_DEC": "DECODED-MILD",
-                "SEVERITY_RAW": "RAW-MILD"
-              },
               "DM": {
-                "AGE": "49",
-                "AGE_DEC": "DECODED-49",
-                "AGE_RAW": "RAW-49",
+                "AGE": "50",
+                "AGE_DEC": "DECODED-50",
+                "BRTHDTC": "17 APR 1995",
+                "BRTHDTC_DEC": "DECODED-17 APR 1995",
                 "DM.VERSION": "2",
                 "SEX": "M",
-                "SEX_DEC": "DECODED-M",
-                "SEX_RAW": "RAW-M"
+                "SEX_DEC": "DECODED-M"
               },
               "VS": {
-                "DIA": "80",
-                "DIA_DEC": "DECODED-80",
-                "DIA_RAW": "RAW-80",
-                "SYS": "129",
-                "SYS_DEC": "DECODED-129",
-                "SYS_RAW": "RAW-129",
+                "DIA": "82 mmHg",
+                "DIA_DEC": "DECODED-82 mmHg",
+                "SYS": "136 mmHg",
+                "SYS_DEC": "DECODED-136 mmHg",
                 "VS.VERSION": "8"
               }
             }
@@ -602,28 +458,20 @@
           {
             "eventOid": "VISIT-002",
             "forms": {
-              "AE": {
-                "AE.VERSION": "9",
-                "SEVERITY": "SEVERE",
-                "SEVERITY_DEC": "DECODED-SEVERE",
-                "SEVERITY_RAW": "RAW-SEVERE"
-              },
               "DM": {
-                "AGE": "20",
-                "AGE_DEC": "DECODED-20",
-                "AGE_RAW": "RAW-20",
+                "AGE": "40",
+                "AGE_DEC": "DECODED-40",
+                "BRTHDTC": "04 MAR 1981",
+                "BRTHDTC_DEC": "DECODED-04 MAR 1981",
                 "DM.VERSION": "2",
-                "SEX": "F",
-                "SEX_DEC": "DECODED-F",
-                "SEX_RAW": "RAW-F"
+                "SEX": "M",
+                "SEX_DEC": "DECODED-M"
               },
               "VS": {
-                "DIA": "83",
-                "DIA_DEC": "DECODED-83",
-                "DIA_RAW": "RAW-83",
-                "SYS": "109",
-                "SYS_DEC": "DECODED-109",
-                "SYS_RAW": "RAW-109",
+                "DIA": "98 mmHg",
+                "DIA_DEC": "DECODED-98 mmHg",
+                "SYS": "132 mmHg",
+                "SYS_DEC": "DECODED-132 mmHg",
                 "VS.VERSION": "8"
               }
             }
@@ -631,28 +479,20 @@
           {
             "eventOid": "VISIT-003",
             "forms": {
-              "AE": {
-                "AE.VERSION": "9",
-                "SEVERITY": "MODERATE",
-                "SEVERITY_DEC": "DECODED-MODERATE",
-                "SEVERITY_RAW": "RAW-MODERATE"
-              },
               "DM": {
-                "AGE": "58",
-                "AGE_DEC": "DECODED-58",
-                "AGE_RAW": "RAW-58",
+                "AGE": "76",
+                "AGE_DEC": "DECODED-76",
+                "BRTHDTC": "25 AUG 1972",
+                "BRTHDTC_DEC": "DECODED-25 AUG 1972",
                 "DM.VERSION": "2",
-                "SEX": "F",
-                "SEX_DEC": "DECODED-F",
-                "SEX_RAW": "RAW-F"
+                "SEX": "M",
+                "SEX_DEC": "DECODED-M"
               },
               "VS": {
-                "DIA": "69",
-                "DIA_DEC": "DECODED-69",
-                "DIA_RAW": "RAW-69",
-                "SYS": "126",
-                "SYS_DEC": "DECODED-126",
-                "SYS_RAW": "RAW-126",
+                "DIA": "71 mmHg",
+                "DIA_DEC": "DECODED-71 mmHg",
+                "SYS": "140 mmHg",
+                "SYS_DEC": "DECODED-140 mmHg",
                 "VS.VERSION": "8"
               }
             }

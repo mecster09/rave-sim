@@ -16,10 +16,16 @@ export interface Visit {
 
 interface VisitForm {
   formOid: string;
-  data: Record<string, PrimitiveValue>;
+  data: Record<string, VisitFormDataPoint>;
 }
 
 type PrimitiveValue = string | number;
+
+export interface VisitFormDataPoint {
+  valueRegular: PrimitiveValue;
+  valueRaw?: PrimitiveValue;
+  measurementUnitOid?: string;
+}
 
 interface Subject {
   subjectKey: number;
@@ -81,6 +87,12 @@ export interface MetadataCodeListDefinition {
   items: MetadataCodeListItem[];
 }
 
+export interface MetadataMeasurementUnitDefinition {
+  measurementUnitOid: string;
+  name: string;
+  symbol: string;
+}
+
 export interface StudyMetadataVersion {
   metadataVersionOid: string;
   name: string;
@@ -88,6 +100,7 @@ export interface StudyMetadataVersion {
   studyEvents: MetadataStudyEventDefinition[];
   forms: MetadataFormDefinition[];
   codeLists: MetadataCodeListDefinition[];
+  measurementUnits: MetadataMeasurementUnitDefinition[];
 }
 
 export interface SimulatorSnapshot {
@@ -133,33 +146,67 @@ function seededRandom(seed: number): () => number {
   };
 }
 
-function deterministicValue(rng: () => number, formOid: string, fieldOid: string): string | number {
+const MONTH_ABBREVIATIONS = ['JAN', 'FEB', 'MAR', 'APR', 'MAY', 'JUN', 'JUL', 'AUG', 'SEP', 'OCT', 'NOV', 'DEC'];
+
+function formatIsoDate(year: number, month: number, day: number): string {
+  return `${year.toString().padStart(4, '0')}-${(month + 1).toString().padStart(2, '0')}-${day
+    .toString()
+    .padStart(2, '0')}`;
+}
+
+function formatRawDate(year: number, month: number, day: number): string {
+  const monthLabel = MONTH_ABBREVIATIONS[month];
+  return `${day.toString().padStart(2, '0')} ${monthLabel} ${year.toString().padStart(4, '0')}`;
+}
+
+function deterministicDataPoint(rng: () => number, formOid: string, fieldOid: string): VisitFormDataPoint {
   if (formOid === 'DM') {
     if (fieldOid === 'SEX') {
-      return rng() > 0.5 ? 'M' : 'F';
+      const value = rng() > 0.5 ? 'M' : 'F';
+      return { valueRegular: value, valueRaw: value };
+    }
+    if (fieldOid === 'BRTHDTC') {
+      const year = 1955 + Math.floor(rng() * 45);
+      const month = Math.floor(rng() * 12);
+      const day = Math.floor(rng() * 28) + 1;
+      return {
+        valueRegular: formatIsoDate(year, month, day),
+        valueRaw: formatRawDate(year, month, day)
+      };
     }
     if (fieldOid === 'AGE') {
-      return Math.floor(rng() * 60) + 18;
+      const age = Math.floor(rng() * 60) + 18;
+      return { valueRegular: age, valueRaw: age.toString() };
     }
   }
 
   if (formOid === 'VS') {
     if (fieldOid === 'SYS') {
-      return Math.floor(rng() * 50) + 100;
+      const systolic = Math.floor(rng() * 50) + 100;
+      return {
+        valueRegular: systolic,
+        valueRaw: `${systolic} mmHg`,
+        measurementUnitOid: 'MU.MMHG'
+      };
     }
     if (fieldOid === 'DIA') {
-      return Math.floor(rng() * 40) + 60;
+      const diastolic = Math.floor(rng() * 40) + 60;
+      return {
+        valueRegular: diastolic,
+        valueRaw: `${diastolic} mmHg`,
+        measurementUnitOid: 'MU.MMHG'
+      };
     }
   }
 
-  if (formOid === 'AE') {
-    if (fieldOid === 'SEVERITY') {
-      const severities = ['MILD', 'MODERATE', 'SEVERE'];
-      return severities[Math.floor(rng() * severities.length)];
-    }
+  if (formOid === 'AE' && fieldOid === 'SEVERITY') {
+    const severities = ['MILD', 'MODERATE', 'SEVERE'];
+    const severity = severities[Math.floor(rng() * severities.length)];
+    return { valueRegular: severity, valueRaw: severity };
   }
 
-  return `VAL-${formOid}-${fieldOid}-${Math.floor(rng() * 1000)}`;
+  const fallback = `VAL-${formOid}-${fieldOid}-${Math.floor(rng() * 1000)}`;
+  return { valueRegular: fallback, valueRaw: fallback };
 }
 
 function createSites(config: HarnessConfig): Site[] {
@@ -209,13 +256,14 @@ function createVisits(config: HarnessConfig, rng: () => number): Visit[] {
 function createFormData(config: HarnessConfig, rng: () => number): VisitForm[] {
   const templates: Array<{ formOid: string; fieldOid: string }> = [
     { formOid: 'DM', fieldOid: 'SEX' },
+    { formOid: 'DM', fieldOid: 'BRTHDTC' },
     { formOid: 'DM', fieldOid: 'AGE' },
     { formOid: 'VS', fieldOid: 'SYS' },
     { formOid: 'VS', fieldOid: 'DIA' },
     { formOid: 'AE', fieldOid: 'SEVERITY' }
   ];
 
-  const formsMap = new Map<string, Record<string, PrimitiveValue>>();
+  const formsMap = new Map<string, Record<string, VisitFormDataPoint>>();
 
   const ensureForm = (formOid: string) => {
     if (!formsMap.has(formOid)) {
@@ -236,7 +284,7 @@ function createFormData(config: HarnessConfig, rng: () => number): VisitForm[] {
           };
 
     const form = ensureForm(template.formOid);
-    form[template.fieldOid] = deterministicValue(rng, template.formOid, template.fieldOid);
+    form[template.fieldOid] = deterministicDataPoint(rng, template.formOid, template.fieldOid);
   }
 
   const forms: VisitForm[] = Array.from(formsMap.entries())
@@ -625,6 +673,14 @@ function buildStudyMetadata(config: HarnessConfig): StudyMetadataVersion[] {
     }
   ];
 
+  const measurementUnits: MetadataMeasurementUnitDefinition[] = [
+    {
+      measurementUnitOid: 'MU.MMHG',
+      name: 'Millimeters of Mercury',
+      symbol: 'mmHg'
+    }
+  ];
+
   return [
     {
       metadataVersionOid: '1',
@@ -632,7 +688,8 @@ function buildStudyMetadata(config: HarnessConfig): StudyMetadataVersion[] {
       primaryFormOid: 'DM',
       studyEvents,
       forms,
-      codeLists
+      codeLists,
+      measurementUnits
     }
   ];
 }

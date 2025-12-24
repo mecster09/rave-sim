@@ -386,7 +386,7 @@ async function sendClinicalDataset(
     }
   }
 
-  const rawSuffix = parseResult.value.rawSuffix ?? (datasetType === 'raw' ? '_RAW' : undefined);
+  const rawSuffix = datasetType === 'regular' ? parseResult.value.rawSuffix : undefined;
 
   const subjects = buildClinicalViewSubjects(snapshot, {
     currentStudyDay: simClock.simCurrentStudyDay,
@@ -395,7 +395,8 @@ async function sendClinicalDataset(
     startStudyDay,
     versionItem: parseResult.value.versionItem,
     decodeSuffix: parseResult.value.decodeSuffix,
-    rawSuffix
+    rawSuffix,
+    mode: datasetType
   });
 
   const config = deps.getConfig();
@@ -478,8 +479,8 @@ function parseClinicalDatasetQuery(
     return rawResult;
   }
 
-  if (datasetType === 'regular' && rawResult.value) {
-    return { ok: false, statusCode: 400, message: 'rawsuffix is only supported on raw dataset endpoints' };
+  if (datasetType === 'raw' && rawResult.value) {
+    return { ok: false, statusCode: 400, message: 'rawsuffix is only supported on regular dataset endpoints' };
   }
 
   return {

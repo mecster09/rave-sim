@@ -33,8 +33,9 @@ function flattenSnapshot(snapshot: SimulatorSnapshot): RawAuditRecord[] {
       for (const form of visit.forms) {
         const itemOids = Object.keys(form.data).sort();
         for (const itemOid of itemOids) {
-          const valueRaw = form.data[itemOid];
-          const value = typeof valueRaw === 'string' ? valueRaw : String(valueRaw);
+          const dataPoint = form.data[itemOid];
+          const valueSource = dataPoint.valueRegular;
+          const value = typeof valueSource === 'string' ? valueSource : String(valueSource);
           const hashSource = `${subject.subjectKey}|${visit.visitOid}|${form.formOid}|${itemOid}|${value}`;
           const id = createDeterministicId(hashSource);
           records.push({

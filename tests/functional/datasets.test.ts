@@ -240,7 +240,7 @@ describe('Clinical view datasets', () => {
     expect(res.json().error).toBe('truncate must be a boolean value');
   });
 
-  it('supports raw datasets with start and suffix query options', async () => {
+  it('supports raw datasets with start and decode query options', async () => {
     const app = buildServer();
     await freezeStudyDay(app, 2.5);
     const startIso = await resolveStartIso(app, 1);
@@ -250,7 +250,7 @@ describe('Clinical view datasets', () => {
       url:
         `/RaveWebServices/studies/Default%20Study/datasets/raw?start=${encodeURIComponent(
           startIso
-        )}&decodesuffix=_DEC&rawsuffix=_RAW&versionitem=VERSION`,
+        )}&decodesuffix=_DEC&versionitem=VERSION`,
       headers: {
         authorization: authHeader()
       }
@@ -261,11 +261,12 @@ describe('Clinical view datasets', () => {
     const visits = extractVisitOids(body);
     expect(new Set(visits)).toEqual(new Set(['VISIT-002', 'VISIT-003']));
     expect(body).toContain('ItemOID="SYS_DEC"');
-    expect(body).toContain('ItemOID="SYS_RAW"');
+    expect(body).toMatch(/ItemOID="SYS"[^>]*MeasurementUnitOID="MU.MMHG"[^>]*Value="\d+ mmHg"/);
+    expect(body).toMatch(/ItemOID="BRTHDTC"[^>]*Value="\d{2} [A-Z]{3} \d{4}"/);
     expect(body).toContain('ItemOID="VS.VERSION"');
   });
 
-  it('rejects rawsuffix on regular dataset endpoints', async () => {
+  it('supports rawsuffix on regular dataset endpoints', async () => {
     const app = buildServer();
 
     const res = await app.inject({
@@ -276,8 +277,23 @@ describe('Clinical view datasets', () => {
       }
     });
 
+    expect(res.statusCode).toBe(200);
+    expect(res.body).toMatch(/ItemOID="BRTHDTC_RAW"[^>]*Value="\d{2} [A-Z]{3} \d{4}"/);
+  });
+
+  it('rejects rawsuffix on raw dataset endpoints', async () => {
+    const app = buildServer();
+
+    const res = await app.inject({
+      method: 'GET',
+      url: '/RaveWebServices/studies/Default%20Study/datasets/raw?rawsuffix=_RAW',
+      headers: {
+        authorization: authHeader()
+      }
+    });
+
     expect(res.statusCode).toBe(400);
-    expect(res.json().error).toBe('rawsuffix is only supported on raw dataset endpoints');
+    expect(res.json().error).toBe('rawsuffix is only supported on regular dataset endpoints');
   });
 
   it('validates start query parameter', async () => {
@@ -334,7 +350,7 @@ describe('Clinical view datasets', () => {
       url:
         `/RaveWebServices/studies/Default%20Study/versions/V2/datasets/raw?start=${encodeURIComponent(
           startIso
-        )}&decodesuffix=_DEC&rawsuffix=_RAW&versionitem=VERSION`,
+        )}&decodesuffix=_DEC&versionitem=VERSION`,
       headers: {
         authorization: authHeader()
       }
@@ -345,7 +361,7 @@ describe('Clinical view datasets', () => {
     const visits = extractVisitOids(body);
     expect(new Set(visits)).toEqual(new Set(['VISIT-002', 'VISIT-003']));
     expect(body).toContain('ItemOID="SYS_DEC"');
-    expect(body).toContain('ItemOID="SYS_RAW"');
+    expect(body).toMatch(/ItemOID="SYS"[^>]*MeasurementUnitOID="MU.MMHG"[^>]*Value="\d+ mmHg"/);
     expect(body).toContain('ItemOID="VS.VERSION"');
   });
 
@@ -392,7 +408,7 @@ describe('Clinical view datasets', () => {
     expect(res.json().error).toBe('Invalid versionId');
   });
 
-  it('rejects rawsuffix on versioned regular dataset endpoints', async () => {
+  it('supports rawsuffix on versioned regular dataset endpoints', async () => {
     const app = buildServer();
 
     const res = await app.inject({
@@ -403,8 +419,8 @@ describe('Clinical view datasets', () => {
       }
     });
 
-    expect(res.statusCode).toBe(400);
-    expect(res.json().error).toBe('rawsuffix is only supported on raw dataset endpoints');
+    expect(res.statusCode).toBe(200);
+    expect(res.body).toMatch(/ItemOID="BRTHDTC_RAW"/);
   });
 
   it('returns 404 when versioned subject is missing', async () => {

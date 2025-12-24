@@ -7,8 +7,6 @@
 >**IMPORTANT:** Consumers of this document are assumed to have **no access** to the original Rave API reference. Therefore, *all required dependencies, parameters, behaviors, schemas, and examples are fully documented here*.
 >
 >**Primary goal:** Enable deterministic, production-faithful testing by exactly matching endpoint behavior, response codes, and XML (ODM 1.3) payloads based on request parameters.
->
->Refer to [docs/constitution.md](docs/constitution.md) for coding constraints, testing thresholds, and task-level governance that apply to every change.
 
 ---
 
@@ -23,7 +21,7 @@ This harness has two cooperating parts:
 - **1.4.2** – ODM Operational Data Model Adapter
 - **1.5.1.6** – Retrieve Clinical View Datasets as ODM
 - **1.5.3.5** – Retrieve Admin Data with the Version Folders Dataset
-- **1.5.7** – Retrieve Study and Library Metadata
+- **1.5.7** – Clinical View metadata and extension dependencies
 - **1.5.9** – Retrieve the List of Subjects in a Study
 
 ### Out of Scope
@@ -56,9 +54,6 @@ The service must support **pre-run configuration** via either environment/config
 | `formDataPointsPerVisit` | Yes | integer | >= 1 | Number of form datapoints captured per visit |
 | `simSpeedMinutesPerDay` | Yes | integer | 15..1440 in increments of 15 | Maps “1 study day” to N minutes of wall-clock time. Default 1440 (1 day = 1 day). Fastest 15 (1 day = 15 minutes). |
 | `resetOnStartup` | No | boolean | default false | If true, clear all persisted generated data at startup |
-| `truncateOdm` | No | boolean | default false | Truncates Clinical View datasets when the request opts into truncation |
-| `forceClinicalViewStreamFailure` | No | boolean | default false | Forces Clinical View regular datasets to end without a closing `</ODM>` to simulate a streaming failure |
-| `forceVersionFoldersStreamFailure` | No | boolean | default false | Forces VersionFolders.odm to omit the closing `</ODM>` so clients can exercise streaming-failure handling |
 
 ### A1.2 Derived/Implicit Simulator Behaviors
 - The simulator must establish a **simulation clock** (see A4) and a “study day” concept.
@@ -444,40 +439,116 @@ GET https://{host}/RaveWebServices/datasets/VersionFolders.odm?studyoid=Mediflex
 
 ## 2.3 Retrieve Clinical View Datasets as ODM (Section 1.5.1.6)
 
-### Endpoints
-```
-GET /RaveWebServices/studies/{study-oid}/datasets/regular
-GET /RaveWebServices/studies/{study-oid}/datasets/regular/{form-oid}
-GET /RaveWebServices/studies/{study-oid}/subjects/{subject-key}/datasets/regular
-GET /RaveWebServices/studies/{study-oid}/versions/{version-id}/datasets/regular
-GET /RaveWebServices/studies/{study-oid}/versions/{version-id}/datasets/regular/{form-oid}
-GET /RaveWebServices/studies/{study-oid}/versions/{version-id}/subjects/{subject-key}/datasets/regular
+### Purpose
+Retrieve clinical data from **Rave Clinical Views** in ODM format. The service supports **three distinct data modes** that materially affect the XML payload structure:
 
-GET /RaveWebServices/studies/{study-oid}/datasets/raw
-GET /RaveWebServices/studies/{study-oid}/datasets/raw/{form-oid}
-GET /RaveWebServices/studies/{study-oid}/subjects/{subject-key}/datasets/raw
-GET /RaveWebServices/studies/{study-oid}/versions/{version-id}/datasets/raw
-GET /RaveWebServices/studies/{study-oid}/versions/{version-id}/datasets/raw/{form-oid}
-GET /RaveWebServices/studies/{study-oid}/versions/{version-id}/subjects/{subject-key}/datasets/raw
+1. **regular** – conformant, normalized values
+2. **raw** – values exactly as entered in EDC
+3. **regular + rawsuffix** – normalized values plus parallel raw values
+
+This section is self-contained and defines all payload structure rules without requiring access to the Rave API reference.
+
+---
+
+### Endpoints
+
 ```
+GET /RaveWebServices/studies/{study-oid}/datasets/{regular-or-raw}
+GET /RaveWebServices/studies/{study-oid}/datasets/{regular-or-raw}/{form-oid}
+GET /RaveWebServices/studies/{study-oid}/subjects/{subject-key}/datasets/{regular-or-raw}
+GET /RaveWebServices/studies/{study-oid}/versions/{version-id}/datasets/{regular-or-raw}
+```
+
+Where `{regular-or-raw}` **must** be one of:
+- `regular`
+- `raw`
+
+---
+
+### Query Parameters (Impact Payload Structure)
+
+| Parameter | Applies To | Effect on Payload |
+|---|---|---|
+| `rawsuffix` | `regular` only | Adds an additional `ItemData` per field containing raw/as-entered values |
+| `decodesuffix` | all modes | Adds decoded-value `ItemData` elements |
+| `versionitem` | all modes | Adds CRF version `ItemData` elements |
+| `truncate` | regular | Allows intentional ODM truncation (streaming failure simulation) |
+
+---
+
+## Payload Structure Rules (Normative)
+
+### A. Regular Mode (`/datasets/regular`)
+
+**Semantics**
+- Values are converted to **ODM-conformant datatypes**
+- Non-conformant raw values are **excluded**
+- Date/time values use ISO-8601 format
+
+**ItemData example**
+```xml
+<ItemData ItemOID="DM.BRTHDTC" Value="1978-07-06" />
+```
+
+---
+
+### B. Raw Mode (`/datasets/raw`)
+
+**Semantics**
+- Values are returned **exactly as entered** in Rave EDC
+- Values may be non-normalized or non-ISO
+- Unit dictionary fields may include `<MeasurementUnitRef>`
+
+**ItemData example**
+```xml
+<ItemData ItemOID="DM.BRTHDTC" Value="06 JUL 1978" />
+```
+
+---
+
+### C. Regular + Raw Suffix (`/datasets/regular?rawsuffix=_RAW`)
+
+**Semantics**
+- The response contains **both**:
+  1. The regular (normalized) value
+  2. A parallel raw value with the configured suffix appended to the ItemOID
+
+**Rules**
+- Exactly one additional `ItemData` is added **per field** that has a raw value
+- The suffixed field uses: `{ItemOID}{rawsuffix}`
+
+**ItemData example**
+```xml
+<ItemData ItemOID="DM.BRTHDTC" Value="1978-07-06" />
+<ItemData ItemOID="DM.BRTHDTC_RAW" Value="06 JUL 1978" />
+```
+
+---
+
+### Harness Requirements (Updated)
+
+The harness **must**:
+- Maintain both raw and normalized representations for each datapoint
+- Select payload structure strictly by `{regular-or-raw}` and query parameters
+- Ensure ordering of `ItemData` elements is deterministic
+- Support golden snapshot generation for **each mode** independently
 
 ---
 
 ### Query Parameters
 
-| Name | Applies To | Description |
-|----|------------|------------|
-| `truncate` | Regular datasets | Boolean flag requesting ODM truncation while retaining HTTP 200 responses |
-| `start` | Raw datasets, versioned datasets | ISO-8601 datetime indicating the lower bound for incremental extracts |
-| `versionitem` | Raw datasets, versioned datasets | Adds CRF version item metadata to ItemData elements |
-| `decodesuffix` | Raw datasets, versioned datasets | Adds decoded ItemData values using the provided suffix |
-| `rawsuffix` | Raw datasets, versioned datasets | Adds raw ItemData values using the provided suffix; rejected on regular datasets |
+| Name | Required | Description |
+|----|--------|------------|
+| `start` | No | Start datetime for incremental extract |
+| `versionitem` | No | Adds CRF version item |
+| `decodesuffix` | No | Adds decoded values |
+| `rawsuffix` | No | Adds raw entered values |
 
 ---
 
 ### Response
 - **HTTP 200**
-- ODM 1.3 **snapshot** document by default (scenario harnesses may serialize JSON for certain raw captures used in regression testing)
+- ODM 1.3 **snapshot** document
 
 ---
 
@@ -485,12 +556,11 @@ GET /RaveWebServices/studies/{study-oid}/versions/{version-id}/subjects/{subject
 - Form-level filtering
 - Subject-level filtering
 - Optional inclusion of extension ItemData elements
- - Exact element ordering
- - Deterministic truncation when `truncate=true` or when `forceClinicalViewStreamFailure` is enabled via the harness configuration
+- Exact element ordering
 
 ---
 
-## 2.4 Retrieve the List of Subjects in a Study (Section 1.5.9)
+## 2.3 Retrieve the List of Subjects in a Study (Section 1.5.9)
 
 ### Purpose
 Retrieve a list of **all subjects accessible to the authenticated user** within a specified study. This endpoint is used as a discovery dependency for subject-level operations.
@@ -590,9 +660,9 @@ GET /RaveWebServices/studies/{study-oid}/Subjects
 
 | Scenario ID | Match Inputs | Simulator Preconditions | Expected Result | Golden Payload |
 |-----------|--------------|------------------------|----------------|---------------|
-| VF-001 | `studyoid` only | Study exists; at least one CRF version in use | 200 + complete ODM listing folders per in-use CRF version | `version-folders/VF-001.xml` |
-| VF-002 | `studyoid` only | `forceVersionFoldersStreamFailure` enabled | 200 + **incomplete ODM** (ODM not closed) | `version-folders/VF-002.xml` |
-| VF-003 | Unauthorized | Auth fails | 4xx | `version-folders/VF-003.json` (JSON error payload) |
+| VF-001 | `studyoid` only | Study exists; at least one CRF version in use | 200 + complete ODM listing folders per in-use CRF version | `VersionFolders/VF-001.xml` |
+| VF-002 | `studyoid` only | Streaming failure toggle enabled | 200 + **incomplete ODM** (ODM not closed) | `VersionFolders/VF-002.xml` |
+| VF-003 | Unauthorized | Auth fails | 4xx | `VersionFolders/VF-003.xml` (if body required) |
 
 ---
 
@@ -615,32 +685,7 @@ GET /RaveWebServices/studies/{study-oid}/Subjects
 
 ---
 
-
-## 2.4 Retrieve Study and Library Metadata Scenarios (1.5.7)
-
-**Endpoint under test (MUST):**  
-`GET /RaveWebServices/metadata/studies/{study-name}/versions/{version-id}` fileciteturn9file7L1-L23
-
-### Scenario table
-
-| Scenario ID | Inputs | Simulator pre-state | Match rules | Expected status | Expected body |
-|---|---|---|---|---:|---|
-| META-200-BASE | `study-name={StudyName}`, `version-id={DefaultVersionId}` | Simulator initialized; metadata objects generated for configured study | Path match + version-id exact | 200 | ODM 1.3 Snapshot generated from simulator state; `Content-Type: application/xml` fileciteturn9file7L17-L23 |
-| META-200-GOLDEN | Same as above + `X-Harness-Scenario: META-200-GOLDEN` | Golden mode enabled | Header overrides simulator selection | 200 | Exact byte-for-byte match to stored golden `metadata/default-study-1.xml` |
-| META-401 | Any request with bad Basic auth | N/A | Auth failure | 401 | RWS error payload format (consistent global error model) fileciteturn10file2L748-L770 |
-| META-403 | Valid auth, but user not permitted for `{study-name}` | User configured with limited access | Authorization failure | 403 | RWS error payload format |
-| META-404-STUDY | `study-name` not configured/known | N/A | Study name mismatch | 404 | RWS error payload format |
-| META-404-VERSION | Known study, unknown `version-id` | N/A | Version mismatch | 404 | RWS error payload format |
-| META-200-LABELS (optional) | Add `?labels=independent` | Labels enabled in simulator | Query param match | 200 | ODM 1.3 Snapshot containing label defs (if implemented) fileciteturn11file1L15-L23 |
-| META-200-ATTRS (optional) | `/attributes?namespace=MyIntegration` | Vendor attributes enabled | Path suffix + namespace match | 200 | ODM 1.3 Snapshot including `mdsol:Attribute` nodes fileciteturn12file8L11-L20 |
-
-### Golden snapshot rules (MUST)
-- For `META-200-GOLDEN`, the response MUST be **exact bytes** of the golden file (including whitespace/newlines).
-- For `META-200-BASE`, the response MUST still be deterministic for a given simulator seed/time; the harness MUST provide a command or mode to materialize the generated payload into a new golden snapshot (see “Golden Snapshot Generation” section).
-
-
-
-## 2.5 Retrieve the List of Subjects in a Study Scenarios (1.5.9)
+## 2.3 Retrieve the List of Subjects in a Study Scenarios (1.5.9)
 
 | Scenario ID | Match Inputs | Simulator Preconditions | Expected Result | Golden Payload |
 |-----------|--------------|------------------------|----------------|---------------|
@@ -653,9 +698,9 @@ GET /RaveWebServices/studies/{study-oid}/Subjects
 
 ---
 
-## 2.6 Control Plane Scenarios (NEW)
+## 2.4 Control Plane Scenarios (NEW)
 
-### 2.6.1 `/harness/config`
+### 2.4.1 `/harness/config`
 
 | Scenario ID | Method | Inputs | Expected Result |
 |-----------|--------|--------|----------------|
@@ -664,7 +709,7 @@ GET /RaveWebServices/studies/{study-oid}/Subjects
 | CFG-003 | PUT | invalid values (e.g., `simSpeedMinutesPerDay=17`) | 400 + validation error |
 | CFG-004 | PUT | apply without reset (`applyMode=apply`) | 200 + config updated; note: only safe fields updated without reset |
 
-### 2.6.2 `/harness/speed`
+### 2.4.2 `/harness/speed`
 
 | Scenario ID | Method | Inputs | Expected Result |
 |-----------|--------|--------|----------------|
@@ -673,14 +718,14 @@ GET /RaveWebServices/studies/{study-oid}/Subjects
 | SPD-003 | PUT | `simSpeedMinutesPerDay=15` | 200 + speed updated (max acceleration) |
 | SPD-004 | PUT | invalid step (e.g., 20) | 400 + validation error |
 
-### 2.6.3 `/harness/reset`
+### 2.4.3 `/harness/reset`
 
 | Scenario ID | Method | Inputs | Expected Result |
 |-----------|--------|--------|----------------|
 | RST-001 | POST | none | 200 + reset performed; new clock baseline; entities regenerated |
 | RST-002 | POST | with optional seed/config override (optional enhancement) | 200 + reset with specified seed |
 
-### 2.6.4 `/harness/status`
+### 2.4.4 `/harness/status`
 
 | Scenario ID | Method | Inputs | Expected Result |
 |-----------|--------|--------|----------------|
@@ -690,7 +735,7 @@ GET /RaveWebServices/studies/{study-oid}/Subjects
 
 ---
 
-## 2.7 Cross-Endpoint, Time-Driven Parity Scenarios (End-to-End)
+## 2.5 Cross-Endpoint, Time-Driven Parity Scenarios (End-to-End)
 
 These scenarios validate that simulator time impacts parity endpoints consistently.
 
@@ -941,7 +986,7 @@ Golden payloads should be stored using the following convention:
 ## 3.5 Golden Payloads — VersionFolders.odm
 
 ### Scenario VF-001 — Version Folders Export (Complete ODM)
-**File:** `version-folders/VF-001.xml`
+**File:** `VersionFolders/VF-001.xml`
 
 ```xml
 <ODM ODMVersion="1.3.1" CreationDateTime="2024-01-01T00:00:00">
@@ -966,7 +1011,7 @@ Golden payloads should be stored using the following convention:
 ---
 
 ### Scenario VF-002 — Partial ODM (Streaming Failure)
-**File:** `version-folders/VF-002.xml`
+**File:** `VersionFolders/VF-002.xml`
 
 ```xml
 <ODM ODMVersion="1.3.1">
@@ -977,15 +1022,6 @@ Golden payloads should be stored using the following convention:
 ```
 
 **NOTE:** The ODM element is intentionally **not closed** to emulate streaming failure behavior.
-
----
-
-### Scenario VF-003 — Unauthorized Response
-**File:** `version-folders/VF-003.json`
-
-```json
-{ "error": "Unauthorized" }
-```
 
 ---
 

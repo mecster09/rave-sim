@@ -24,15 +24,16 @@ describe('buildClinicalViewSubjects', () => {
               {
                 formOid: 'DM',
                 data: {
-                  SEX: 'M',
-                  AGE: 35
+                  SEX: { valueRegular: 'M', valueRaw: 'M' },
+                  BRTHDTC: { valueRegular: '1972-07-06', valueRaw: '06 JUL 1972' },
+                  AGE: { valueRegular: 35, valueRaw: '35' }
                 }
               },
               {
                 formOid: 'VS',
                 data: {
-                  SYS: 120,
-                  DIA: 80
+                  SYS: { valueRegular: 120, valueRaw: '120 mmHg', measurementUnitOid: 'MU.MMHG' },
+                  DIA: { valueRegular: 80, valueRaw: '80 mmHg', measurementUnitOid: 'MU.MMHG' }
                 }
               }
             ]
@@ -45,8 +46,8 @@ describe('buildClinicalViewSubjects', () => {
               {
                 formOid: 'VS',
                 data: {
-                  SYS: 118,
-                  DIA: 78
+                  SYS: { valueRegular: 118, valueRaw: '118 mmHg', measurementUnitOid: 'MU.MMHG' },
+                  DIA: { valueRegular: 78, valueRaw: '78 mmHg', measurementUnitOid: 'MU.MMHG' }
                 }
               }
             ]
@@ -66,7 +67,7 @@ describe('buildClinicalViewSubjects', () => {
               {
                 formOid: 'DM',
                 data: {
-                  SEX: 'F'
+                  SEX: { valueRegular: 'F', valueRaw: 'F' }
                 }
               }
             ]
@@ -77,7 +78,7 @@ describe('buildClinicalViewSubjects', () => {
   };
 
   it('includes only visits available for the current study day', () => {
-    const subjects = buildClinicalViewSubjects(snapshot, { currentStudyDay: 0.4 });
+    const subjects = buildClinicalViewSubjects(snapshot, { currentStudyDay: 0.4, mode: 'regular' });
     expect(subjects).toHaveLength(2);
     expect(subjects[0].visits).toHaveLength(1);
     expect(subjects[0].visits[0].visitOid).toBe('VISIT-001');
@@ -85,7 +86,7 @@ describe('buildClinicalViewSubjects', () => {
   });
 
   it('filters forms when formOid provided', () => {
-    const subjects = buildClinicalViewSubjects(snapshot, { currentStudyDay: 2, formOid: 'VS' });
+    const subjects = buildClinicalViewSubjects(snapshot, { currentStudyDay: 2, formOid: 'VS', mode: 'regular' });
     expect(subjects).toHaveLength(1);
     expect(subjects[0].visits.length).toBe(2);
     expect(subjects[0].visits[0].forms).toHaveLength(1);
@@ -94,20 +95,21 @@ describe('buildClinicalViewSubjects', () => {
   });
 
   it('filters subjects when subjectKey provided', () => {
-    const subjects = buildClinicalViewSubjects(snapshot, { currentStudyDay: 1, subjectKey: 100002 });
+    const subjects = buildClinicalViewSubjects(snapshot, { currentStudyDay: 1, subjectKey: 100002, mode: 'regular' });
     expect(subjects).toHaveLength(1);
     expect(subjects[0].subjectKey).toBe('100002');
   });
 
   it('returns empty list when no data matches filters', () => {
-    const subjects = buildClinicalViewSubjects(snapshot, { currentStudyDay: -1 });
+    const subjects = buildClinicalViewSubjects(snapshot, { currentStudyDay: -1, mode: 'regular' });
     expect(subjects).toHaveLength(0);
   });
 
   it('applies startStudyDay filter to visits', () => {
     const subjects = buildClinicalViewSubjects(snapshot, {
       currentStudyDay: 5,
-      startStudyDay: 1.1
+      startStudyDay: 1.1,
+      mode: 'regular'
     });
     expect(subjects).toHaveLength(1);
     expect(subjects[0].visits).toHaveLength(1);
@@ -119,16 +121,31 @@ describe('buildClinicalViewSubjects', () => {
       currentStudyDay: 2,
       decodeSuffix: '_DEC',
       rawSuffix: '_RAW',
-      versionItem: 'VERSION'
+      versionItem: 'VERSION',
+      mode: 'regular'
     });
 
-    expect(subjects[0].visits[0].forms[0].data).toMatchObject({
-      'DM.VERSION': expect.any(String)
-    });
+    const firstFormItems = Object.fromEntries(
+      subjects[0].visits[0].forms[0].items.map(item => [item.itemOid, item.value])
+    );
+    expect(firstFormItems).toHaveProperty('DM.VERSION');
 
     const dmForm = subjects[0].visits[0].forms.find(form => form.formOid === 'DM');
     expect(dmForm).toBeDefined();
-    expect(dmForm?.data).toHaveProperty('SEX_DEC', expect.stringContaining('DECODED-'));
-    expect(dmForm?.data).toHaveProperty('SEX_RAW', expect.stringContaining('RAW-'));
+    const dmValues = Object.fromEntries(dmForm!.items.map(item => [item.itemOid, item.value]));
+    expect(dmValues['SEX_DEC']).toMatch(/DECODED-/);
+    expect(dmValues['SEX_RAW']).toBe('M');
+  });
+
+  it('emits raw mode values with measurement units when available', () => {
+    const subjects = buildClinicalViewSubjects(snapshot, { currentStudyDay: 2, mode: 'raw' });
+    expect(subjects).toHaveLength(1);
+    const dmForm = subjects[0].visits[0].forms.find(form => form.formOid === 'DM');
+    const dmValues = Object.fromEntries(dmForm!.items.map(item => [item.itemOid, item.value]));
+    expect(dmValues['BRTHDTC']).toBe('06 JUL 1972');
+    const vsForm = subjects[0].visits[0].forms.find(form => form.formOid === 'VS');
+    const systolic = vsForm!.items.find(item => item.itemOid === 'SYS');
+    expect(systolic?.value).toBe('120 mmHg');
+    expect(systolic?.measurementUnitOid).toBe('MU.MMHG');
   });
 });

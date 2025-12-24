@@ -69,8 +69,20 @@ describe('SimulatorState', () => {
     const termKeys = Object.keys(aeForm!.data).filter(key => key.startsWith('TERM-'));
     expect(termKeys.length).toBeGreaterThan(0);
     const fallbackValue = aeForm!.data[termKeys[termKeys.length - 1]];
-    expect(typeof fallbackValue).toBe('string');
-    expect(String(fallbackValue)).toMatch(/^VAL-AE-TERM-/);
+    expect(fallbackValue.valueRegular).toMatch(/^VAL-AE-TERM-/);
+    expect(fallbackValue.valueRaw).toMatch(/^VAL-AE-TERM-/);
+
+    const dmForm = visit.forms.find(form => form.formOid === 'DM');
+    expect(dmForm).toBeDefined();
+    const birthData = dmForm!.data.BRTHDTC;
+    expect(birthData.valueRegular).toMatch(/^\d{4}-\d{2}-\d{2}$/);
+    expect(birthData.valueRaw).toMatch(/^\d{2} [A-Z]{3} \d{4}$/);
+
+    const vsForm = visit.forms.find(form => form.formOid === 'VS');
+    expect(vsForm).toBeDefined();
+    const systolic = vsForm!.data.SYS;
+    expect(systolic.measurementUnitOid).toBe('MU.MMHG');
+    expect(String(systolic.valueRaw)).toContain('mmHg');
     expect(snapshotA).toEqual(snapshotB);
     expect(hashSnapshot(snapshotA)).toBe(hashSnapshot(snapshotB));
   });

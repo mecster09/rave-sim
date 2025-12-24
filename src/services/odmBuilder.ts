@@ -3,9 +3,15 @@ import type { StudyMetadataVersion } from './simulatorState';
 
 type Primitive = string | number | boolean;
 
+export interface SnapshotItemData {
+  itemOid: string;
+  value: Primitive;
+  measurementUnitOid?: string;
+}
+
 export interface SnapshotForm {
   formOid: string;
-  data: Record<string, Primitive>;
+  items: SnapshotItemData[];
 }
 
 export interface SnapshotVisit {
@@ -115,10 +121,15 @@ export function buildSnapshotODM(options: BuildSnapshotOptions): string {
 
       for (const form of sortedForms) {
         lines.push(`        <FormData FormOID="${escapeAttribute(form.formOid)}">`);
-        const itemDataKeys = Object.keys(form.data).sort();
-        for (const key of itemDataKeys) {
-          const value = form.data[key];
-          lines.push(`          <ItemData ItemOID="${escapeAttribute(key)}" Value="${escapeAttribute(String(value))}"/>`);
+        const sortedItems = [...form.items].sort((a, b) => a.itemOid.localeCompare(b.itemOid));
+        for (const item of sortedItems) {
+          const measurementAttr =
+            item.measurementUnitOid !== undefined
+              ? ` MeasurementUnitOID="${escapeAttribute(item.measurementUnitOid)}"`
+              : '';
+          lines.push(
+            `          <ItemData ItemOID="${escapeAttribute(item.itemOid)}"${measurementAttr} Value="${escapeAttribute(String(item.value))}"/>`
+          );
         }
         lines.push('        </FormData>');
       }
@@ -219,6 +230,22 @@ export function buildStudyMetadataODM(options: BuildStudyMetadataOptions): strin
   lines.push(`      <StudyDescription>${escapeText(description)}</StudyDescription>`);
   lines.push(`      <ProtocolName>${escapeText(protocolName)}</ProtocolName>`);
   lines.push('    </GlobalVariables>');
+  if (metadata.measurementUnits.length > 0) {
+    lines.push('    <BasicDefinitions>');
+    const sortedUnits = [...metadata.measurementUnits].sort((a, b) =>
+      a.measurementUnitOid.localeCompare(b.measurementUnitOid)
+    );
+    for (const unit of sortedUnits) {
+      lines.push(
+        `      <MeasurementUnit OID="${escapeAttribute(unit.measurementUnitOid)}" Name="${escapeAttribute(unit.name)}">`
+      );
+      lines.push('        <Symbol>');
+      lines.push(`          <TranslatedText xml:lang="en">${escapeText(unit.symbol)}</TranslatedText>`);
+      lines.push('        </Symbol>');
+      lines.push('      </MeasurementUnit>');
+    }
+    lines.push('    </BasicDefinitions>');
+  }
   lines.push(
     `    <MetaDataVersion OID="${escapeAttribute(metadata.metadataVersionOid)}" Name="${escapeAttribute(metadata.name)}" mdsol:PrimaryFormOID="${escapeAttribute(
       metadata.primaryFormOid
@@ -481,7 +508,14 @@ function hashStudyMetadata(metadata: StudyMetadataVersion): string {
           }))
           .sort((a, b) => a.codedValue.localeCompare(b.codedValue))
       }))
-      .sort((a, b) => a.codeListOid.localeCompare(b.codeListOid))
+      .sort((a, b) => a.codeListOid.localeCompare(b.codeListOid)),
+    measurementUnits: metadata.measurementUnits
+      .map(unit => ({
+        measurementUnitOid: unit.measurementUnitOid,
+        name: unit.name,
+        symbol: unit.symbol
+      }))
+      .sort((a, b) => a.measurementUnitOid.localeCompare(b.measurementUnitOid))
   };
   hash.update(JSON.stringify(normalized));
   return hash.digest('hex');
@@ -500,9 +534,9 @@ function hashSubjects(subjects: SnapshotSubject[]): string {
           forms: visit.forms
             .map(form => ({
               formOid: form.formOid,
-              data: Object.keys(form.data)
-                .sort()
-                .map(key => [key, String(form.data[key])])
+              items: form.items
+                .map(item => [item.itemOid, String(item.value), item.measurementUnitOid ?? ''])
+                .sort((a, b) => a[0].localeCompare(b[0]))
             }))
             .sort((a, b) => a.formOid.localeCompare(b.formOid))
         }))

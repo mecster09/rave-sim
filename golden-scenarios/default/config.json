@@ -36,7 +36,7 @@
       "outputFormat": "clinical-dataset-json",
       "request": {
         "method": "GET",
-        "url": "/RaveWebServices/studies/Default%20Study/datasets/raw?start=2023-12-31T22:30:00Z&decodesuffix=_DEC&rawsuffix=_RAW&versionitem=VERSION"
+        "url": "/RaveWebServices/studies/Default%20Study/datasets/raw?start=2023-12-31T22:30:00Z&decodesuffix=_DEC&versionitem=VERSION"
       }
     },
     {
@@ -53,7 +53,7 @@
       "outputFormat": "clinical-dataset-json",
       "request": {
         "method": "GET",
-        "url": "/RaveWebServices/studies/Default%20Study/versions/V1/datasets/raw?start=2023-12-31T22:30:00Z&decodesuffix=_DEC&rawsuffix=_RAW&versionitem=VERSION"
+        "url": "/RaveWebServices/studies/Default%20Study/versions/V1/datasets/raw?start=2023-12-31T22:30:00Z&decodesuffix=_DEC&versionitem=VERSION"
       }
     }
   ]
