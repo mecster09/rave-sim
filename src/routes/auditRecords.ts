@@ -34,8 +34,8 @@ export function registerAuditRecordsRoutes(app: FastifyInstance, deps: AuditReco
     const unicodeRaw = typeof query.unicode === 'string' ? query.unicode.trim().toLowerCase() : undefined;
 
     const perPage = typeof perPageRaw === 'number' ? perPageRaw : Number(perPageRaw ?? 50);
-    if (!Number.isInteger(perPage) || perPage < 1 || perPage > 100) {
-      return reply.code(400).send({ error: 'per_page must be an integer between 1 and 100' });
+    if (!Number.isInteger(perPage) || perPage < 1 || perPage > 10000) {
+      return reply.code(400).send({ error: 'per_page must be an integer between 1 and 10000' });
     }
 
     const MODE_ALIASES: Record<string, 'default' | 'enhanced' | 'all'> = {

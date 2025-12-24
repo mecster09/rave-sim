@@ -79,7 +79,7 @@ describe('ClinicalAuditRecords dataset', () => {
     });
 
     expect(res.statusCode).toBe(400);
-    expect(res.json().error).toBe('per_page must be an integer between 1 and 100');
+    expect(res.json().error).toBe('per_page must be an integer between 1 and 10000');
   });
 
   it('returns ODM error when enhanced mode gated', async () => {

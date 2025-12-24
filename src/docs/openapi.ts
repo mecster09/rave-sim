@@ -1088,7 +1088,7 @@ export const openApiSpec: OpenAPIV3_1.Document = {
         schema: {
           type: 'integer',
           minimum: 1,
-          maximum: 100,
+          maximum: 10000,
           default: 50
         }
       },
