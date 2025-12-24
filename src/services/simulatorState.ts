@@ -466,7 +466,7 @@ export class SimulatorState {
 
   getPrimaryMetadataVersionOid(): string {
     const versions = this.getMetadataVersions();
-    return versions.length > 0 ? versions[0].metadataVersionOid : 'MDV.DEFAULT';
+    return versions.length > 0 ? versions[0].metadataVersionOid : '1';
   }
 }
 
@@ -487,7 +487,7 @@ function buildVersionMetadata(config: HarnessConfig): VersionFolderMetadata[] {
 
   return [
     {
-      metadataVersionOid: 'MDV.VERSION-1',
+      metadataVersionOid: '1',
       name: '1',
       primaryFormOid,
       studyEvents
@@ -627,7 +627,7 @@ function buildStudyMetadata(config: HarnessConfig): StudyMetadataVersion[] {
 
   return [
     {
-      metadataVersionOid: 'MDV.VERSION-1',
+      metadataVersionOid: '1',
       name: '1',
       primaryFormOid: 'DM',
       studyEvents,

@@ -7,16 +7,11 @@ meta {
 put {
   url: {{base-url}}/harness/time
   body: json
-  auth: basic
+  auth: inherit
 }
 
 headers {
   Content-Type: application/json
-}
-
-auth:basic {
-  username: test-user
-  password: test-pass
 }
 
 body:json {

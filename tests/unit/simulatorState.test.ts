@@ -143,7 +143,7 @@ describe('SimulatorState', () => {
 
     expect(versionFolders).toHaveLength(1);
     const version = versionFolders[0];
-    expect(version.metadataVersionOid).toBe('MDV.VERSION-1');
+    expect(version.metadataVersionOid).toBe('1');
     expect(version.primaryFormOid).toBe('DM');
     const studyEventOids = version.studyEvents.map(event => event.studyEventOid);
     expect(studyEventOids).toEqual(['VISIT-001', 'VISIT-002']);

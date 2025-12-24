@@ -5,7 +5,7 @@ meta {
 }
 
 get {
-  url: {{base_url}}/RaveWebServices/studies/:study_oid/subjects/:subject_name/datasets/:regular_or_raw
+  url: {{base-url}}/RaveWebServices/studies/:study_oid/subjects/:subject_name/datasets/:regular_or_raw
   body: none
   auth: inherit
 }
@@ -17,7 +17,7 @@ params:path {
 }
 
 vars:pre-request {
-  base_url: http://localhost:3000
+  base-url: http://localhost:3000
 }
 
 settings {

@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <ODM FileOID="cffe2776baebf28c6aa3cecd25328248daf04ba892ed257a34ba8ca215bdbe8c" FileType="Snapshot" ODMVersion="1.3.2" CreationDateTime="2024-01-01T00:00:00.000Z" xmlns="http://www.cdisc.org/ns/odm/v1.3" xmlns:mdsol="http://www.mdsol.com/ns/odm/metadata">
-  <ClinicalData StudyOID="Default Study" MetaDataVersionOID="MDV.VERSION-1">
+  <ClinicalData StudyOID="Default Study" MetaDataVersionOID="1">
     <SubjectData SubjectKey="100001" mdsol:SubjectStatus="Active">
       <SiteRef LocationOID="SITE-001"/>
       <StudyEventData StudyEventOID="VISIT-001">

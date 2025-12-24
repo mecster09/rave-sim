@@ -7,7 +7,7 @@
   },
   "clinicalData": {
     "study": "Default Study",
-    "metadataVersion": "MDV.VERSION-1",
+    "metadataVersion": "1",
     "subjects": [
       {
         "subjectKey": "100001",

@@ -6,7 +6,7 @@
       <StudyDescription>Harness Metadata Snapshot</StudyDescription>
       <ProtocolName>Default Study</ProtocolName>
     </GlobalVariables>
-    <MetaDataVersion OID="MDV.VERSION-1" Name="1" mdsol:PrimaryFormOID="DM">
+    <MetaDataVersion OID="1" Name="1" mdsol:PrimaryFormOID="DM">
       <Protocol>
         <StudyEventRef StudyEventOID="VISIT-001" OrderNumber="1" Mandatory="Yes" mdsol:StudyEventDefName="Visit 1"/>
         <StudyEventRef StudyEventOID="VISIT-002" OrderNumber="2" Mandatory="Yes" mdsol:StudyEventDefName="Visit 2"/>

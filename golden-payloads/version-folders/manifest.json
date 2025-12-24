@@ -1,18 +1,18 @@
 {
-  "generatedAt": "2025-12-23T18:23:19.612Z",
+  "generatedAt": "2025-12-24T09:51:04.566Z",
   "scenarios": [
     {
       "family": "version-folders",
       "name": "VF-001",
       "file": "version-folders/VF-001.xml",
-      "sha256": "99f33281c1f6100e2ef283f81a49c3dfbe7907f189b89678e4f9195a6d7b7a25",
+      "sha256": "15a02486c167e8cbe5a35944be2fb43de02ee9eefddab6836082f8b4e36e6908",
       "statusCode": 200
     },
     {
       "family": "version-folders",
       "name": "VF-002",
       "file": "version-folders/VF-002.xml",
-      "sha256": "ff1e469fcca86fa5cc4228a313a64bd3a6a33614a540f5cfe16fab06f92f7260",
+      "sha256": "1121af0446bde7a025d4a1d18fb9850759ed36127c375203bcc2d54ca0769f9e",
       "statusCode": 200
     },
     {

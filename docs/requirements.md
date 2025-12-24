@@ -626,7 +626,7 @@ GET /RaveWebServices/studies/{study-oid}/Subjects
 | Scenario ID | Inputs | Simulator pre-state | Match rules | Expected status | Expected body |
 |---|---|---|---|---:|---|
 | META-200-BASE | `study-name={StudyName}`, `version-id={DefaultVersionId}` | Simulator initialized; metadata objects generated for configured study | Path match + version-id exact | 200 | ODM 1.3 Snapshot generated from simulator state; `Content-Type: application/xml` fileciteturn9file7L17-L23 |
-| META-200-GOLDEN | Same as above + `X-Harness-Scenario: META-200-GOLDEN` | Golden mode enabled | Header overrides simulator selection | 200 | Exact byte-for-byte match to stored golden `metadata/default-study-mdv.version-1.xml` |
+| META-200-GOLDEN | Same as above + `X-Harness-Scenario: META-200-GOLDEN` | Golden mode enabled | Header overrides simulator selection | 200 | Exact byte-for-byte match to stored golden `metadata/default-study-1.xml` |
 | META-401 | Any request with bad Basic auth | N/A | Auth failure | 401 | RWS error payload format (consistent global error model) fileciteturn10file2L748-L770 |
 | META-403 | Valid auth, but user not permitted for `{study-name}` | User configured with limited access | Authorization failure | 403 | RWS error payload format |
 | META-404-STUDY | `study-name` not configured/known | N/A | Study name mismatch | 404 | RWS error payload format |

@@ -1,0 +1,12 @@
+{
+  "generatedAt": "2025-12-24T09:51:04.574Z",
+  "scenarios": [
+    {
+      "family": "version-folders",
+      "name": "VF-002",
+      "file": "version-folders/VF-002.xml",
+      "sha256": "1121af0446bde7a025d4a1d18fb9850759ed36127c375203bcc2d54ca0769f9e",
+      "statusCode": 200
+    }
+  ]
+}

@@ -21,7 +21,7 @@ function authHeader(username = USER, password = PASS) {
 }
 
 describe('Study metadata endpoint', () => {
-  const baseUrl = '/RaveWebServices/metadata/studies/Default%20Study/versions/MDV.VERSION-1';
+  const baseUrl = '/RaveWebServices/metadata/studies/Default%20Study/versions/1';
 
   it('requires authentication', async () => {
     const app = buildServer();
@@ -39,7 +39,7 @@ describe('Study metadata endpoint', () => {
 
     const res = await app.inject({
       method: 'GET',
-      url: '/RaveWebServices/metadata/studies/Unknown/versions/MDV.VERSION-1',
+      url: '/RaveWebServices/metadata/studies/Unknown/versions/1',
       headers: {
         authorization: authHeader()
       }
@@ -95,7 +95,7 @@ describe('Study metadata endpoint', () => {
     });
 
     expect(res.statusCode).toBe(200);
-    const goldenPath = path.resolve('golden-payloads/default/metadata/default-study-mdv.version-1.xml');
+    const goldenPath = path.resolve('golden-payloads/default/metadata/default-study-1.xml');
     const golden = await fs.readFile(goldenPath, 'utf8');
     expect(res.body).toBe(golden);
   });
