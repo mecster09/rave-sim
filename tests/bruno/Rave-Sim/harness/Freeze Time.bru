@@ -1,11 +1,11 @@
 meta {
   name: Freeze Time
   type: http
-  seq: 3
+  seq: 2
 }
 
 put {
-  url: http://localhost:3000/harness/time
+  url: {{base-url}}/harness/time
   body: json
   auth: basic
 }
@@ -21,6 +21,10 @@ auth:basic {
 
 body:json {
   {"simStudyDay":2.5,"freeze":true}
+}
+
+vars:pre-request {
+  base-url: http://localhost:3000
 }
 
 settings {

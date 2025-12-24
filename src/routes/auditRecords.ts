@@ -56,9 +56,9 @@ export function registerAuditRecordsRoutes(app: FastifyInstance, deps: AuditReco
       return reply.code(400).send({ error: 'truncate must be a boolean value' });
     }
     const simulatorState = deps.getSimulatorState();
+    const metadataVersionOid = simulatorState.getPrimaryMetadataVersionOid();
     const shouldTruncate = deps.getConfig().truncateOdm || truncateFlag.requested;
     const { simClock, generatedAt } = computeGeneratedAt(simulatorState);
-    const metadataVersionOid = 'MDV.DEFAULT';
     const backfillComplete = simulatorState.isAuditBackfillComplete(simClock.simCurrentStudyDay);
 
     if ((mode === 'enhanced' || mode === 'all') && !backfillComplete) {

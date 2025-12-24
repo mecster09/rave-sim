@@ -1,0 +1,24 @@
+meta {
+  name: VersionFolders
+  type: http
+  seq: 2
+}
+
+get {
+  url: {{base-url}}/RaveWebServices/datasets/VersionFolders.odm?studyoid=Default Study
+  body: none
+  auth: inherit
+}
+
+params:query {
+  studyoid: Default Study
+}
+
+vars:pre-request {
+  base-url: http://localhost:3000
+}
+
+settings {
+  encodeUrl: true
+  timeout: 0
+}

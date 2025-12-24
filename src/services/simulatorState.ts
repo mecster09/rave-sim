@@ -463,6 +463,11 @@ export class SimulatorState {
   findMetadataVersion(metadataVersionOid: string): StudyMetadataVersion | undefined {
     return this.getMetadataVersions().find(version => version.metadataVersionOid === metadataVersionOid);
   }
+
+  getPrimaryMetadataVersionOid(): string {
+    const versions = this.getMetadataVersions();
+    return versions.length > 0 ? versions[0].metadataVersionOid : 'MDV.DEFAULT';
+  }
 }
 
 export function hashSnapshot(snapshot: SimulatorSnapshot): string {

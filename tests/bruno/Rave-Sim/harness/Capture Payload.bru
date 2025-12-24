@@ -1,11 +1,11 @@
 meta {
   name: Capture Payload
   type: http
-  seq: 3
+  seq: 2
 }
 
 get {
-  url: http://localhost:3000/RaveWebServices/studies/Default%20Study/datasets/regular
+  url: {{base-url}}/RaveWebServices/studies/Default%20Study/datasets/regular
   body: none
   auth: basic
 }
@@ -15,6 +15,11 @@ auth:basic {
   password: test-pass
 }
 
+vars:pre-request {
+  base-url: http://localhost:3000
+}
+
 settings {
   encodeUrl: false
+  timeout: 0
 }

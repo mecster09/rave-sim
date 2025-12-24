@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <ODM FileOID="6780ff0549d29d2ba5152b8fa144e6494c70b8541bd8b9d1a8706c85cc6f6cb5" FileType="Transactional" ODMVersion="1.3.2" CreationDateTime="2024-01-01T00:00:00.000Z" xmlns="http://www.cdisc.org/ns/odm/v1.3" xmlns:mdsol="http://www.mdsol.com/ns/odm/metadata">
-  <ClinicalData StudyOID="Default Study" MetaDataVersionOID="MDV.DEFAULT">
+  <ClinicalData StudyOID="Default Study" MetaDataVersionOID="MDV.VERSION-1">
     <AuditRecords>
       <AuditRecord AuditRecordID="045c143c" UserOID="coordinator" DateTimeStamp="2021-12-06T16:58:14Z">
         <ReasonForChange>Data entry</ReasonForChange>

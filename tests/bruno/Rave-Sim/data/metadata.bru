@@ -1,0 +1,25 @@
+meta {
+  name: metadata
+  type: http
+  seq: 3
+}
+
+get {
+  url: {{base-url}}/RaveWebServices/metadata/studies/:study_name/versions/:version
+  body: none
+  auth: inherit
+}
+
+params:path {
+  study_name: Default Study
+  version: MDV.VERSION-1
+}
+
+vars:pre-request {
+  base-url: http://localhost:3000
+}
+
+settings {
+  encodeUrl: true
+  timeout: 0
+}

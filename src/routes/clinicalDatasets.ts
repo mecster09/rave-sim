@@ -2,7 +2,7 @@ import { FastifyInstance, FastifyReply } from 'fastify';
 import { HarnessConfig } from '../services/config';
 import { buildSnapshotODM } from '../services/odmBuilder';
 import { buildClinicalViewSubjects } from '../services/clinicalViewBuilder';
-import { SimulatorSnapshot, SimulatorState } from '../services/simulatorState';
+import { SimulatorState } from '../services/simulatorState';
 import { computeGeneratedAt } from '../services/simulatorHelpers';
 import { parseTruncateFlag } from '../utils/flags';
 
@@ -377,7 +377,8 @@ async function sendClinicalDataset(
     simClock.simSpeedMinutesPerDay
   );
 
-  const snapshot = resolveClinicalDatasetSnapshot(options.versionId, simClock, simulatorState, deps);
+  const datasetState = resolveClinicalDatasetState(options.versionId, simClock, simulatorState, deps);
+  const snapshot = datasetState.getSnapshot();
   if (typeof params.subjectKey === 'number') {
     const found = snapshot.subjects.some(subject => subject.subjectKey === params.subjectKey);
     if (!found) {
@@ -400,10 +401,11 @@ async function sendClinicalDataset(
   const config = deps.getConfig();
   const forcedStreamFailure = datasetType === 'regular' && config.forceClinicalViewStreamFailure;
   const shouldTruncate = config.truncateOdm || parseResult.value.truncateRequested || forcedStreamFailure;
+  const metadataVersionOid = datasetState.getPrimaryMetadataVersionOid();
 
   const xml = buildSnapshotODM({
     studyOid,
-    metadataVersionOid: 'MDV.DEFAULT',
+    metadataVersionOid,
     generatedAt,
     subjects,
     truncate: shouldTruncate
@@ -413,22 +415,22 @@ async function sendClinicalDataset(
   return reply.send(xml);
 }
 
-function resolveClinicalDatasetSnapshot(
+function resolveClinicalDatasetState(
   versionId: string | undefined,
   simClock: {
     simCurrentStudyDay: number;
   },
   simulatorState: SimulatorState,
   deps: ClinicalDatasetRouteDeps
-): SimulatorSnapshot {
+): SimulatorState {
   if (!versionId) {
-    return simulatorState.getSnapshot();
+    return simulatorState;
   }
 
   const seed = computeVersionSeed(versionId);
   const versionState = deps.createSimulatorState(deps.getConfig(), seed);
   versionState.setSimDay(simClock.simCurrentStudyDay, simulatorState.isFrozen());
-  return versionState.getSnapshot();
+  return versionState;
 }
 
 function computeVersionSeed(versionId: string): number {

@@ -46,6 +46,7 @@ export function registerSubjectRoutes(app: FastifyInstance, deps: SubjectsRouteD
 
     const simulatorState = deps.getSimulatorState();
     const snapshot = simulatorState.getSnapshot();
+    const metadataVersionOid = simulatorState.getPrimaryMetadataVersionOid();
     const filteredSubjects = snapshot.subjects
       .filter(subject => allowedStatuses.includes(subject.subjectStatus))
       .map(subject => ({
@@ -67,7 +68,7 @@ export function registerSubjectRoutes(app: FastifyInstance, deps: SubjectsRouteD
 
     const xml = buildSnapshotODM({
       studyOid,
-      metadataVersionOid: 'MDV.DEFAULT',
+      metadataVersionOid,
       generatedAt,
       subjects: filteredSubjects,
       truncate: shouldTruncate

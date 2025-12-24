@@ -5,7 +5,7 @@ meta {
 }
 
 put {
-  url: http://localhost:3000/harness/config
+  url: {{base-url}}/harness/config
   body: json
   auth: basic
 }
@@ -34,6 +34,10 @@ body:json {
       "truncateOdm": false
     }
   }
+}
+
+vars:pre-request {
+  base-url: http://localhost:3000
 }
 
 settings {
