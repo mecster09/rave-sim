@@ -1,0 +1,30 @@
+meta {
+  name: Subjects/RegularDataset regular with RAW querystring
+  type: http
+  seq: 3
+}
+
+get {
+  url: {{base-url}}/RaveWebServices/studies/:study_oid/subjects/:subject_name/datasets/:regular_or_raw?rawsuffix=_RAW
+  body: none
+  auth: inherit
+}
+
+params:query {
+  rawsuffix: _RAW
+}
+
+params:path {
+  regular_or_raw: regular
+  subject_name: 100001
+  study_oid: Default Study
+}
+
+vars:pre-request {
+  base-url: http://localhost:3000
+}
+
+settings {
+  encodeUrl: true
+  timeout: 0
+}
