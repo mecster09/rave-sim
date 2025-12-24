@@ -107,7 +107,7 @@ function buildSnapshotItems(
       continue;
     }
 
-    const baseValue = mode === 'raw' ? point.valueRaw : point.valueRegular;
+    const baseValue = mode === 'raw' ? point.valueRaw! : point.valueRegular;
     const measurementUnitOid = mode === 'raw' ? point.measurementUnitOid : undefined;
 
     items.push({
