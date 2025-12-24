@@ -1,11 +1,11 @@
 {
-  "generatedAt": "2025-12-23T17:52:16.810Z",
+  "generatedAt": "2025-12-24T09:59:30.122Z",
   "scenarios": [
     {
       "family": "clinical-view",
       "name": "streaming-failure",
       "file": "clinical-view/streaming-failure.xml",
-      "sha256": "927503201205bf76c98452ce81f6853aafa7f44c44fb99635de0d226b7cbb831",
+      "sha256": "405c80917217525fd6cf8ad610ed4e449e55aa389f94e28a0c8bdc60baaedff3",
       "statusCode": 200
     }
   ]
