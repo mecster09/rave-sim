@@ -1,6 +1,7 @@
 import { afterEach, beforeAll, beforeEach, describe, expect, it } from 'vitest';
 import path from 'node:path';
 import { promises as fs } from 'node:fs';
+import type { InjectOptions } from 'light-my-request';
 import { buildServer } from '../../src/server';
 import { sha256Hex } from '../../src/services/goldenGenerator';
 
@@ -12,11 +13,13 @@ type GoldenScenarioEntry = {
   statusCode: number;
 };
 
+type InjectMethod = NonNullable<InjectOptions['method']>;
+
 type ClinicalViewsScenario = {
   family: string;
   name: string;
   request: {
-    method?: string;
+    method?: InjectMethod;
     url: string;
   };
 };
@@ -33,6 +36,7 @@ const PASS = 'test-pass';
 const PROJECT_ROOT = path.resolve(__dirname, '..', '..');
 const CONFIG_PATH = path.join(PROJECT_ROOT, 'golden-scenarios', 'clinical-views', 'config.json');
 const MANIFEST_PATH = path.join(PROJECT_ROOT, 'golden-payloads', 'ClinicalViews', 'manifest.json');
+const DEFAULT_METHOD: InjectMethod = 'GET';
 
 function authHeader(username = USER, password = PASS) {
   return `Basic ${Buffer.from(`${username}:${password}`).toString('base64')}`;
@@ -146,7 +150,7 @@ describe('Clinical Views golden payloads', () => {
     expect(scenario).toBeDefined();
 
     const response = await app!.inject({
-      method: scenario?.request.method ?? 'GET',
+      method: scenario?.request.method ?? DEFAULT_METHOD,
       url: scenario!.request.url,
       headers: {
         authorization: authHeader()
@@ -176,7 +180,7 @@ describe('Clinical Views golden payloads', () => {
     expect(scenario).toBeDefined();
 
     const response = await app!.inject({
-      method: scenario?.request.method ?? 'GET',
+      method: scenario?.request.method ?? DEFAULT_METHOD,
       url: scenario!.request.url,
       headers: {
         authorization: authHeader()
@@ -214,7 +218,7 @@ describe('Clinical Views golden payloads', () => {
     expect(scenario).toBeDefined();
 
     const response = await app!.inject({
-      method: scenario?.request.method ?? 'GET',
+      method: scenario?.request.method ?? DEFAULT_METHOD,
       url: scenario!.request.url,
       headers: {
         authorization: authHeader()
@@ -272,7 +276,7 @@ describe('Clinical Views golden payloads', () => {
 
       await applyClinicalViewsScenario(app!, config);
       const first = await app!.inject({
-        method: scenario?.request.method ?? 'GET',
+        method: scenario?.request.method ?? DEFAULT_METHOD,
         url: scenario!.request.url,
         headers: {
           authorization: authHeader()
@@ -282,7 +286,7 @@ describe('Clinical Views golden payloads', () => {
 
       await applyClinicalViewsScenario(app!, config);
       const second = await app!.inject({
-        method: scenario?.request.method ?? 'GET',
+        method: scenario?.request.method ?? DEFAULT_METHOD,
         url: scenario!.request.url,
         headers: {
           authorization: authHeader()
